@@ -1,0 +1,120 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% DOCUMENT PREAMBLE %%%
+\documentclass[english, a4paper]{report}
+\usepackage[T1]{fontenc}            % Riktig fontencoding
+\usepackage[font=small,labelfont=bf]{caption} % Fin figur-undertekst
+\usepackage{url}                    % Skrive url-er
+\usepackage[english]{babel}           % Ordelingsregler, osv (velg språk her)
+\usepackage[utf8]{inputenc}         % Riktig tegnsett
+\usepackage{float}                  % Figurer dukker opp der du ber om
+\usepackage{amsmath} 
+\usepackage{graphicx}               % Inkludere bilder
+\graphicspath{{images/}}
+%\usepackage{listings}               % programeringskode
+%\usepackage{minted}                 % for coding
+%\usepackage{xcolor}                 % for coding
+
+% ---------------------------------------------------------
+
+% kapittelinndeling
+\renewcommand{\thepart}{\arabic{part})}
+\renewcommand\thesection{\arabic{section}}
+\renewcommand{\thesubsection}{\alph{subsection})} % Alph = ABC, alph = abc
+\renewcommand{\thesubsubsection}{\roman{subsubsection})}
+
+% LaTeX symbol
+\newcommand{\latex}{\LaTeX\xspace}
+
+%---------------------------------------------------------
+\pdfinfo{
+%   /Title () 
+	/Author (Henrik Løland Gjestang) 
+	/Creator () 
+	/Producer () 
+	/Subject () 
+	/Keywords () 
+}
+% ---------------------------------------------------------
+
+
+
+%------------------------------------------------------------
+% Forside
+% ----------------------------------------------------------
+\begin{document}
+\begin{titlepage}
+\begin{center}
+
+\textsc{}\\[1.0cm]
+\textsc{\Large CODE1000}\\[0.5cm]
+\rule{\linewidth}{0.5mm} \\[0.4cm]
+{ \huge \bfseries Title on paper}\\[0.10cm]
+\rule{\linewidth}{0.5mm} \\[1.5cm]
+\textsc{\Large oblig x}\\
+\medbreak
+\textsc{\Large henriklg}\\
+\textsc{}\\[7.0cm]
+
+% Av hvem?(kopier for flere personer, feks ved samarbeid)
+\begin{minipage}{0.69\textwidth}
+    \begin{center} \large
+        Henrik Løland Gjestang\\ \url{henriklg@student.matnat.uio.no} \\[0.8cm]
+    \end{center}
+\end{minipage}
+\vfill
+
+% Dato nederst
+\large{Date: \today}
+\end{center}
+\end{titlepage}
+% ----------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Abstract}
+%-----------------------------------------------------------
+ The abstract gives the reader a quick overview of what has been done and the most important results.
+
+% ----------------------------------------------------------
+\tableofcontents
+\newpage
+% ----------------------------------------------------------
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+%-----------------------------------------------------------
+Explain the aims and rationale for the physics case and what you have done. At the end of the introduction you should give a brief summary of the structure of the report. Motivate the reader and give overarching ideas. Describe what has been done and the structure of the report (how is it organized).
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Method}
+%-----------------------------------------------------------
+Theoretical models and technicalities. Describe how you implemented the methods and also say something about the structure and the algorithms used and central parts of code. Plug in some calculations to demonstrate your code, such as selected runs used to validate and verify results.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Results and discussion}
+%-----------------------------------------------------------
+Present the results. Give critical discussion of your work and place it in the correct context. Try to relate your work to other calculations/studies. The reader should be able to reproduce your calculations if they wanted to. Remember to explain all input variables. Make sure figures and tables contain enough information in their captions/labels/axis so that the reader can gain a first impression of your work.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusions and perspectives}
+%-----------------------------------------------------------
+State your main findings and interpretations. Try as far as possible to present perspectives for future work. Discuss the pros and cons of the methods and possible improvements.
+\cite{russellArtificialIntelligenceModern2016}
+
+
+\newpage
+\bibliography{essay}
+\bibliographystyle{ieeetr}
+
+\end{document}
