@@ -1,0 +1,259 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 2.9 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global}
+    \entry{PillCamCamera}{misc}{}
+      \list{language}{1}{%
+        {no}%
+      }
+      \field{sortinit}{1}
+      \field{sortinithash}{2174f786c6195e7fe2ee1c229b416e29}
+      \field{labeltitlesource}{title}
+      \field{abstract}{In this project, we aim to design and develop a system for analysing video from a camera pill. The pill is~swallowed and records video of the~digestive system - the goal is to be able to automatically detect cancer in the colon.}
+      \field{howpublished}{https://www.mn.uio.no/ifi/studier/masteroppgaver/nd/SRL-media-pill-cam.html}
+      \field{title}{{PillCam - A Camera Pill System for Automatic Screening of the Digestive System - Institutt for informatikk.}}
+      \verb{file}
+      \verb /home/henrik/Zotero/storage/JAQ2XTAL/SRL-media-pill-cam.html
+      \endverb
+    \endentry
+    \entry{CancerStatistics10}{article}{}
+      \name{author}{4}{}{%
+        {{hash=6fe437d47a0f5a4a476be97810534e27}{%
+           family={Jemal},
+           familyi={J\bibinitperiod},
+           given={Ahmedin},
+           giveni={A\bibinitperiod}}}%
+        {{hash=e2f9df428c364feea0642b6b7752e8b2}{%
+           family={Siegel},
+           familyi={S\bibinitperiod},
+           given={Rebecca},
+           giveni={R\bibinitperiod}}}%
+        {{hash=95aeb5ec9c611c214cf053ed66f580d9}{%
+           family={Xu},
+           familyi={X\bibinitperiod},
+           given={Jiaquan},
+           giveni={J\bibinitperiod}}}%
+        {{hash=d1acea907b712aaedceafdbc27c8383a}{%
+           family={Ward},
+           familyi={W\bibinitperiod},
+           given={Elizabeth},
+           giveni={E\bibinitperiod}}}%
+      }
+      \list{language}{1}{%
+        {en}%
+      }
+      \strng{namehash}{e7fb1c3773d0de56e8189b5721a46b20}
+      \strng{fullhash}{ffe4f15f552734ad2d613d86e2ae3fae}
+      \strng{bibnamehash}{ffe4f15f552734ad2d613d86e2ae3fae}
+      \strng{authorbibnamehash}{ffe4f15f552734ad2d613d86e2ae3fae}
+      \strng{authornamehash}{e7fb1c3773d0de56e8189b5721a46b20}
+      \strng{authorfullhash}{ffe4f15f552734ad2d613d86e2ae3fae}
+      \field{sortinit}{3}
+      \field{sortinithash}{a4b52e5432884761f50fb9571273b93e}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Each year, the American Cancer Society estimates the number of new cancer cases and deaths expected in the United States in the current year and compiles the most recent data regarding cancer incidence, mortality, and survival based on incidence data from the National Cancer Institute, the Centers for Disease Control and Prevention, and the North American Association of Central Cancer Registries and mortality data from the National Center for Health Statistics. Incidence and death rates are age-standardized to the 2000 US standard million population. A total of 1,529,560 new cancer cases and 569,490 deaths from cancer are projected to occur in the United States in 2010. Overall cancer incidence rates decreased in the most recent time period in both men (1.3\% per year from 2000 to 2006) and women (0.5\% per year from 1998 to 2006), largely due to decreases in the 3 major cancer sites in men (lung, prostate, and colon and rectum [colorectum]) and 2 major cancer sites in women (breast and colorectum). This decrease occurred in all racial/ethnic groups in both men and women with the exception of American Indian/Alaska Native women, in whom rates were stable. Among men, death rates for all races combined decreased by 21.0\% between 1990 and 2006, with decreases in lung, prostate, and colorectal cancer rates accounting for nearly 80\% of the total decrease. Among women, overall cancer death rates between 1991 and 2006 decreased by 12.3\%, with decreases in breast and colorectal cancer rates accounting for 60\% of the total decrease. The reduction in the overall cancer death rates translates to the avoidance of approximately 767,000 deaths from cancer over the 16-year period. This report also examines cancer incidence, mortality, and survival by site, sex, race/ethnicity, geographic area, and calendar year. Although progress has been made in reducing incidence and mortality rates and improving survival, cancer still accounts for more deaths than heart disease in persons younger than 85 years. Further progress can be accelerated by applying existing cancer control knowledge across all segments of the population and by supporting new discoveries in cancer prevention, early detection, and treatment. CA Cancer J Clin 2010. ©{} 2010 American Cancer Society, Inc.}
+      \field{issn}{1542-4863}
+      \field{journaltitle}{CA: A Cancer Journal for Clinicians}
+      \field{number}{5}
+      \field{title}{Cancer {{Statistics}}}
+      \field{volume}{60}
+      \field{year}{2010}
+      \field{pages}{277\bibrangedash 300}
+      \range{pages}{24}
+      \verb{doi}
+      \verb 10.3322/caac.20073
+      \endverb
+      \verb{file}
+      \verb /home/henrik/Zotero/storage/UDTTBEGD/Jemal et al. - 2010 - Cancer Statistics, 2010.pdf;/home/henrik/Zotero/storage/D9BH79GY/caac.html
+      \endverb
+      \keyw{cancer statistics}
+    \endentry
+    \entry{NewMethod54}{article}{}
+      \name{author}{1}{}{%
+        {{hash=aefa7cbedbb0888b9fb5cb52f89606d3}{%
+           family={Van\bibnamedelima Heel},
+           familyi={V\bibinitperiod\bibinitdelim H\bibinitperiod},
+           given={A.\bibnamedelimi C.\bibnamedelimi S.},
+           giveni={A\bibinitperiod\bibinitdelim C\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+      }
+      \list{language}{1}{%
+        {en}%
+      }
+      \strng{namehash}{aefa7cbedbb0888b9fb5cb52f89606d3}
+      \strng{fullhash}{aefa7cbedbb0888b9fb5cb52f89606d3}
+      \strng{bibnamehash}{aefa7cbedbb0888b9fb5cb52f89606d3}
+      \strng{authorbibnamehash}{aefa7cbedbb0888b9fb5cb52f89606d3}
+      \strng{authornamehash}{aefa7cbedbb0888b9fb5cb52f89606d3}
+      \strng{authorfullhash}{aefa7cbedbb0888b9fb5cb52f89606d3}
+      \field{sortinit}{4}
+      \field{sortinithash}{11cdaee3b18e01d77f3f428b13c1fc76}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{0028-0836, 1476-4687}
+      \field{journaltitle}{Nature}
+      \field{month}{1}
+      \field{number}{4392}
+      \field{title}{A {{New Method}} of Transporting {{Optical Images}} without {{Aberrations}}}
+      \field{volume}{173}
+      \field{year}{1954}
+      \field{pages}{39\bibrangedash 39}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1038/173039a0
+      \endverb
+      \verb{file}
+      \verb /home/henrik/Zotero/storage/R3TXS4M8/Van Heel - 1954 - A New Method of transporting Optical Images withou.pdf
+      \endverb
+    \endentry
+    \entry{MedicalPhysics}{misc}{}
+      \field{sortinit}{5}
+      \field{sortinithash}{3c19c3776b658b3558e9e2e4840c01e2}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{http://www.genesis.net.au/~{}ajs/projects/medical\_physics/endoscopes/index.html}
+      \field{title}{Medical {{Physics}} - {{Endoscopes}}}
+      \verb{file}
+      \verb /home/henrik/Zotero/storage/YTY6DUKB/index.html
+      \endverb
+    \endentry
+    \entry{DigestiveSystem}{article}{}
+      \list{language}{1}{%
+        {en}%
+      }
+      \field{sortinit}{7}
+      \field{sortinithash}{c818dd9105a2852444fc9f5e145c294e}
+      \field{labeltitlesource}{shorttitle}
+      \field{journaltitle}{Wikipedia}
+      \field{shorttitle}{Digestive {{System}}}
+      \field{title}{Digestive System Diagram}
+      \verb{file}
+      \verb /home/henrik/Zotero/storage/CAT5AHNQ/FileDigestive_system_diagram_edit.html
+      \endverb
+    \endentry
+    \entry{WirelessCapsule00}{article}{}
+      \name{author}{4}{}{%
+        {{hash=2aa38f4bd287e3bf14ac65fa823b65a9}{%
+           family={Iddan},
+           familyi={I\bibinitperiod},
+           given={Gavriel},
+           giveni={G\bibinitperiod}}}%
+        {{hash=6625ee4790b8fc8291a8302b7a18092d}{%
+           family={Meron},
+           familyi={M\bibinitperiod},
+           given={Gavriel},
+           giveni={G\bibinitperiod}}}%
+        {{hash=b4f5f7875061efcda586280260bfd6ec}{%
+           family={Glukhovsky},
+           familyi={G\bibinitperiod},
+           given={Arkady},
+           giveni={A\bibinitperiod}}}%
+        {{hash=ed96754033aad4ed142bf85635ed584b}{%
+           family={Swain},
+           familyi={S\bibinitperiod},
+           given={Paul},
+           giveni={P\bibinitperiod}}}%
+      }
+      \list{language}{1}{%
+        {En}%
+      }
+      \strng{namehash}{afee410e44e7c9a9cbaee86ae6e95d2a}
+      \strng{fullhash}{15b0480ffca4cbd6e3fe098adf4a63f6}
+      \strng{bibnamehash}{15b0480ffca4cbd6e3fe098adf4a63f6}
+      \strng{authorbibnamehash}{15b0480ffca4cbd6e3fe098adf4a63f6}
+      \strng{authornamehash}{afee410e44e7c9a9cbaee86ae6e95d2a}
+      \strng{authorfullhash}{15b0480ffca4cbd6e3fe098adf4a63f6}
+      \field{sortinit}{9}
+      \field{sortinithash}{1dd72ab054147731c9d824b49aba0534}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{The discomfort of internal gastrointestinal examination may soon be a thing of the past.}
+      \field{issn}{1476-4687}
+      \field{journaltitle}{Nature}
+      \field{month}{5}
+      \field{number}{6785}
+      \field{title}{Wireless Capsule Endoscopy}
+      \field{volume}{405}
+      \field{year}{2000}
+      \field{pages}{417}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1038/35013140
+      \endverb
+      \verb{file}
+      \verb /home/henrik/Zotero/storage/U6JJ6MIK/Iddan et al. - 2000 - Wireless capsule endoscopy.pdf;/home/henrik/Zotero/storage/HS7TCR72/35013140.html
+      \endverb
+    \endentry
+    \entry{SmallIntestine13}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=ec34e19cda01c52937cc9bfe911c0d1b}{%
+           family={{Dr.HH.Krause}},
+           familyi={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{ec34e19cda01c52937cc9bfe911c0d1b}
+      \strng{fullhash}{ec34e19cda01c52937cc9bfe911c0d1b}
+      \strng{bibnamehash}{ec34e19cda01c52937cc9bfe911c0d1b}
+      \strng{authorbibnamehash}{ec34e19cda01c52937cc9bfe911c0d1b}
+      \strng{authornamehash}{ec34e19cda01c52937cc9bfe911c0d1b}
+      \strng{authorfullhash}{ec34e19cda01c52937cc9bfe911c0d1b}
+      \field{sortinit}{1}
+      \field{sortinithash}{2174f786c6195e7fe2ee1c229b416e29}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{shorttitle}{Deutsch}
+      \field{title}{Small Intestine}
+      \field{year}{1 June 2013, 18:33:05}
+      \verb{file}
+      \verb /home/henrik/Zotero/storage/9VVYEPIQ/FileDünndarm.html
+      \endverb
+    \endentry
+    \entry{Colon13}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=ec34e19cda01c52937cc9bfe911c0d1b}{%
+           family={{Dr.HH.Krause}},
+           familyi={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{ec34e19cda01c52937cc9bfe911c0d1b}
+      \strng{fullhash}{ec34e19cda01c52937cc9bfe911c0d1b}
+      \strng{bibnamehash}{ec34e19cda01c52937cc9bfe911c0d1b}
+      \strng{authorbibnamehash}{ec34e19cda01c52937cc9bfe911c0d1b}
+      \strng{authornamehash}{ec34e19cda01c52937cc9bfe911c0d1b}
+      \strng{authorfullhash}{ec34e19cda01c52937cc9bfe911c0d1b}
+      \field{sortinit}{1}
+      \field{sortinithash}{2174f786c6195e7fe2ee1c229b416e29}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{shorttitle}{Deutsch}
+      \field{title}{Colon}
+      \field{year}{1 June 2013, 18:33:01}
+      \verb{file}
+      \verb /home/henrik/Zotero/storage/TSYSJMVF/FileNormales_Colon.html
+      \endverb
+    \endentry
+    \entry{GOTURNDeep}{misc}{}
+      \field{sortinit}{1}
+      \field{sortinithash}{2174f786c6195e7fe2ee1c229b416e29}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{https://www.learnopencv.com/goturn-deep-learning-based-object-tracking/}
+      \field{title}{{{GOTURN}} : {{Deep Learning}} Based {{Object Tracking}} | {{Learn OpenCV}}}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+
