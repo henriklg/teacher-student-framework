@@ -89,15 +89,15 @@ Neural networks models that I would like to explore further for this purpose are
 The main idea is to go beyond image-based methods and also exploit the time factor of the data. 
 The videos we will be using for this is delivered by Bærum Hospital, and is carefully labeled by professionals for use as training data for the neural networks. For simplicity, much or all of the training data is from regular "bottom-up" colonoscopy. 
 
-\begin{figure}[H]
+\begin{figure}[H] % pill-cam
   \begin{center}
     \includegraphics[width=\linewidth]{pill-cam.jpg}
-    \caption{Illustration of how such a camera pill could look like.\autocite{PillCamCamera}}
+    \caption{Illustration of how such a camera pill could look like.\cite{PillCamCamera}}
     \label{fig:pill-cam}
   \end{center}
 \end{figure}
 
-Colorectal cancer (CRC) is the third most common cause of cancer mortality for both men and women \autocite{CancerStatistics10}, and it is a condition where early detection is of clear value for the ultimate survival of the patient. As statistics show that 15\% of male and female above 50 years are at risk (SOURCE), the procedure is recommended on a regular basis (every 3-5 years) for the population over 50, and from an earlier age for high-risk groups. Colonoscopy is a demanding procedure requiring an significant amount of time by specialized physicians, in addition to the discomfort and risks inherent in the procedure. Thus, traditional methods based on colonoscopy are not cost-effective for population-based screening purposes, so only about 2-3\% of the target population is reached at present. Moreover, the cost of a population screening program is prohibitively expensive. In the US, the colonoscopy is the most expensive cancer screening process with annual costs of \$10 billion dollars (\$1100 per person) (SOURCE). In Norway, we have similar costs of around \$1000 per person, with a time consumption of about 1 doctor-hour and 2 nurse-hours, per examination. By researching an automatic system for a camera pill, the aim is to greatly increase the number of patients that can be examined, i.e., making the public health care system more scalable and cost effective, while at the same time reducing the need for intrusive procedures like "bottom-up" examinations like colonoscopy.
+Colorectal cancer (CRC) is the third most common cause of cancer mortality for both men and women \cite{CancerStatistics10}, and it is a condition where early detection is of clear value for the ultimate survival of the patient. As statistics show that 15\% of male and female above 50 years are at risk (SOURCE), the procedure is recommended on a regular basis (every 3-5 years) for the population over 50, and from an earlier age for high-risk groups. Colonoscopy is a demanding procedure requiring an significant amount of time by specialized physicians, in addition to the discomfort and risks inherent in the procedure. Thus, traditional methods based on colonoscopy are not cost-effective for population-based screening purposes, so only about 2-3\% of the target population is reached at present. Moreover, the cost of a population screening program is prohibitively expensive. In the US, the colonoscopy is the most expensive cancer screening process with annual costs of \$10 billion dollars (\$1100 per person) (SOURCE). In Norway, we have similar costs of around \$1000 per person, with a time consumption of about 1 doctor-hour and 2 nurse-hours, per examination. By researching an automatic system for a camera pill, the aim is to greatly increase the number of patients that can be examined, i.e., making the public health care system more scalable and cost effective, while at the same time reducing the need for intrusive procedures like "bottom-up" examinations like colonoscopy.
 
 
 
@@ -106,19 +106,19 @@ Colorectal cancer (CRC) is the third most common cause of cancer mortality for b
 \section{Wireless Capsule Endoscopy}
 %-----------------------------------------------------------
 %general info about WCE, some history etc
-The basic technology behind the modern endoscope was developed in the early 1950s by English physicist Harold Hopkins and his student Narinder Kapany which let light travel through flexible pieces of glass - now known as optical fibers. \autocite{NewMethod54}
+The basic technology behind the modern endoscope was developed in the early 1950s by English physicist Harold Hopkins and his student Narinder Kapany which let light travel through flexible pieces of glass - now known as optical fibers. \cite{NewMethod54}
 
 Before the year 2000 the only option you had to visualize the foodpipe, stomach, duodenum, colon and terminal ileum (see figure \ref{fig:digestive_system} for details) was to use a fibre-optic endoscope, which is a tool with a relatively wide cable that is pushed into the bowel with as much as 50 000 optic fibers (as seen on figure \ref{fig:fibre-optic-endoscopy}). These cables have to carry fibre optic bundles, water pipes, operations channel and control cables. Although these cables can be quite flexible there is a limit for how far they can advance into the small bowel. This method cause pain and discomfort for the pasient, and there was a clinical need for an improved methods.
 
-\begin{figure}
+\begin{figure} % fibre-optic-endoscope
   \begin{center}
-    \includegraphics[width=0.7\textwidth]{fibre-optic-endoscopy}
-    \caption{Image of a fibre optic endoscope with explanation of different parts of the tool. \autocite{MedicalPhysics}}
+    \includegraphics[width=0.7\textwidth]{fibre-optic-endoscope.jpg}
+    \caption{Image of a fibre optic endoscope with explanation of different parts of the tool. \cite{MedicalPhysics}}
     \label{fig:fibre-optic-endoscopy}
   \end{center}
 \end{figure}
 
-\begin{figure}
+\begin{figure} % digestive-system
   \begin{center}
     \includegraphics[width=0.7\textwidth]{digestive-system}
     \caption{An overview of the terms used to describe the digestive system. \cite{DigestiveSystem} }
@@ -126,9 +126,9 @@ Before the year 2000 the only option you had to visualize the foodpipe, stomach,
   \end{center}
 \end{figure}
 
-That is why in the year 2000 Iddal et al.\autocite{WirelessCapsule00} developed a new type of videotelemetry capsule endoscope that was swallowable. It could travel through the entire digestive system because it had no external wires, fibre-optic bundles or cables of any sort. The capsule travels by peristalsis\footnote{Peristalsis is a radially symmetrical contraction and relaxation of muscles that propagates in a wave down a tube, in an anterograde direction.} through the gastroitestinal tract, which takes from 10 hours to 48 hours, and transmit images on a regular interval to recievers attached around the outside of the pasients stomach for as long as the battery allows, usually in the range 6-8 hours. Two example images taken by WCE are presented in Figure \ref{fig:pillcam_examples}. By triangulating the signal strength and the location of the receivers taped on the body it is possible to calculate the position of the capsule.
+That is why in the year \citeyear{WirelessCapsule00} \citeauthor*{WirelessCapsule00} \cite{WirelessCapsule00} developed a new type of videotelemetry capsule endoscope that was swallowable. It could travel through the entire digestive system because it had no external wires, fibre-optic bundles or cables of any sort. The capsule travels by peristalsis\footnote{Peristalsis is a radially symmetrical contraction and relaxation of muscles that propagates in a wave down a tube, in an anterograde direction.} through the gastroitestinal tract, which takes from 10 hours to 48 hours, and transmit images on a regular interval to recievers attached around the outside of the pasients stomach for as long as the battery allows, usually in the range 6-8 hours. Two example images taken by WCE are presented in Figure \ref{fig:pillcam_examples}. By triangulating the signal strength and the location of the receivers taped on the body it is possible to calculate the position of the capsule.
 
-\begin{figure}%
+\begin{figure} % small intestine and colon double figure
   \centering
   \begin{subfigure}[b]{0.4\linewidth}%
     \centering
@@ -161,21 +161,13 @@ These diseases have varying patterns and while some can be easy to split apart, 
 
 
 
-
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Neural network models}
 %-----------------------------------------------------------
 %explain the different neural networks I'd like to test out on the video
 As apposed to using regular optic-fibre endoscopy, it can be difficult to know the location and orientation of the capsule when it is traveling through the digestive system. In a paper by \citeauthor*{ClassifyingDigestive15} \cite{ClassifyingDigestive15} it is shown that by using Deep Convolutional Networks (DCNN) it is possible to classify the digestive organs in wireless capsule endoscopy with about 95\% classification accuracy on average. 
 
-The DCNN-based WCE digestive organ classifiaction system is constructed of three stages of convolution, pooling and two fully-connected layers. This is illustrated in figure 3 in the paper. \cite{ClassifyingDigestive15}
-
-
-
-
-
+The DCNN-based WCE digestive organ classifiaction system is constructed of three stages of convolution, pooling and two fully-connected layers. This is illustrated in figure 3 in the paper. \cite{ClassifyingDigestive15} The main steps of this convolutional neural network are as follows:
 
 \subsubsection{Convolution layer}
 % ----------------------------------------------------------
@@ -183,7 +175,7 @@ The first step in a convolutional neural network is to extract features from the
 
 The convolution of \textit{f} and \textit{g} is written as $f*g$, and is defined as the integral of the product of the two functions after one (usually the filter) is reversed and shifted.
 
-\begin{equation}
+\begin{equation} % convolution_func
   (f*g)(t) = \int_{-\infty}^{\infty} f(\tau) g(t-\tau) d\tau
   \label{convolution_func}
 \end{equation}
@@ -194,7 +186,7 @@ The convolution of \textit{f} and \textit{g} is written as $f*g$, and is defined
 % ----------------------------------------------------------
 Rectified Linear unit function, known as simply ReLU, is an activation function represented by equation (\ref{relu_func}). It sets all negative numbers to zero, by discarding them from the activation map entirely. In this way, ReLU increases the nonlinear properties of the decision function and thus of the overall network without affecting the receptive fields of the convolution layer.
 
-\begin{equation}
+\begin{equation} % relu_func
     ReLU(x) = max(0, x)
     \label{relu_func}
 \end{equation}
@@ -205,7 +197,7 @@ Rectified Linear unit function, known as simply ReLU, is an activation function 
 % ----------------------------------------------------------
 Pooling layers are applied to reduce the number of parameters when the images are considerably large. Spatial pooling, or merely downsampling, reduces the dimensionality of each image but it keeps the important information. The most used downsampling is max pooling. It extracts the largest element from the rectified feature map and thus reduces computational complexity of the algorithm. In addition average pooling is also frequently used, this method computes the average value of the input map. The input-output model is denoted as:
 
-\begin{equation}
+\begin{equation} % pool_func
   y_i = f(pool(x_i))
   \label{pool_func}
 \end{equation}
@@ -216,7 +208,7 @@ Pooling layers are applied to reduce the number of parameters when the images ar
 % ----------------------------------------------------------
 In a FC-layer every neuron in one layer is connected to every neuron in the previous layer. It is here the high-level reasoning is done. The activation function in the neurons is a \textit{sigmoid} or \textit{tanh} function.
 
-\begin{equation}
+\begin{equation} % sigmoid and tanh func
   f(z) = \frac{1}{1+exp(-z)} \quad \text{or} \quad f(z) = tanh(z) = \frac{e^{z} - e^{-z}}{e^{z} + e^{-z}}
 \end{equation}
 
@@ -242,14 +234,14 @@ where $f$ represents the ReLU activation function. After going through the convo
 Before getting our final output $\hat{y}$, we need to collect the outputs from all the filters, which will be an input to a fully connected layer. 
 The fully connected layer use the softmax activation function to classify the input image, much like a neural network would. The softmax function is an accepted standard probability function for a multiclass classifier \cite{NotesBackpropagation16}. The total sum of the probabilities will always add up to 1 when using softmax. 
 
-\begin{equation}
+\begin{equation} % softmax
   \sigma(z)_j = \frac{e^{z_j}}{\sum_{k=1}^{K} e^{z_k}} \quad \text{for } j = 1, ..., K.
   \label{softmax}
 \end{equation}
 
 To calculate the error of the forward propegation it is common to use cross-entropy error function.
 
-\begin{equation}
+\begin{equation} % loss
   C(\hat{y}) = - \sum_{i=1}^N t_i log(y_i)
   \label{loss}
 \end{equation}
@@ -293,7 +285,7 @@ And finally with regards to the weights
 
 where $\hat{a}_{j}^{L-1}$ is the vectorized output from the previous layer. From here, we will propagate the error throughout the layers. The error with regards to the input $a_i^L$ to the fully connected layer is:
 
-\begin{equation}
+\begin{equation} % back_error func
   \delta^{L-1} = \frac{\partial C}{\partial a_i^L} = \sum_i^N (y_i - t_i)w_{ji}^{L}
   \label{back_error}
 \end{equation}
@@ -312,11 +304,9 @@ In equation \ref{back_error} $a^l$ is the output of a convolutional layer $l$. S
 
 Having found the error, the gradient of the cost function with regards to the weights is
 
-\begin{equation}
+\begin{equation} % 
   \frac{\partial C}{\partial w_{ij}^l} = \delta_{ij}^l * \sigma{ROT180(z_{ij}^{l-1})}
 \end{equation}
-
-
 
 
 
@@ -324,7 +314,7 @@ Having found the error, the gradient of the cost function with regards to the we
 %-----------------------------------------------------------
 Object tracking is one of the harder problem to overcome in computer vision and is key to achieving good results in endoscopic video analysis. Tracking algorithms are developed to determine the movement of the object or objects in each video frame. The algorithm has to take into account the dynamic environment such as differences in lightning, occlusions and scaling changes. Also the absence of any prior knowledge to the object and its position further increase the complexity of the problem.
 
-\begin{figure}[H]
+\begin{figure}[H] % object-tracking.jpg
   \begin{center}
     \includegraphics[width=\textwidth]{object-tracking.jpg}
     \caption{Illustration of how object in two frames is tracked with a bounding box. \cite{GOTURNDeep} }
@@ -332,7 +322,12 @@ Object tracking is one of the harder problem to overcome in computer vision and 
   \end{center}
 \end{figure}
 
+My hope is that by implementing an object-tracing algorithm I can use it together with a object detection 
 
+
+\subsection{Related work}
+%-----------------------------------------------------------
+\citeauthor*{DeepEndoVO18} \cite{DeepEndoVO18} has recently made substantial progress in converting passive capsule endoscopes to active capsule robots, enabling more accurate, precise, and intuitive detection of the location and size of the diseased areas by developing reliable real time pose estimation functionality of the capule with RCNN's\footnote{Deep recurrent convolutional neural networks}. \citeauthor*{LesionDetection15} \cite{LesionDetection15} have made a computer-aided lesion\footnote{a region in an organ or tissue which has suffered damage through injury or disease, such as a wound, ulcer, abscess, or tumour.} detection system which uses a trainable feature extractor based on a CNN and feed the generic features to a SVM\footnote{Support Vector Machine} which enhance the generalization ability. This method greatly outperform the earlier methods based on color and texture features. \citeauthor*{DeepLearning17a} \cite{DeepLearning17a} have accomplished an average overall recognition accuracy of 98.0\% for detecting polyps in WCE images by using a deep feature learning method, named stacked sparse autoencoder with image manifold constraint (SSAEIM).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
