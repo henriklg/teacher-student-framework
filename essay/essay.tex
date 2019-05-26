@@ -10,13 +10,17 @@
 \usepackage{amsmath} 
 \usepackage{graphicx}               % Inkludere bilder
 \usepackage{subcaption}				% for subfigures environments
+\usepackage[backend=biber, style=ieee, sortcites=true]{biblatex}
+\usepackage{csquotes}
 \graphicspath{{images/}}
 %\usepackage{listings}               % programeringskode
 %\usepackage{minted}                 % for coding
 %\usepackage{xcolor}                 % for coding
-
+\usepackage{footnote}
+%\makesavenoteenv{figure}
 % ---------------------------------------------------------
 
+\addbibresource{../references.bib}
 
 % kapittelinndeling
 \renewcommand{\thepart}{\arabic{part})}
@@ -92,14 +96,14 @@ The main idea is to go beyond image-based methods and also exploit the time fact
 The videos we will be using for this is delivered by Bærum Hospital, and is carefully labeled by professionals for use as training data for the neural networks. For simplicity, much or all of the training data is from regular "bottom-up" colonoscopy. 
 
 \begin{figure}[H]
-\begin{center}
- \includegraphics[width=\textwidth]{pill-cam.jpg}
- \caption{Illustration of how such a camera pill could look like. \cite{PillCamCamera}}
- \label{fig:pill-cam}
- \end{center}
+  \begin{center}
+    \includegraphics[width=\linewidth]{pill-cam.jpg}
+    \caption{Illustration of how such a camera pill could look like.\autocite{PillCamCamera}}
+    \label{fig:pill-cam}
+  \end{center}
 \end{figure}
 
-Colorectal cancer (CRC) is the third most common cause of cancer mortality for both men and women \cite{CancerStatistics10}, and it is a condition where early detection is of clear value for the ultimate survival of the patient. As statistics show that 15\% of male and female above 50 years are at risk (SOURCE), the procedure is recommended on a regular basis (every 3-5 years) for the population over 50, and from an earlier age for high-risk groups. Colonoscopy is a demanding procedure requiring an significant amount of time by specialized physicians, in addition to the discomfort and risks inherent in the procedure. Thus, traditional methods based on colonoscopy are not cost-effective for population-based screening purposes, so only about 2-3\% of the target population is reached at present. Moreover, the cost of a population screening program is prohibitively expensive. In the US, the colonoscopy is the most expensive cancer screening process with annual costs of \$10 billion dollars (\$1100 per person) (SOURCE). In Norway, we have similar costs of around \$1000 per person, with a time consumption of about 1 doctor-hour and 2 nurse-hours, per examination. By researching an automatic system for a camera pill, the aim is to greatly increase the number of patients that can be examined, i.e., making the public health care system more scalable and cost effective, while at the same time reducing the need for intrusive procedures like "bottom-up" examinations like colonoscopy.
+Colorectal cancer (CRC) is the third most common cause of cancer mortality for both men and women \autocite{CancerStatistics10}, and it is a condition where early detection is of clear value for the ultimate survival of the patient. As statistics show that 15\% of male and female above 50 years are at risk (SOURCE), the procedure is recommended on a regular basis (every 3-5 years) for the population over 50, and from an earlier age for high-risk groups. Colonoscopy is a demanding procedure requiring an significant amount of time by specialized physicians, in addition to the discomfort and risks inherent in the procedure. Thus, traditional methods based on colonoscopy are not cost-effective for population-based screening purposes, so only about 2-3\% of the target population is reached at present. Moreover, the cost of a population screening program is prohibitively expensive. In the US, the colonoscopy is the most expensive cancer screening process with annual costs of \$10 billion dollars (\$1100 per person) (SOURCE). In Norway, we have similar costs of around \$1000 per person, with a time consumption of about 1 doctor-hour and 2 nurse-hours, per examination. By researching an automatic system for a camera pill, the aim is to greatly increase the number of patients that can be examined, i.e., making the public health care system more scalable and cost effective, while at the same time reducing the need for intrusive procedures like "bottom-up" examinations like colonoscopy.
 
 
 
@@ -108,36 +112,44 @@ Colorectal cancer (CRC) is the third most common cause of cancer mortality for b
 \section{Wireless Capsule Endoscopy}
 %-----------------------------------------------------------
 %general info about WCE, some history etc
-The basic technology behind the modern endoscope was developed in the early 1950s by English physicist Harold Hopkins and his student Narinder Kapany which let light travel through flexible pieces of glass - now known as optical fibers. \cite{NewMethod54}
+The basic technology behind the modern endoscope was developed in the early 1950s by English physicist Harold Hopkins and his student Narinder Kapany which let light travel through flexible pieces of glass - now known as optical fibers. \autocite{NewMethod54}
 
-Before the year 2000 the only option you had to visualize the stomach, bowel and colon (screening) was to use a fibre-optic endoscope, which is a tool with a relatively wide cable that is pushed into the bowel with as much as 50 000 optic fibers (as seen on figure \ref{fig:fibre-optic-endoscopy}). These cables have to carry fibre optic bundles, water pipes, operations channel and control cables. Although these cables can be quite flexible there is a limit for how far they can advance into the small bowel. This method cause pain and discomfort for the pasient, and there was a clinical need for an improved methods.
+Before the year 2000 the only option you had to visualize the foodpipe, stomach, duodenum, colon and terminal ileum (see figure \ref{fig:digestive_system} for details) was to use a fibre-optic endoscope, which is a tool with a relatively wide cable that is pushed into the bowel with as much as 50 000 optic fibers (as seen on figure \ref{fig:fibre-optic-endoscopy}). These cables have to carry fibre optic bundles, water pipes, operations channel and control cables. Although these cables can be quite flexible there is a limit for how far they can advance into the small bowel. This method cause pain and discomfort for the pasient, and there was a clinical need for an improved methods.
 
 \begin{figure}
   \begin{center}
-    \includegraphics[width=\textwidth]{fibre-optic-endoscopy}
-    \caption{Image of a fibre optic endoscope with explanation of different parts of the tool. \cite{MedicalPhysics}}
+    \includegraphics[width=0.7\textwidth]{fibre-optic-endoscopy}
+    \caption{Image of a fibre optic endoscope with explanation of different parts of the tool. \autocite{MedicalPhysics}}
     \label{fig:fibre-optic-endoscopy}
   \end{center}
 \end{figure}
 
-That is why in the year 2000 Iddal et al.\cite{WirelessCapsule00} developed a new type of videotelemetry capsule endoscope that was swallowable. It could travel through the entire digestive system because it had no external wires, fibre-optic bundles or cables of any sort. The capsule travels by peristalsis\footnote{Peristalsis is a radially symmetrical contraction and relaxation of muscles that propagates in a wave down a tube, in an anterograde direction.} through the gastroitestinal tract, which takes from 10 hours to 48 hours, and transmit images on a regular interval to recievers attached around the outside of the pasients stomach for as long as the battery allows, usually in the range 6-8 hours. Two example images taken by WCE are presented in Figure \ref{fig:pillcam_examples}. By triangulating the signal strength and the location of the receivers taped on the body it is possible to calculate the position of the capsule.
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=0.7\textwidth]{digestive-system}
+    \caption{An overview of the terms used to describe the digestive system. \cite{DigestiveSystem} }
+    \label{fig:digestive_system}
+  \end{center}
+\end{figure}
+
+That is why in the year 2000 Iddal et al.\autocite{WirelessCapsule00} developed a new type of videotelemetry capsule endoscope that was swallowable. It could travel through the entire digestive system because it had no external wires, fibre-optic bundles or cables of any sort. The capsule travels by peristalsis\footnote{Peristalsis is a radially symmetrical contraction and relaxation of muscles that propagates in a wave down a tube, in an anterograde direction.} through the gastroitestinal tract, which takes from 10 hours to 48 hours, and transmit images on a regular interval to recievers attached around the outside of the pasients stomach for as long as the battery allows, usually in the range 6-8 hours. Two example images taken by WCE are presented in Figure \ref{fig:pillcam_examples}. By triangulating the signal strength and the location of the receivers taped on the body it is possible to calculate the position of the capsule.
 
 \begin{figure}%
   \centering
   \begin{subfigure}[b]{0.4\linewidth}%
     \centering
     \includegraphics[width=\linewidth]{pillcam_small_intestine}%
-    \caption{Small Intestine}%
+    \caption{Small Intestine \cite{SmallIntestine13} }%
     \label{fig:pillcam_small_intestine}%
   \end{subfigure}%
   \quad
   \begin{subfigure}[b]{0.4\linewidth}%
     \centering
     \includegraphics[width=\linewidth]{pillcam_colon}%
-    \caption{Colon}%
+    \caption{Colon \cite{Colon13} }%
     \label{fig:pillcam_colon}%
   \end{subfigure}%
-  \caption{Images taken with WCE. }%
+  \caption{Images taken with WCE.}%
   \label{fig:pillcam_examples}%
 \end{figure}%
 
@@ -147,7 +159,9 @@ That is why in the year 2000 Iddal et al.\cite{WirelessCapsule00} developed a ne
 %-----------------------------------------------------------
 %what to look for when analyzing videos from the digestive system
 
-To detect irregularities in the digestive system is a difficult task and time-consuming. To classify irregularities correctly and precisely require expert knowledge. Furtunately we have access to data which already has been labeled by trained proffesionals that we will use in this project. However I feel that some very basic knowledge will come in handy. \footnote{some text}
+To detect irregularities in the digestive system is a difficult task and time-consuming. To classify irregularities correctly and precisely require expert knowledge. Furtunately we have access to data which already has been labeled by trained proffesionals that we will use in this project. However I feel that some very basic knowledge in the subject will come in handy.
+
+The most common way of screening pasients is with a endoscope. This 
 
 
 
@@ -192,7 +206,6 @@ Present the results. Give critical discussion of your work and place it in the c
 
 
 \newpage
-\bibliography{../references}
-\bibliographystyle{ieeetr}
+\printbibliography
 
 \end{document}
