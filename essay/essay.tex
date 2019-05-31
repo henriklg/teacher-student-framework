@@ -41,7 +41,7 @@
 
 
 %-----------------------------------------------------------
-% Forside
+% Front/title page
 % ----------------------------------------------------------
 \begin{document}
 \begin{titlepage}
@@ -50,7 +50,7 @@
   \textsc{}\\[1.0cm]
   \textsc{\Large Master essay}\\[0.5cm]
   \rule{\linewidth}{0.5mm} \\[0.4cm]
-  {\huge \bfseries A look on neural networks}\\[0.10cm]
+  {\huge \bfseries Time series analysis for medical videos}\\[0.10cm]
   \rule{\linewidth}{0.5mm} \\[1.5cm]
   \textsc{}\\[7.0cm]
 
@@ -61,7 +61,6 @@
   \end{minipage}
   \vfill
 
-  % Dato nederst
   \large{Date: \today}
   \end{center}
 \end{titlepage}
@@ -149,7 +148,7 @@ That is why in the year \citeyear{WirelessCapsule00} \citeauthor*{WirelessCapsul
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Spotting irregulartities in the digestive system}
+\section{The digestive system}
 %-----------------------------------------------------------
 %what to look for when analyzing videos from the digestive system
 
@@ -168,6 +167,12 @@ These diseases have varying patterns and while some can be easy to split apart, 
 As apposed to using regular optic-fibre endoscopy, it can be difficult to know the location and orientation of the capsule when it is traveling through the digestive system. In a paper by \citeauthor*{ClassifyingDigestive15} \cite{ClassifyingDigestive15} it is shown that by using Deep Convolutional Networks (DCNN) it is possible to classify the digestive organs in wireless capsule endoscopy with about 95\% classification accuracy on average. 
 
 The DCNN-based WCE digestive organ classifiaction system is constructed of three stages of convolution, pooling and two fully-connected layers. This is illustrated in figure 3 in the paper. \cite{ClassifyingDigestive15} The main steps of this convolutional neural network are as follows:
+
+\subsection{Convolutional Neural Network}
+% ----------------------------------------------------------
+% write some general stuff about CNN's
+One of the most used neural networks for image classifcation is the Convolutional Neural Network. The model was first proposed by \citeauthor*{ImageNetClassification12} in \citeyear{ImageNetClassification12} \cite{ImageNetClassification12} where they trained a deep convolutional neural network and used it to classify 1.2 million high-resolution images in the ImageNet LSVRC-2010 contest into the 1000 different classes with top-1 and top-5 error rates of 37.5\% and 17.0\% which far surpassed all other models at the time.
+
 
 \subsubsection{Convolution layer}
 % ----------------------------------------------------------
