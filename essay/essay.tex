@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% DOCUMENT PREAMBLE %%%
-\documentclass[english, a4paper]{report}
+\documentclass[english, a4paper]{article}
 \usepackage[T1]{fontenc}            % Riktig fontencoding
 \usepackage[font=small, labelfont=bf]{caption} % Fin figur-undertekst
 \usepackage{url}                    % Skrive url-er
@@ -10,21 +10,12 @@
 \usepackage{amsmath} 
 \usepackage{graphicx}               % Inkludere bilder
 \usepackage{subcaption}				% for subfigures environments
-\usepackage[backend=biber, style=ieee, sortcites=true]{biblatex}
+\usepackage[block=ragged, backend=biber, style=ieee, sortcites=true]{biblatex}
 \usepackage{csquotes}
 \graphicspath{{images/}}
-%\usepackage{listings}               % programeringskode
-%\usepackage{minted}                 % for coding
-%\usepackage{xcolor}                 % for coding
 % ---------------------------------------------------------
 
 \addbibresource{../references.bib}
-
-% kapittelinndeling
-\renewcommand{\thepart}{\arabic{part})}
-\renewcommand\thesection{\arabic{section}}
-\renewcommand{\thesubsection}{\alph{subsection})} % Alph = ABC, alph = abc
-\renewcommand{\thesubsubsection}{\roman{subsubsection})}
 
 %---------------------------------------------------------
 \pdfinfo{
@@ -48,7 +39,7 @@
   \begin{center}
 
   \textsc{}\\[1.0cm]
-  \textsc{\Large Master essay}\\[0.5cm]
+  \textsc{\Large Essay}\\[0.5cm]
   \rule{\linewidth}{0.5mm} \\[0.4cm]
   {\huge \bfseries Time series analysis for medical videos}\\[0.10cm]
   \rule{\linewidth}{0.5mm} \\[1.5cm]
@@ -81,12 +72,12 @@
 %-----------------------------------------------------------
 %Explain the aims and rationale for the physics case and what you have done. At the end of the introduction you should give a brief summary of the structure of the report. Motivate the reader and give overarching ideas. Describe what has been done and the structure of the report (how is it organized).
 
-In this project, we aim to design and develop a system for analyzing medical videos from a camera pill, as seen in figure \ref{fig:pill-cam}. The pill is swallowed and records video of the entire digestive system and stores it on a onboard chip - the goal is to be able to detect different irregularities in the patients digestive system, like a colon polyp, Chron's disease, Colorectal cancer, etc. By using video object tracking, object detection, machine learning or other relevant tools or mechanisms.
+In this project, we aim to design and develop a system for analyzing medical videos from a camera pill, as seen in figure \ref{fig:pill-cam}. The pill is swallowed and records video of the entire digestive system The goal is to be able to detect different irregularities in the patients digestive system, like a colon polyp, Chron's disease, Colorectal cancer, etc. by using video object tracking, object detection, machine learning or other relevant tools.
 
 Neural networks models that I would like to explore further for this purpose are Convolutional neural networks (CNN), Recurrent neural networks (RNN), Capsule neural networks, Long Short-Term memory networks and more.
 
 The main idea is to go beyond image-based methods and also exploit the time factor of the data. 
-The videos we will be using for this is delivered by Bærum Hospital, and is carefully labeled by professionals for use as training data for the neural networks. For simplicity, much or all of the training data is from regular "bottom-up" colonoscopy. 
+The videos we will be using for this is delivered by Bærum Hospital, and is carefully labeled by using tools such as described in the paper \citetitle*{ExpertDriven15}. In this paper \citeauthor*{ExpertDriven15} presents a semi-supervised method to gather the annotations in a easy and time saving way \cite{ExpertDriven15}. 
 
 \begin{figure}[H] % pill-cam
   \begin{center}
@@ -96,7 +87,7 @@ The videos we will be using for this is delivered by Bærum Hospital, and is car
   \end{center}
 \end{figure}
 
-Colorectal cancer (CRC) is the third most common cause of cancer mortality for both men and women \cite{CancerStatistics10}, and it is a condition where early detection is of clear value for the ultimate survival of the patient. As statistics show that 15\% of male and female above 50 years are at risk (SOURCE), the procedure is recommended on a regular basis (every 3-5 years) for the population over 50, and from an earlier age for high-risk groups. Colonoscopy is a demanding procedure requiring an significant amount of time by specialized physicians, in addition to the discomfort and risks inherent in the procedure. Thus, traditional methods based on colonoscopy are not cost-effective for population-based screening purposes, so only about 2-3\% of the target population is reached at present. Moreover, the cost of a population screening program is prohibitively expensive. In the US, the colonoscopy is the most expensive cancer screening process with annual costs of \$10 billion dollars (\$1100 per person) (SOURCE). In Norway, we have similar costs of around \$1000 per person, with a time consumption of about 1 doctor-hour and 2 nurse-hours, per examination. By researching an automatic system for a camera pill, the aim is to greatly increase the number of patients that can be examined, i.e., making the public health care system more scalable and cost effective, while at the same time reducing the need for intrusive procedures like "bottom-up" examinations like colonoscopy.
+Colorectal cancer (CRC) is the third most common cause of cancer mortality for both men and women \cite{CancerStatistics10}, and it is a condition where early detection is of clear value for the ultimate survival of the patient. As statistics show that 15\% of male and female above 50 years are at risk, the procedure is recommended on a regular basis (every 3-5 years) for the population over 50, and from an earlier age for high-risk groups. Colonoscopy is a demanding procedure requiring an significant amount of time by specialized physicians, in addition to the discomfort and risks inherent in the procedure. Thus, traditional methods based on colonoscopy are not cost-effective for population-based screening purposes, so only about 2-3\% of the target population is reached at present. Moreover, the cost of a population screening program is prohibitively expensive. In the US, the colonoscopy is the most expensive cancer screening process with annual costs of \$10 billion dollars (\$1100 per person). In Norway, we have similar costs of around \$1000 per person, with a time consumption of about 1 doctor-hour and 2 nurse-hours, per examination. By researching an automatic system for a camera pill, the aim is to greatly increase the number of patients that can be examined, i.e., making the public health care system more scalable and cost effective, while at the same time reducing the need for intrusive procedures like "bottom-up" examinations like colonoscopy.
 
 
 
@@ -105,7 +96,7 @@ Colorectal cancer (CRC) is the third most common cause of cancer mortality for b
 \section{Wireless Capsule Endoscopy}  \label{wireless_capsule_endoscopy}
 %-----------------------------------------------------------
 %general info about WCE, some history etc
-The basic technology behind the modern endoscope was developed in the early 1950s by English physicist Harold Hopkins and his student Narinder Kapany which let light travel through flexible pieces of glass - now known as optical fibers. \cite{NewMethod54}
+The basic technology behind the modern endoscope was developed in the early 1950s by English physicist Harold Hopkins and his student Narinder Kapany which let light travel through flexible pieces of glass, now known as optical fibers. \cite{NewMethod54}
 
 Before the year 2000 the only option you had to visualize the foodpipe, stomach, duodenum, colon and terminal ileum (see figure \ref{fig:digestive_system} for details) was to use a fiber-optic endoscope, which is a tool with a relatively wide cable that is pushed into the bowel with as much as 50 000 optic fibers (as seen on figure \ref{fig:fiber-optic-endoscopy}). These cables have to carry fiber optic bundles, water pipes, operations channel and control cables. Although these cables can be quite flexible there is a limit for how far they can advance into the small bowel. This method cause pain and discomfort for the patient, and there was a clinical need for an improved methods.
 
@@ -125,9 +116,9 @@ Before the year 2000 the only option you had to visualize the foodpipe, stomach,
   \end{center}
 \end{figure}
 
-That is why in the year \citeyear{WirelessCapsule00} \citeauthor*{WirelessCapsule00} \cite{WirelessCapsule00} developed a new type of video-telemetry capsule endoscope that was swallowable. It could travel through the entire digestive system because it had no external wires, fiber-optic bundles or cables of any sort. The capsule travels by peristalsis\footnote{Peristalsis is a radially symmetrical contraction and relaxation of muscles that propagates in a wave down a tube, in an anterograde direction.} through the gastrointestinal tract, which takes from 10 hours to 48 hours, and transmit images on a regular interval to receivers attached around the outside of the patients stomach for as long as the battery allows, usually in the range 6-8 hours. Two example images taken by WCE are presented in Figure \ref{fig:pillcam_examples}. By triangulating the signal strength and the location of the receivers taped on the body it is possible to calculate the position of the capsule.
+That is why in the year \citeyear{WirelessCapsule00} \citeauthor*{WirelessCapsule00} developed a new type of video-telemetry capsule endoscope that was swallowable \cite{WirelessCapsule00}. It could travel through the entire digestive system because it had no external wires, fiber-optic bundles or cables of any sort. The capsule travels by peristalsis\footnote{Peristalsis is a radially symmetrical contraction and relaxation of muscles that propagates in a wave down a tube, in an anterograde direction.} through the gastrointestinal tract, which takes from 10 to 48 hours, and transmit images on a regular interval to receivers attached around the outside of the patients stomach for as long as the battery allows, usually in the range 6-8 hours. Two example images taken by WCE are presented in Figure \ref{fig:pillcam_examples}. By triangulating the signal strength and the location of the receivers taped on the body it is possible to roughly estimate the position of the capsule. This is however not very precise and can not tell us the rotation or direction of the capsule. Regardless, that information will not be available for us in this study as we only have access to the images themselves. Therefore we could try to implement an algorithm to predict which region of the degistive system the image is taken from. More on this later.
 
-\begin{figure} % small intestine and colon double figure
+\begin{figure} % fig:pillcam_examples (double figure)
   \centering
   \begin{subfigure}[b]{0.4\linewidth}%
     \centering
@@ -139,7 +130,7 @@ That is why in the year \citeyear{WirelessCapsule00} \citeauthor*{WirelessCapsul
   \begin{subfigure}[b]{0.4\linewidth}%
     \centering
     \includegraphics[width=\linewidth]{pillcam_colon}%
-    \caption{Colon \cite{Colon13} }%
+    \caption{Colon \cite{ImageColon13} }%
     \label{fig:pillcam_colon}%
   \end{subfigure}%
   \caption{Images taken with WCE.}%
@@ -161,14 +152,20 @@ These diseases have varying patterns and while some can be easy to split apart, 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Neural network models}
+\section{Neural network models} \label{neural_network_models}
 %-----------------------------------------------------------
 %explain the different neural networks I'd like to test out on the video
-As apposed to using regular optic-fibre endoscopy, it can be difficult to know the location and orientation of the capsule when it is traveling through the digestive system. In a paper by \citeauthor*{ClassifyingDigestive15} \cite{ClassifyingDigestive15} it is shown that by using Deep Convolutional Networks (DCNN) it is possible to classify the digestive organs in wireless capsule endoscopy with about 95\% classification accuracy on average. 
+As apposed to using regular optic-fibre endoscopy, it can be difficult to know the location and orientation of the capsule when it is traveling through the digestive system. In a paper by \citeauthor*{ClassifyingDigestive15} it is shown that by using Deep Convolutional Networks (DCNN) it is possible to classify the digestive organs in wireless capsule endoscopy with about 95\% classification accuracy on average \cite{ClassifyingDigestive15}.
+The DCNN-based WCE digestive organ classifiaction system is constructed of three stages of convolution, pooling and two fully-connected layers. This is illustrated in figure 3 in the paper. \cite{ClassifyingDigestive15} The main steps of this convolutional neural network are described in detail in section \ref{convolutional_neural_network}
 
-The DCNN-based WCE digestive organ classifiaction system is constructed of three stages of convolution, pooling and two fully-connected layers. This is illustrated in figure 3 in the paper. \cite{ClassifyingDigestive15} The main steps of this convolutional neural network are as follows:
+\medbreak
+\citeauthor*{LesionDetection15} have made a computer-aided lesion\footnote{a region in an organ or tissue which has suffered damage through injury or disease, such as a wound, ulcer, abscess, or tumour.} detection system which uses a trainable feature extractor, also based on a CNN, and feed the generic features to a SVM\footnote{Support Vector Machine} which enhance the generalization ability. \cite{LesionDetection15} This method greatly outperform the earlier methods based on color and texture features. 
 
-\subsection{Convolutional Neural Network}
+\medbreak
+\citeauthor*{DeepLearning17} have accomplished an average overall recognition accuracy of 98.0\% for detecting polyps in WCE images by using a deep feature learning method, named stacked sparse autoencoder with image manifold constraint (SSAEIM). \cite{DeepLearning17}
+
+
+\subsection{Convolutional Neural Network} \label{convolutional_neural_network}
 % ----------------------------------------------------------
 % write some general stuff about CNN's
 One of the most used neural networks for image classifcation is the Convolutional Neural Network (CNN). The model was first proposed by \citeauthor*{ImageNetClassification12} in \citeyear{ImageNetClassification12} \cite{ImageNetClassification12} where they trained a deep convolutional neural network and used it to classify 1.2 million high-resolution images in the ImageNet LSVRC-2010 contest into the 1000 different classes with top-1 and top-5 error rates of 37.5\% and 17.0\% which far surpassed all other models at the time. Next I will get into a bit of the details of a CNN.
@@ -336,16 +333,14 @@ My hope is that by implementing an object-tracking algorithm I can use it to cla
 
 
 
-\subsection{Segmentation}
+\subsection{Segmentation} \label{segmentation}
 %-----------------------------------------------------------
 % Image/video segmentation. Specially related to the paper "U-Net: Convolutional Networks for Biomedical Image Segmentation" citekey UNetConvolutional15
-Image segmention is the process of partitioning a image into multiple segments of pixel, usually each segment describing some feature of the image or an entire object or class of objects. The goal of segmentation is to simplify the image and make it easier to analyze or further process. \citeauthor*{UNetConvolutional15} propose a method in the paper \citetitle*{UNetConvolutional15} \cite{UNetConvolutional15} for using a network and training strategy that relies on the strong use of date augmentation to use the available labeled samples more effieciently. This network outperform the old method of sliding-window-convolution by a great deal. They extend the "fully convolutional network" \cite{FullyConvolutional15} such that it works with very few training images and yields more precise segmentations. The way this is achieved is to supplement a contracting network by successive layers, where instead of using pooling operators, upsampling operators are used. This means that these successive layers increase the resolution of the output. The high resolution features from the contracting path are combined with the upsampled output to localize objects and with that a convolution layer can then learn to assemble more precise output based on this information. 
+Image segmention is the process of partitioning a image into multiple segments of pixel, usually each segment describing some feature of the image or an entire object or class of objects. The goal of segmentation is to simplify the image and make it easier to analyze or further process. \citeauthor*{UNetConvolutional15} propose a method in the paper \citetitle*{UNetConvolutional15} \cite{UNetConvolutional15} for using a network and training strategy that relies on the strong use of date augmentation to use the available labeled samples more effieciently. This network outperform the old method of sliding-window-convolution by a great deal. They extend the "fully convolutional network" \cite{FullyConvolutional15} such that it works with very few training images and yields more precise segmentations. The way this is achieved is to supplement a contracting network by successive layers, where instead of using pooling operators, upsampling operators are used. This means that these successive layers increase the resolution of the output. The high resolution features from the contracting path are combined with the upsampled output to localize objects and with that a convolution layer can then learn to produce more precise output based on this information. 
 
 Another important feature in this architecture is that in the upsampling portion of the network there is also large number of feature channels. These channels allow the network to pass on context information to the higher resolution layers. 
 
-A common problem in training neural networks are too little labeled training data. This is also the case for us. We require a lot of medical data, and personell with the expertise to correctly label our data are of high demand and they usually have very little time for projects like these. This is why \citeauthor*{UNetConvolutional15} use different methods of data augmentation to "generate" more training data. They apply elastic deformations to the available images, and this allows the network to learn invariance to such deformations without the need to see these transformations in the annoted image corpus. Which is particular important in biomedical segmentation since deformation used to be the most common variation in tissue and realistic deformations can be simulated efficiently. \cite{UNetConvolutional15}
-
-By doing this \citeauthor*{UNetConvolutional15} were able to achieve increadible results, see table \ref{table:segmentation_results}.
+A common problem in training neural networks are too little labeled training data. This is also the case for us. We require a lot of medical data, and personell with the expertise to correctly label our data are of high demand and they usually have very little time for projects like these. This is why \citeauthor*{UNetConvolutional15} use different methods of data augmentation to generate more training data. They apply elastic deformations to the available images, and this allows the network to learn invariance to such deformations without the need to see these transformations in the annoted image corpus. Which is particular important in biomedical segmentation since deformation used to be the most common variation in tissue and realistic deformations can be simulated efficiently \cite{UNetConvolutional15}. By doing this \citeauthor*{UNetConvolutional15} were able to achieve good results, see Table \ref{table:segmentation_results}.
 
 \begin{table} % table:segmentation_results
   \centering
@@ -368,33 +363,41 @@ By doing this \citeauthor*{UNetConvolutional15} were able to achieve increadible
 \subsection{Mapping} \label{mapping}
 %-----------------------------------------------------------
 % Mapping of the intestine. Specially related to the paper "Deep EndoVO: A recurrent convolutional neural network (RCNN) based visual odometry approach for endoscopic capsule robots" citekey DeepEndoVO18
-As mentioned in section \ref{wireless_capsule_endoscopy}, a concern when processing the images taken with a WCE is not having the spatial data you get when using a normal fiber-optic endoscope. This is why \citeauthor*{DeepEndoVO18} has recently made substantial progress in converting passive capsule endoscopes to active capsule robots, enabling more accurate, precise, and intuitive detection of the location and size of the diseased areas by developing reliable real time pose estimation functionality of the capsule with RCNN's\footnote{Deep recurrent convolutional neural networks}. \cite{DeepEndoVO18}
+As mentioned in section \ref{wireless_capsule_endoscopy}, a concern when processing the images taken with a WCE is not having the spatial data you get when using a normal fiber-optic endoscope. This is why \citeauthor*{DeepEndoVO18} has recently made substantial progress in converting passive capsule endoscopes to active capsule robots, enabling more accurate, precise, and intuitive detection of the location and size of the diseased areas by developing reliable real time pose estimation functionality of the capsule with RCNN's\footnote{Deep recurrent convolutional neural networks} \cite{DeepEndoVO18}. See figure \ref{fig:deep_endovo_example} for an example.
 
-This is achieved by
+This architecture uses inception modules for feature extraction and a RNN for sequential modelling of motion dynamics to regress the robot's orientation and position in real time. By taking multiple of RGB Depth images with timestamps it can calculate the 6-DoF pose of the capsule without the need of any extra sensors. For obtaining the depth images \citeauthor*{DeepEndoVO18} use the shape from shading (SfS) technique of \citeauthor{ShapeShading94} \cite{ShapeShading94}. This model outperforms state-of-the-art models like LSD SLAM and ORB SLAM.
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Related work} \label{related_work}
-%-----------------------------------------------------------
- \citeauthor*{LesionDetection15} \cite{LesionDetection15} have made a computer-aided lesion\footnote{a region in an organ or tissue which has suffered damage through injury or disease, such as a wound, ulcer, abscess, or tumour.} detection system which uses a trainable feature extractor based on a CNN and feed the generic features to a SVM\footnote{Support Vector Machine} which enhance the generalization ability. This method greatly outperform the earlier methods based on color and texture features. \citeauthor*{DeepLearning17} \cite{DeepLearning17} have accomplished an average overall recognition accuracy of 98.0\% for detecting polyps in WCE images by using a deep feature learning method, named stacked sparse autoencoder with image manifold constraint (SSAEIM).
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Discussion} \label{discussion}
-%-----------------------------------------------------------
-%Present the results. Give critical discussion of your work and place it in the correct context. Try to relate your work to other calculations/studies. The reader should be able to reproduce your calculations if they wanted to. Remember to explain all input variables. Make sure figures and tables contain enough information in their captions/labels/axis so that the reader can gain a first impression of your work.
-How do I think it will help to implement some of these papers and test them on our data?
+\begin{figure}[h] % fig:deep_endovo_example
+  \centering
+  \begin{subfigure}[b]{0.4\linewidth}%
+    \centering
+    \includegraphics[width=\linewidth]{endovo_training_data}%
+    \caption{Training data vs ground truth }%
+    \label{fig:endovo_training_data}%
+  \end{subfigure}%
+  \quad
+  \begin{subfigure}[b]{0.4\linewidth}%
+    \centering
+    \includegraphics[width=\linewidth]{endovo_test_data}%
+    \caption{Test data vs ground truth }%
+    \label{fig:endovo_test_data}%
+  \end{subfigure}%
+  \caption{An example of Deep EndoVO. \cite{DeepEndoVO18} }%
+  \label{fig:deep_endovo_example}%
+\end{figure}%
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusion} \label{conclusion}
 %-----------------------------------------------------------
-What is the summary of the discussion?
+%Present the results. Give critical discussion of your work and place it in the correct context. 
+I am excited to begin working on this project and I feel very much motivated for doing further research and to implement some of the papers I have read during writing this paper. I've found several papers which I unfortunately did not have time to look at but the amount of work done in this field will be of much use. Especially excited to implement and perhaps improve on the work done by \citeauthor*{LesionDetection15} and \citeauthor*{DeepLearning17}. And if possible, be able to use the work done by \citeauthor*{DeepEndoVO18} to track the capsule throughout the intestine. Which hopefully will be a useful tool for doctors and specialists looking at WCE video in the future. However I expect to meet some difficulties along the way. Example, I read that group behind the Deep EndoVO paper used a camera capsule with a fairly high refresh rate. Having fewer datapoints per distance traveled will increase the likelihood of drifting away from the ground truth. 
+
+I have included a section about segmentation but I don't plan on getting into that unless I get a lot of spare time at the end of writing my thesis. The main objective of my thesis will be to label the video with regions of interest for the doctors to have a closer look at. 
+
 
 
 \newpage
 \printbibliography
-
 \end{document}
