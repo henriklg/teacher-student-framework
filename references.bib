@@ -106,15 +106,6 @@
   file = {/home/henrik/Zotero/storage/5ZJHN63L/Lieberman - 2010 - Progress and Challenges in Colorectal Cancer Scree.pdf}
 }
 
-@misc{ComputerAidedScreening15,
-  title = {Computer-{{Aided Screening}} of {{Capsule Endoscopy Videos}}},
-  abstract = {Colon cancer accounts for almost 10\% of all cancer cases worldwide. It is also the fourth most common cause of death from cancer globally. However, many cases of colon cancer could be prevented by early screening and removal of colon polyps - a common precursor of colon cancer. In this respect, capsule endoscopy is a non-invasive screening method with the potential to significantly reduce the cost of screening as well as the discomfort caused for the patient using traditional endoscopy examination. The financial cost of evaluating the recorded video footage, as well as the availability of specialists, currently prevents the deployment of capsule endoscopy for mass screening. With this work, we research solutions for automating the evaluation of capsule endoscopy video sequences using machine learning, image recognition and extraction of global image features. Rather than focusing on a single approach, we build tools that can be used for conducting further experiments with different methods and algorithms. We present the prototype of an integrated software solution that can be used for collecting videos from hospitals, annotating videos, tracking objects in video sequences, build- ing training and testing datasets, training classifiers and eventually, testing and evaluating the generated classifiers. We evaluate our software by training classifiers that are based on three different image recognition approaches. We also test the generated classifiers with different datasets and thereby evaluate the different approaches for their feasibility of being used to recognize colon polyps. Our main conclusion is that state of the art image recognition methods, such as the use of Haar- features or Histogram of oriented Gradients based detectors, are not suitable for detecting lesions in the intestine because of the enormous variety of possible appearances and orientations of such lesions. Global image features such as Joint Composite Descriptor on the other hand, lead to very promising results. Performing leave-one-out-cross-validation with all 20 videos of the ASU-Mayo Clinic polyp database, our system achieves a weighted average precision of 93.9\% and a weighted average recall of 98.5\%.},
-  language = {eng},
-  author = {Albisser, Zeno},
-  year = {2015},
-  keywords = {cancer,capsule,colon,colonoscopy,endoscopy,polyp}
-}
-
 @article{CompetitiveNeural13,
   title = {A {{Competitive Neural Network}} for {{Multiple Object Tracking}} in {{Video Sequence Analysis}}},
   volume = {37},
@@ -348,19 +339,6 @@ Conclusion: The comprehensive results have demonstrated that the proposed SSAEIM
   file = {/home/henrik/Zotero/storage/DSPZ2LDD/Simonyan et al. - 2013 - Deep Inside Convolutional Networks Visualising Im.pdf;/home/henrik/Zotero/storage/628HFNB7/1312.html}
 }
 
-@inproceedings{IdentificationUlcers09a,
-  title = {Identification of Ulcers in {{Wireless Capsule Endoscopy}} Videos},
-  abstract = {Wireless Capsule Endoscopy (WCE) is a non invasive procedure which is used to view the lower gastrointestinal tract. Physicians can detect diseases such as bleeding, Crohn's disease, peptic ulcers, and colon cancer. In this paper a methodology is presented to identify peptic ulcers in the small intestine automatically. It first performs color transformation into the HSV color space; it utilizes log Gabor filters to find meaningful regions. A segmentation scheme is used to extract color information of these meaningful regions in the original RGB color space. Additionally, texture information is extracted and together with color values are fed into an artificial neural network for classification. Illustrative results from the methodology are also given in this paper.},
-  booktitle = {Proceedings of the 2009 {{IEEE International Symposium}} on {{Biomedical Imaging}}: {{From Nano}} to {{Macro}}},
-  doi = {10.1109/ISBI.2009.5193107},
-  author = {Karargyris, A. and Bourbakis, N.},
-  month = jun,
-  year = {2009},
-  keywords = {colon cancer,endoscopes,Endoscopes,Hemorrhaging,medical image processing,neural nets,Videos,biological organs,feature extraction,image classification,Intestines,Gastrointestinal tract,artificial neural network,bleeding,Cancer detection,Colon,color information extraction,Crohn's disease,Data mining,diseases,Diseases,fuzzy least squares support vector machines,fuzzy region segmentation,Gabor filters,gastrointestinal tract,HSV color space,image segmentation,log Gabor filters,log-Gabor filters,noninvasive procedure,peptic ulcers,RGB color space,segmentation scheme,small intestine,texture,texture information,ulcers,video signal processing,Wireless capsule Endoscopy Imaging,wireless capsule endoscopy videos},
-  pages = {554-557},
-  file = {/home/henrik/Zotero/storage/667XME3L/Karargyris and Bourbakis - 2009 - Identification of ulcers in Wireless Capsule Endos.pdf;/home/henrik/Zotero/storage/U3HA6ZRY/5193107.html}
-}
-
 @article{CNNbasedSegmentation17,
   archivePrefix = {arXiv},
   eprinttype = {arxiv},
@@ -441,6 +419,185 @@ Conclusion: The comprehensive results have demonstrated that the proposed SSAEIM
   keywords = {3D shape,physics-based vision,shape from shading},
   pages = {487-498},
   file = {/home/henrik/Zotero/storage/RP6KRHXZ/0262885694900027.html}
+}
+
+@misc{DemystifyingConvolutional18,
+  title = {Demystifying {{Convolutional Neural Networks}}},
+  abstract = {An Intuitive Explanation of Convolutional Neural Networks.},
+  language = {en},
+  journal = {Medium},
+  howpublished = {https://medium.com/@eternalzer0dayx/demystifying-convolutional-neural-networks-ca17bdc75559},
+  author = {Zerium, Aegeus},
+  month = sep,
+  year = {2018},
+  file = {/home/henrik/Zotero/storage/BFDGM3IN/demystifying-convolutional-neural-networks-ca17bdc75559.html}
+}
+
+@article{DynamicRouting17,
+  archivePrefix = {arXiv},
+  eprinttype = {arxiv},
+  eprint = {1710.09829},
+  primaryClass = {cs},
+  title = {Dynamic {{Routing Between Capsules}}},
+  abstract = {A capsule is a group of neurons whose activity vector represents the instantiation parameters of a specific type of entity such as an object or an object part. We use the length of the activity vector to represent the probability that the entity exists and its orientation to represent the instantiation parameters. Active capsules at one level make predictions, via transformation matrices, for the instantiation parameters of higher-level capsules. When multiple predictions agree, a higher level capsule becomes active. We show that a discrimininatively trained, multi-layer capsule system achieves state-of-the-art performance on MNIST and is considerably better than a convolutional net at recognizing highly overlapping digits. To achieve these results we use an iterative routing-by-agreement mechanism: A lower-level capsule prefers to send its output to higher level capsules whose activity vectors have a big scalar product with the prediction coming from the lower-level capsule.},
+  journal = {arXiv:1710.09829 [cs]},
+  author = {Sabour, Sara and Frosst, Nicholas and Hinton, Geoffrey E.},
+  month = oct,
+  year = {2017},
+  keywords = {Computer Science - Computer Vision and Pattern Recognition},
+  file = {/home/henrik/Zotero/storage/VAK5X6YX/Sabour et al. - 2017 - Dynamic Routing Between Capsules.pdf;/home/henrik/Zotero/storage/756F7S8K/1710.html}
+}
+
+@article{BleedingDetection19,
+  title = {Bleeding Detection in Wireless Capsule Endoscopy Videos \textemdash{} {{Color}} versus Texture Features},
+  volume = {20},
+  issn = {1526-9914},
+  abstract = {Abstract Wireless capsule endoscopy (WCE) is an effective technology that can be used to make a gastrointestinal (GI) tract diagnosis of various lesions and abnormalities. Due to a long time required to pass through the GI tract, the resulting WCE data stream contains a large number of frames which leads to a tedious job for clinical experts to perform a visual check of each and every frame of a complete patient?s video footage. In this paper, an automated technique for bleeding detection based on color and texture features is proposed. The approach combines the color information which is an essential feature for initial detection of frame with bleeding. Additionally, it uses the texture which plays an important role to extract more information from the lesion captured in the frames and allows the system to distinguish finely between borderline cases. The detection algorithm utilizes machine-learning-based classification methods, and it can efficiently distinguish between bleeding and nonbleeding frames and perform pixel-level segmentation of bleeding areas in WCE frames. The performed experimental studies demonstrate the performance of the proposed bleeding detection method in terms of detection accuracy, where we are at least as good as the state-of-the-art approaches. In this research, we have conducted a broad comparison of a number of different state-of-the-art features and classification methods that allows building an efficient and flexible WCE video processing system.},
+  number = {8},
+  journal = {Journal of Applied Clinical Medical Physics},
+  doi = {10.1002/acm2.12662},
+  author = {Pogorelov, Konstantin and Suman, Shipra and Azmadi Hussin, Fawnizu and Saeed Malik, Aamir and Ostroukhova, Olga and Riegler, Michael and Halvorsen, P{\aa}l and Hooi Ho, Shiaw and Goh, Khean-Lee},
+  month = aug,
+  year = {2019},
+  keywords = {bleeding detection,color feature,machine learning,texture feature,wireless capsule endoscopy},
+  pages = {141-154},
+  file = {/home/henrik/Zotero/storage/YABA4NNF/Pogorelov et al. - 2019 - Bleeding detection in wireless capsule endoscopy v.pdf;/home/henrik/Zotero/storage/IRVPWGI2/acm2.html}
+}
+
+@phdthesis{MimirAutomatic18,
+  title = {{Mimir: An Automatic Reporting and Reasoning System for Screening of the Gastrointestinal Tract Using Deep Neural Networks}},
+  shorttitle = {{Mimir}},
+  abstract = {Data is arguably one of the most valuable resources available today. More
+than ever, data is collected on such a large scale that we do not have
+the capacity to process it efficiently. In healthcare alone, there is an
+estimated 162 exabyte of data throughout the world, which is growing at
+the speed of approximately 2.5 exabytes per year [18]. Medical data in
+and of itself can be used for many things, such as patient follow-ups or
+recommendations. Nevertheless, to enable the use of this information to
+its fullest potential, we need sophisticated data analysis methods such as
+statistics or machine learning. Machine learning is a field where machines
+learn from data without explicitly being programmed. This process is
+often applied through supervised learning (machines learning from labeled
+data), unsupervised learning (machines learning from unlabeled data), or
+semi-supervised (machines learning from a combination of labeled and
+unlabeled data). Over the past few years, this field has been dominated
+by a growing class of algorithms known as deep learning. Inspired by
+the neurological connections in the animal brain, deep learning has made
+immense strides in the production of state-of-the-art results within many
+areas of data analytics [4]. Nowadays, deep learning based methods have
+become a popular topic within the medical field as well [7]. This has
+brought up some specific challenges which may make the application of
+these methods difficult, such as the lack of data or poor understanding
+of their internal workings. The latter issue, namely that deep learning is
+something of a ``black box'', is one of the biggest hurdles since it hinders
+the application of deep learning from being used in hospitals due to lack
+of trust and understanding. For this reason, we developed a medical
+reporting system, which focuses on transparency and understanding of
+its internal processes. In this thesis, we present this system and show
+how it may aid us in the development and understanding of deep neural
+networks.},
+  language = {nob},
+  author = {Hicks, Steven Alexander},
+  year = {2018},
+  file = {/home/henrik/Zotero/storage/M6ILEV7V/Hicks - 2018 - Mimir An Automatic Reporting and Reasoning System.pdf;/home/henrik/Zotero/storage/69JSKP4S/65179.html}
+}
+
+@phdthesis{MachineLearning,
+  title = {A {{Machine Learning Approach To Improve Consistency In User}}-{{Driven Medical Image Analysis}}},
+  abstract = {The work we present in this thesis stems out from the need of standardisation of training image analysts. We will particularly focus on the training
+of image analysis using a growingly popular medical imaging technique,
+T1 mapping MRI. Its usefulness relies on the ability to detect abnormalities
+in the cardiac tissue myocardial structure due to a range of pathologies in a
+non invasive and mostly contrast-agent free manner. T1 mapping is not yet
+a routinely used clinical imaging modality, but as more evidence of its potential is published, it is foreseen by experts to soon become a fundamental
+clinical tool.},
+  school = {University of Oslo},
+  author = {Eriksen, Edvarda}
+}
+
+@phdthesis{UnsupervisedPreprocessing19,
+  type = {Master's {{Thesis}}},
+  title = {Unsupervised Preprocessing of Medical Imaging Data with Generative Adversarial Networks},
+  abstract = {As an attempt to address the challenge of improving the field of computer-aided
+diagnosis, our work explores ways to help existing models to increase their accuracy
+when it comes to finding anomalies in medical images. In this thesis, we tackle the
+problems associated with the misclassification of data based on overlays and other
+artefacts in the medical image data.
+We will look at how we can use machine learning to develop a system to increase
+the classification accuracy of existing models, as well as going in-depth into the topic
+of preprocessing to see if it has a place in modern classification models based on deep
+learning.},
+  school = {University of Oslo},
+  author = {Kirker{\o}d, Mathias},
+  year = {2019},
+  file = {/home/henrik/Zotero/storage/VACL4IVN/Kirkerød - 2019 - Unsupervised preprocessing of medical imaging data.pdf}
+}
+
+@phdthesis{HyperparameterOptimization18,
+  title = {Hyperparameter Optimization Using {{Bayesian}} Optimization on Transfer Learning for Medical Image Classification},
+  abstract = {The field of medicine has a history of adopting new technology. Video equipment and sensors are used to visualize areas of interest in the human allowing for doctors to make diagnoses based on imagery observations. However, the detection rate of the doctors towards diseases and abnormalities is heavily dependent on the experience and state of mind of the doctor doing the examination. Computer-aided detection systems are systems designed to aid the doctor in improving the detection rate, and they are using or experimenting with machine learning. Deep convolutional neural networks, a type of machine learning, are shown to be highly efficient at image detection, classification, and analysis. However, these networks require large datasets to train properly. Transfer learning is a training technique where we use a pre-trained machine learning model and transfer some of the attained knowledge from other application domains over to a new model. This way, we can use small datasets and train a model in much shorter time. In this respect, transfer learning works fine but has many configurations called hyperparameters which are often not optimized. Our work aims to address the lack of automatic hyperparameter optimization for transfer learning by experiments utilizing a known hyperparameter optimization method and creating a system for running those experiments. First, we decided to focus on the field of gastroenterology by utilizing two publicly available datasets showing images from the gastrointestinal tract. Next, we used a specific transfer learning method and chose hyperparameters suitable for automatic optimization. The optimization method we chose was Bayesian optimization because of its reputation for being one of the best methods for hyperparameter optimization. However, Bayesian optimization has hyperparameters of its own, and there are also different versions of Bayesian optimization. We chose to limit the thesis, so we use standard Bayesian optimization with standard parameters. We created a system for running automatic experiments of three different hyperparameter optimization strategies. With the system, we ran a set of experiments for each dataset. Between the strategies, one was successful in achieving a high validation accuracy, while the others were considered failures. Compared to baselines, our best models was around 10\% better. With these experiments, we demonstrated that automatic hyperparameter optimization is an effective strategy for increasing performance in transfer learning and that the best hyperparameters are nontrivial to select manually.},
+  language = {eng},
+  author = {Borgli, Rune Johan},
+  year = {2018},
+  file = {/home/henrik/Zotero/storage/F3CTSEMU/Borgli - 2018 - Hyperparameter optimization using Bayesian optimiz.pdf;/home/henrik/Zotero/storage/DGPRG2IR/64146.html}
+}
+
+@phdthesis{MedicalMultimedia17,
+  type = {Master's {{Thesis}}},
+  title = {A {{Medical Multimedia Real}}-{{Time Polyp Detection System}} Using {{Low Computational Resources}}},
+  abstract = {In this research, the focal point has been on real-time polyp detection on computers
+with low computational resources with the help of open source libraries such as LIRE
+Lucene, OpenCV.},
+  school = {University of Oslo},
+  author = {Khan, Asif Qayyum},
+  year = {2017},
+  file = {/home/henrik/Zotero/storage/5RYV6QNB/Khan - 2017 - A Medical Multimedia Real-Time Polyp Detection Sys.pdf}
+}
+
+@phdthesis{PolypDetection17,
+  type = {Master's {{Thesis}}},
+  title = {Polyp {{Detection}}: {{Effect}} of {{Early}} and {{Late Feature Fusion}}},
+  shorttitle = {Polyp {{Detection}}},
+  abstract = {In this thesis, we look at a specific component of these learning
+methods and how they affect performance in aiding medical systems. This
+component, called feature fusion, has two widely adopted variations: early
+fusion and late fusion. We seek to compare the performance of early and
+late fusion for medical diagnosis problems through image datasets, and
+provide some insight to data scientists on how our results can help their
+decision when building a practical system.},
+  school = {University of Oslo},
+  author = {Asskali, Salman},
+  year = {2017},
+  file = {/home/henrik/Zotero/storage/TAPV4X24/Asskali - 2017 - Polyp Detection Effect of Early and Late Feature .pdf}
+}
+
+@phdthesis{PolypDetection17a,
+  title = {Polyp {{Detection}} Using {{Neural Networks}} - {{Data Enhancement}} and {{Training Optimization}}},
+  abstract = {Colorectal cancer is the third most common type of cancer diagnosed for men and the second most for women. Today's main methods of examination are expensive, time consuming and intrusive for the patient. Recent technologies, such as CAD and ACD, aims to increase automation in the screening and examination processes. CAD could aid medical professionals during examinations by providing a second opinion, while ACD could be used to screen entire populations, and thus relieving pressure on the health care system. In recent years, neural networks have gained traction among researchers in topics regarding recognition, and we believe it can be utilized in these automated systems. In this thesis, we examine the performance of neural networks for polyp detection. We also explore how data enhancement affect the training and evaluation of the networks, and if it can be used to increase the polyp detection rate. Finally, we experiment with how various training techniques can be used to increase performance. We conclude that neural networks are suitable for polyp detection. We show how data enhancement and training optimization can be used to increase different aspects of the performance. We discuss what aspects are suitable for different scenarios. At the end, we also discuss how our system can be used to detect polyps per frame, per sequence and per polyp, and what the results of our system look like using the different metrics. Detection per frame can be considered a computer science viewpoint, while detection per sequence or per polyp is more of a medical field viewpoint.},
+  author = {Jensen, Rune},
+  year = {2017},
+  keywords = {Artificial neural network,Biological Neural Networks,Classification,Computer Assisted Diagnosis,Computer-aided design,Endoscopy of stomach,Greater,Machine learning,Mathematical optimization,Neoplasms,Neural Network Simulation,Object detection,Open-source software,polyps,Population,TensorFlow,Tract (literature),Traction TeamPage,Urinary tract infection,Weight},
+  file = {/home/henrik/Zotero/storage/DG89EWW9/Jensen - 2017 - Polyp Detection using Neural Networks - Data Enhan.pdf}
+}
+
+@phdthesis{AutomaticAnalysis17,
+  title = {Automatic {{Analysis}} of {{Endoscopic Videos}}},
+  abstract = {The human digestive system can be affected by many types of diseases. For example, three of the six most common cancer types (esophagus, stomach and colorectal) are located in the gastrointestinal tract. Colorectal cancer (CRC) is the third most common cancer in men and the second most common cancer in women worldwide, and Norway has one of the highest incidences of this cancer. Early detection is vital for the prognosis, level of treatment and survival. EIR is a multimedia system with the main objective of supporting doctors in gastrointestinal tract disease detection, both as a live examination system and an offline system for VCE. However, the detection and automatic analysis subsystem within EIR today consists of two parts; the detection subsystem and the localisation subsystem. Recent advances in machine learning, particularly deep learning, have provided excellent object detection models. This thesis explores the possibility of using a deep neural network at the base of the detection and automatic analysis subsystem in EIR, specifically by using You only look once (YOLO). YOLO is a state-of-the-art, real-time object detection system that was used together with the ASU Mayo Clinic polyp database to detect CRC precursors called polyps. The YOLO system reaches a satisfactory detection accuracy, while still being able to process videos in real-time. The proposed system and EIR is compared using the standard metrics of recall, precision and F1-score. When compared, it is clear that the system still has room for improvement in regard to its precision.},
+  language = {eng},
+  school = {University of Oslo},
+  author = {H{\o}iland, Torbj{\o}rn Nesb{\o}},
+  year = {2017},
+  file = {/home/henrik/Zotero/storage/SUFDRZJD/Høiland - 2017 - Automatic Analysis of Endoscopic Videos.pdf;/home/henrik/Zotero/storage/EKD2IYKW/56885.html}
+}
+
+@phdthesis{ComputerAidedScreening15,
+  title = {Computer-{{Aided Screening}} of {{Capsule Endoscopy Videos}}},
+  abstract = {Colon cancer accounts for almost 10\% of all cancer cases worldwide. It is also the fourth most common cause of death from cancer globally. However, many cases of colon cancer could be prevented by early screening and removal of colon polyps - a common precursor of colon cancer. In this respect, capsule endoscopy is a non-invasive screening method with the potential to significantly reduce the cost of screening as well as the discomfort caused for the patient using traditional endoscopy examination. The financial cost of evaluating the recorded video footage, as well as the availability of specialists, currently prevents the deployment of capsule endoscopy for mass screening. With this work, we research solutions for automating the evaluation of capsule endoscopy video sequences using machine learning, image recognition and extraction of global image features. Rather than focusing on a single approach, we build tools that can be used for conducting further experiments with different methods and algorithms. We present the prototype of an integrated software solution that can be used for collecting videos from hospitals, annotating videos, tracking objects in video sequences, build- ing training and testing datasets, training classifiers and eventually, testing and evaluating the generated classifiers. We evaluate our software by training classifiers that are based on three different image recognition approaches. We also test the generated classifiers with different datasets and thereby evaluate the different approaches for their feasibility of being used to recognize colon polyps. Our main conclusion is that state of the art image recognition methods, such as the use of Haar- features or Histogram of oriented Gradients based detectors, are not suitable for detecting lesions in the intestine because of the enormous variety of possible appearances and orientations of such lesions. Global image features such as Joint Composite Descriptor on the other hand, lead to very promising results. Performing leave-one-out-cross-validation with all 20 videos of the ASU-Mayo Clinic polyp database, our system achieves a weighted average precision of 93.9\% and a weighted average recall of 98.5\%.},
+  language = {eng},
+  school = {University of Oslo},
+  author = {Albisser, Zeno},
+  year = {2015},
+  file = {/home/henrik/Zotero/storage/9W6IJWWT/Albisser - 2015 - Computer-Aided Screening of Capsule Endoscopy Vide.pdf;/home/henrik/Zotero/storage/2MKQ2Z9T/47642.html}
 }
 
 

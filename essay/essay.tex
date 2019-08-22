@@ -6,13 +6,13 @@
 \usepackage{url}                    % Skrive url-er
 \usepackage[english]{babel}         % Ordelingsregler, osv (velg språk her)
 \usepackage[utf8]{inputenc}         % Riktig tegnsett
-\usepackage{float}                  % Figurer dukker opp der du ber om
-\usepackage{amsmath} 
-\usepackage{graphicx}               % Inkludere bilder
-\usepackage{subcaption}				% for subfigures environments
+\usepackage{float}                  % correct placement of figures
+\usepackage{amsmath} 				% math
+\usepackage{graphicx}               % figures
+\usepackage{subcaption}				% subfigures environments
 \usepackage{csquotes}
-\usepackage{hyperref}
-\usepackage{xcolor}
+\usepackage{hyperref}				% hyperlinks
+\usepackage{xcolor}					% colors 
 \usepackage[
 			block=ragged, 
 			backend=biber, 
@@ -20,8 +20,10 @@
 			sortcites=true, 
 			]{biblatex}
 % ---------------------------------------------------------
+% folder for figures
 \graphicspath{{images/}}
 
+% color for hyperlinks in pdf
 \hypersetup{
     colorlinks,
     linkcolor={red!30!black},
@@ -29,6 +31,7 @@
     urlcolor={blue!80!black}
 }
 
+% organize the biblatex-references
 \AtEveryBibitem{
   \clearlist{language}
   \clearlist{location}
@@ -40,7 +43,8 @@
   \clearfield{doi}
   \clearfield{series}
   
-  \ifentrytype{book}{}{ % Remove publisher and editor except for books
+  % remove publisher and editor except for books
+  \ifentrytype{book}{}{
     \clearlist{publisher}
     \clearname{editor}
   }
@@ -48,7 +52,8 @@
 
 \addbibresource{../references.bib}
 
-\interfootnotelinepenalty=10000 % prevent footnote split over multiple pages
+% prevent footnote split over multiple pages
+\interfootnotelinepenalty=10000
 
 %---------------------------------------------------------
 \pdfinfo{
