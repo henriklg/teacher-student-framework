@@ -3,8 +3,9 @@
 \documentclass[english, a4paper]{article}
 \usepackage[T1]{fontenc}            % Riktig fontencoding
 \usepackage[font=small, labelfont=bf]{caption} % Fin figur-undertekst
-\usepackage{url}                    % Skrive url-er
+%\usepackage{url}                    % Skrive url-er
 \usepackage[english]{babel}         % Ordelingsregler, osv (velg språk her)
+\usepackage{duoforside/duomasterforside}
 \usepackage[utf8]{inputenc}         % Riktig tegnsett
 \usepackage{float}                  % correct placement of figures
 \usepackage{amsmath} 				% math
@@ -13,8 +14,7 @@
 \usepackage{csquotes}
 \usepackage{hyperref}				% hyperlinks
 \usepackage{xcolor}					% colors 
-\usepackage[
-			block=ragged, 
+\usepackage[block=ragged, 
 			backend=biber, 
 			style=ieee, 
 			sortcites=true, 
@@ -22,6 +22,13 @@
 % ---------------------------------------------------------
 % folder for figures
 \graphicspath{{figures/}}
+
+
+\title{Time series analysis for medical videos}
+%\subtitle{}
+\author{Henrik Løland Gjestang}
+
+
 
 % color for hyperlinks in pdf - All black??!
 \hypersetup{
@@ -73,35 +80,25 @@
 % Front/title page
 % ----------------------------------------------------------
 \begin{document}
-\begin{titlepage}
-  \begin{center}
 
-  \textsc{}\\[1.0cm]
-  \textsc{\Large Essay}\\[0.5cm]
-  \rule{\linewidth}{0.5mm} \\[0.4cm]
-  {\huge \bfseries Time series analysis for medical videos}\\[0.10cm]
-  \rule{\linewidth}{0.5mm} \\[1.5cm]
-  \textsc{}\\[7.0cm]
+\duoforside[program={Computational Science},
+  dept={Department of Informatics},
+  option={Imaging and Biomedical Computing},
+  long]
 
-  \begin{minipage}{0.69\textwidth}
-    \begin{center} \large
-      Henrik Løland Gjestang\\ \url{henriklg@fys.uio.no} \\[0.8cm]
-    \end{center}
-  \end{minipage}
-  \vfill
-
-  \large{Date: \today}
-  \end{center}
-\end{titlepage}
 
 
 % ----------------------------------------------------------
 % Abstract, table of contents, List of figures/tables
 % ----------------------------------------------------------
+\section*{Abstract}
+This is the abstract part.
+
+
+\newpage
 \tableofcontents
 \newpage
 % ----------------------------------------------------------
-
 
 
 
