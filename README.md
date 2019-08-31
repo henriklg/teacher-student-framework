@@ -7,7 +7,7 @@ By Henrik Gjestang
 - TexLive
 - Biber 2.12
 
-'''
+```
 henrik@X1carbon:essay> which pdflatex
 /usr/local/texlive/2019/bin/x86_64-linux/pdflatex
 henrik@X1carbon:essay> pdflatex --version
@@ -16,4 +16,4 @@ kpathsea version 6.3.1
 Compiled with libpng 1.6.36; using libpng 1.6.36
 Compiled with zlib 1.2.11; using zlib 1.2.11
 Compiled with xpdf version 4.01
-'''
+```
