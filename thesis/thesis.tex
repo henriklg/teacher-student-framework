@@ -43,7 +43,6 @@
   \clearlist{language}
   \clearlist{location}
   \clearlist{publisher}
-  \clearlist{pages} % do not work
   
   \clearfield{isbn}
   \clearfield{issn}
@@ -62,6 +61,9 @@
 % prevent footnote split over multiple pages
 \interfootnotelinepenalty=10000
 
+% controlling the depth of content added to toc
+% -1=part, 0=chapter, 1=section, etc. 5=all
+\setcounter{tocdepth}{5}
 %---------------------------------------------------------
 \pdfinfo{
 %   /Title () 
@@ -81,34 +83,37 @@
 % ----------------------------------------------------------
 \begin{document}
 
+% DUO Forside
 \duoforside[program={Computational Science},
   dept={Department of Informatics},
   option={Imaging and Biomedical Computing},
   long]
 
-
-
 % ----------------------------------------------------------
-% Abstract, table of contents, List of figures/tables
+% Abstract, acknowledgements, LOC/F/T
 % ----------------------------------------------------------
+\pagenumbering{roman}
+
 \section*{Abstract}
 This is the abstract part.
+\clearpage
 
+\section*{Acknowledgements}
+I'd like to thank Tristan the cat and my fridge for brightening up my day when it seemed the darkest.
+\clearpage
 
-\newpage
-\tableofcontents
+% ----------------------------------------------------------
 
-\newpage
-\listoffigures
+\tableofcontents \clearpage
+\addcontentsline{toc}{section}{\listfigurename}
+\listoffigures \clearpage
+\addcontentsline{toc}{section}{\listtablename}
+\listoftables \clearpage
 
-\newpage
-\listoftables
-
-\newpage
 % ----------------------------------------------------------
 
 
-
+\pagenumbering{arabic}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 %-----------------------------------------------------------
@@ -397,7 +402,7 @@ Image segmention is the process of partitioning a image into multiple segments o
 
 Another important feature in this architecture is that in the upsampling portion of the network there is also large number of feature channels. These channels allow the network to pass on context information to the higher resolution layers. 
 
-A common problem in training neural networks are too little labeled training data. This is also the case for us. We require a lot of medical data, and personell with the expertise to correctly label our data are of high demand and they usually have very little time for projects like these. This is why \citeauthor*{UNetConvolutional15} use different methods of data augmentation to generate more training data. They apply elastic deformations to the available images, and this allows the network to learn invariance to such deformations without the need to see these transformations in the annoted image corpus. Which is particular important in biomedical segmentation since deformation used to be the most common variation in tissue and realistic deformations can be simulated efficiently \cite{UNetConvolutional15}. By doing this \citeauthor*{UNetConvolutional15} were able to achieve very good results (Table \ref{table:segmentation_results}).
+A common problem in training neural networks are too little labeled training data. This is also the case for us. We require a lot of medical data, and personell with the expertise to correctly label our data are of high demand and they usually have very little time for projects like these. This is why \citeauthor*{UNetConvolutional15} use different methods of data augmentation to generate more training data. They apply elastic deformations to the available images, and this allows the network to learn invariance to such deformations without the need to see these transformations in the annoted image corpus. Which is particular important in biomedical segmentation since deformation used to be the most common variation in tissue and realistic deformations can be simulated efficiently \cite{UNetConvolutional15}. By doing this \citeauthor*{UNetConvolutional15} were able to achieve very good results (Table \ref{tab:segmentation_results}).
 
 \begin{table} % table:segmentation_results
   \centering
@@ -413,7 +418,7 @@ A common problem in training neural networks are too little labeled training dat
     \hline
   \end{tabular}
   \caption{Segmentation results on the ISBI cell tracking challenge in 2015.}
-  \label{table:segmentation_results}
+  \label{tab:segmentation_results}
 \end{table}
 
 
