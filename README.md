@@ -2,6 +2,11 @@
 By Henrik Gjestang
 
 ## Requirements:
+
+### Code:
+
+
+### Latex:
 - Texmaker 5.0.2
 - Biblatex 3.8
 - TexLive
