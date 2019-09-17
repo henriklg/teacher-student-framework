@@ -1,0 +1,22 @@
+\documentclass[thesis.tex]{subfiles}
+
+\begin{document}
+
+
+\chapter{Related work} \label{related_work}
+% ----------------------------------------------------------
+% Lesion detection of endoscopy images based on convolutional neural network features
+% ----------------------------------------------------------
+
+\citeauthor*{LesionDetection15} have made a computer-aided lesion\footnote{a region in an organ or tissue which has suffered damage through injury or disease, such as a wound, ulcer, abscess, or tumour.} detection system which uses a trainable feature extractor, also based on a CNN, and feed the generic features to a Support Vector Machine which enhance the generalization ability \cite{LesionDetection15}. This method greatly outperform the earlier methods based on color and texture features. However we believe that by using neural networks to do the decision making we can further improve this detection system. 
+
+\medbreak 
+% Deep learning for polyp recognition in wireless capsule endoscopy images
+\citeauthor*{DeepLearning17} have accomplished an average overall recognition accuracy of 98.0\% for detecting polyps in WCE images by using a deep feature learning method, named stacked sparse autoencoder with image manifold constraint (SSAEIM). This method is built on a Sparse auto-encoder (SAE), a symmetrical and unsupervised neural network. It is an encoder–decoder architecture where the encoder network encodes pixel intensities as low dimensional attributes, while the decoder step reconstructs the original pixel intensities from the learned low-dimensional features \cite{DeepLearning17}. Detecting colorectal polyps are important becuase they are precursors to cancer, which may develop if the polyps are left untreated. Where we hopefully can build on this method is by using a larger dataset with pathology proof of other irregularities.
+
+\medbreak
+% A deep convolutional neural network for bleeding detection in Wireless Capsule Endoscopy images
+\citeauthor*{DeepConvolutional16} present a new automatic bleeding detection strategy based on a deep convolutional neural network and evaluate their method on an expanded dataset of 10,000 WCE images. Gastrointestinal (GI) tract bleeding is the most common abnormality in the tract, but also an important symptom or syndrome of other pathologies such as ulcers, polyps, tumors and Crohn's disease. Their method for detecting bleeding have an increase of around 2 percentage in $F_1$ score, up to 0.9955 \cite{DeepConvolutional16}. This method and its high score in somewhat limited to bleeding, and not very good at detecting other lesion. 
+Our goal is to develop a method for using deep learning to find more generalized pathologies in the gastrointestinal tract.
+
+\end{document}
