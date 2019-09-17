@@ -28,11 +28,12 @@
 % Folder for figures
 \graphicspath{ {figures/} }
 
+% Input to duomasterforside
 \title{Time series analysis for medical videos}
 %\subtitle{}
 \author{Henrik Løland Gjestang}
 
-% color for hyperlinks in pdf - All black??!
+% Color for hyperlinks in pdf - All black??!
 \hypersetup{
     colorlinks,
     linkcolor={black!20!black},
@@ -82,19 +83,21 @@
 % ----------------------------------------------------------
 \begin{document}
 
+\pagenumbering{roman}
+
 % DUO Forside
 \duoforside[program={Computational Science},
   dept={Department of Informatics},
   option={Imaging and Biomedical Computing},
   long]
 
-\pagenumbering{roman}
+% External documents (to make referencing (xr-hyper) compatible with subfiles)
+\externaldocument[C3-]{build/chapter03}
+\externaldocument[C4-]{build/chapter04}
 
 \begin{abstract}
 This is the abstract part. How does it look? This is the abstract part. How does it look? This is the abstract part. How does it look? This is the abstract part. How does it look?
 \end{abstract}
-
-
 
 \tableofcontents
 \addcontentsline{toc}{section}{\listfigurename}
@@ -111,13 +114,13 @@ This is the abstract part. How does it look? This is the abstract part. How does
 % ----------------------------------------------------------
 \pagenumbering{arabic}
 
-\subfile{chapter01}
+\subfile{chapter01} % Introduction
 \subfile{chapter02}
 \subfile{chapter03}
 \subfile{chapter04}
 \subfile{chapter05}
 \subfile{chapter06}
-\subfile{chapter07}
+\subfile{chapter07} % Conclusion
 % -----------------------END--------------------------------
 
 
