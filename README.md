@@ -2,6 +2,12 @@
 By Henrik Gjestang
 
 ## Requirements:
+This code was run on Ubuntu 18.04
+
+### Code:
+
+
+### Latex:
 - Texmaker 5.0.2
 - Biblatex 3.8
 - TexLive
