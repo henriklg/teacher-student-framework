@@ -1,12 +1,13 @@
 % ----------------------------------------------------------
 % -----------------------Preamble---------------------------
 % ----------------------------------------------------------
-\documentclass[english, a4paper]{report}
+\documentclass[english,a4paper,twoside]{report}
 
 % Packages
+\usepackage[a4paper,width=150mm,top=25mm,bottom=25mm]{geometry}
 \usepackage[font=small, labelfont=bf]{caption} % Fin figur-undertekst
-%\usepackage{url}                    % Skrive url-er
 \usepackage{subfiles}
+\usepackage{fancyhdr}
 \usepackage[english]{babel}         % Ordelingsregler, osv (velg språk her)
 \usepackage{duoforside/duomasterforside}
 \usepackage[utf8]{inputenc}         % Riktig tegnsett
@@ -16,9 +17,8 @@
 \usepackage{subcaption}				% subfigures environments
 \usepackage{csquotes}
 \usepackage{xr-hyper}				% cross-referencing between files
-\usepackage{hyperref}				% hyperlinks
+\usepackage[hidelinks]{hyperref}	% hyperlinks
 \usepackage{xcolor}					% colors 
-
 \usepackage[block=ragged, 
 			backend=biber, 
 			style=ieee, 
@@ -33,15 +33,7 @@
 %\subtitle{}
 \author{Henrik Løland Gjestang}
 
-% Color for hyperlinks in pdf - All black??!
-\hypersetup{
-    colorlinks,
-    linkcolor={black!20!black},
-    citecolor={blue!30!black},
-    urlcolor={blue!20!black}
-}
-
-% organize the biblatex-references
+% Organize the biblatex-references
 \AtEveryBibitem{
   \clearlist{language}
   \clearlist{location}
@@ -52,7 +44,7 @@
   \clearfield{doi}
   \clearfield{series}
   
-  % remove publisher and editor except for books
+  % Remove publisher and editor except for books
   \ifentrytype{book}{}{
     \clearlist{publisher}
     \clearname{editor}
@@ -61,15 +53,15 @@
 
 \addbibresource{../references.bib}
 
-% prevent footnote split over multiple pages
+% Prevent footnote split over multiple pages
 \interfootnotelinepenalty=10000
 
-% controlling the depth of content added to toc
+% Controlling the depth of content added to toc
 % -1=part, 0=chapter, 1=section, etc. 5=all
-\setcounter{tocdepth}{5}
-%---------------------------------------------------------
+\setcounter{tocdepth}{2}
+% ----------------------------------------------------------
 \pdfinfo{
-   /Title (Time series analysis for medical videos)
+    /Title (Time series analysis for medical videos)
 	/Author (Henrik Løland Gjestang)
 	/Subject ()
 	/Keywords ()
@@ -87,24 +79,35 @@
 
 % DUO Forside
 \duoforside[program={Computational Science},
-  dept={Department of Informatics},
-  option={Imaging and Biomedical Computing},
-  long]
+  			dept={Department of Informatics},
+  			option={Imaging and Biomedical Computing},
+  			long]
 
 % External documents (to make referencing (xr-hyper) compatible with subfiles)
+\externaldocument[C1-]{build/chapter01}
+\externaldocument[C2-]{build/chapter02}
 \externaldocument[C3-]{build/chapter03}
-\externaldocument[C4-]{build/chapter04}
 
-\begin{abstract}
+\section*{Abstract}
 This is the abstract part. How does it look? This is the abstract part. How does it look? This is the abstract part. How does it look? This is the abstract part. How does it look?
-\end{abstract}
+
+\cleardoublepage
+
+\section*{Acknowledgements}
+This thesis is submitted as part of the master's degree in informatics: Computational Science: Imaging and Biomedical Computing. It has been very interesting to work with ..
+\medbreak \noindent
+I would especially like to thank my supervisor Pål for ..
+\medbreak \noindent
+Thanks to my internal supervisor Professor Anne H. Solberg and the rest of the DSB group, for....
+\medbreak \noindent
+Finally, I would like to thank my parents for their encouragement and everlasting love.
+
 
 \tableofcontents
 \addcontentsline{toc}{section}{\listfigurename}
 \listoffigures
 \addcontentsline{toc}{section}{\listtablename}
 \listoftables
-\clearpage
 % -----------------------END--------------------------------
 
 
@@ -112,15 +115,13 @@ This is the abstract part. How does it look? This is the abstract part. How does
 % ----------------------------------------------------------
 % -------------------The main body--------------------------
 % ----------------------------------------------------------
+\cleardoublepage
+\pagestyle{fancy}
 \pagenumbering{arabic}
 
 \subfile{chapter01} % Introduction
-\subfile{chapter02}
-\subfile{chapter03}
-\subfile{chapter04}
-\subfile{chapter05}
-\subfile{chapter06}
-\subfile{chapter07} % Conclusion
+\subfile{chapter02} % The project
+\subfile{chapter03} % Conclusion
 % -----------------------END--------------------------------
 
 
