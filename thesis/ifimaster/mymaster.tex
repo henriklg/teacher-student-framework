@@ -1,0 +1,48 @@
+\documentclass[a4paper,english]{ifimaster}
+
+\usepackage[utf8]{inputenc}
+\usepackage{babel,duomasterforside}
+\usepackage{hyperref}
+
+\usepackage[backend=biber,style=authoryear]{biblatex}
+
+\addbibresource{citations.bib}
+
+\title{Master Thesis}
+\subtitle{A contribution to the world’s collected knowledge on this topic}
+\author{My name}
+
+\begin{document}
+\duoforside[dept={Department of Informatics},
+program={Informatics: Language and Communication},
+long]
+
+\frontmatter{}
+\chapter*{Abstract}
+
+\tableofcontents{}
+\listoffigures{}
+\listoftables{}
+
+\chapter*{Preface}
+
+\mainmatter{}
+\part{Introduction}
+
+Donald Knuth often says smart stuff ~\parencite{Knuth:2007:CPA:1283920.1283929}.
+
+\chapter{Background}
+
+\part{The project}
+
+\chapter{Planning the project}
+
+\part{Conclusion}
+
+\chapter{Results}
+
+\backmatter{}
+
+\printbibliography
+
+\end{document}
