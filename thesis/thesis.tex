@@ -18,7 +18,8 @@
 \usepackage{csquotes}
 \usepackage{xr-hyper}				% cross-referencing between files
 \usepackage[hidelinks]{hyperref}	% hyperlinks
-\usepackage{xcolor}					% colors 
+\usepackage{xcolor}					% colors
+\usepackage{epstopdf}				% convert high res images to low res images automatically 
 \usepackage[block=ragged, 
 			backend=biber, 
 			style=ieee, 
@@ -27,6 +28,9 @@
 % ---------------------------------------------------------
 % Folder for figures
 \graphicspath{ {figures/} }
+% Convert high res .pdf to low res .png
+\epstopdfDeclareGraphicsRule{.pdf}{png}{.png}{convert #1 \OutputFile}
+\DeclareGraphicsExtensions{.png,.pdf}
 
 % Input to duomasterforside
 \title{Time series analysis for medical videos}
