@@ -24,4 +24,5 @@ if __name__ == '__main__':
         print("start_tid er tid til forste screenshot.")
         print("Eksempel: %s 00:00:00:28 00:00:03:27" % (sys.argv[0]))
         sys.exit(1)
-    calc_time(sys.argv[1], sys.argv[2])
+    frame = calc_time(sys.argv[1], sys.argv[2])
+    print (frame)
