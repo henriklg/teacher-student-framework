@@ -15,8 +15,8 @@ def calc_time(start_time, capsule_time):
     frames = v.frames*2
     tc = Timecode(30, frames=frames)
 
-    print("Frames: %d, Timecode: %s" % (frames, tc))
-    
+#     print("Frames: %d, Timecode: %s" % (frames, tc))
+    return int(frames)
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
