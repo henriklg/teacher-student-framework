@@ -7,6 +7,9 @@ from timecode import *
 import sys
 
 def calc_time(start_time, capsule_time):
+    start_time = '00:'+start_time
+    capsule_time = '00:'+capsule_time
+    
     s1 = Timecode(60, start_time)
     c = Timecode(60, capsule_time)
 
