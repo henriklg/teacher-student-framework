@@ -4,12 +4,15 @@
 \documentclass[english,a4paper,twoside]{report}
 
 % Packages
-\usepackage[a4paper,width=150mm,top=25mm,bottom=25mm]{geometry}
-\usepackage[font=small, labelfont=bf]{caption} % Fin figur-undertekst
+\usepackage[a4paper,				% change layout of different elements such as paper size
+			width=150mm,top=25mm,
+			bottom=25mm]{geometry}
+\usepackage[font=small,
+			labelfont=bf]{caption}	% nice figure captions
 \usepackage{subfiles}
 \usepackage{fancyhdr}
 \usepackage[english]{babel}         % Ordelingsregler, osv (velg språk her)
-\usepackage{duoforside/duomasterforside}
+\usepackage{duo/duomasterforside}	% DUO master-forside
 \usepackage[utf8]{inputenc}         % Riktig tegnsett
 \usepackage{float}                  % correct placement of figures
 \usepackage{amsmath} 				% math
@@ -20,7 +23,7 @@
 \usepackage[hidelinks]{hyperref}	% hyperlinks
 \usepackage{xcolor}					% colors
 \usepackage{epstopdf}				% convert high res images to low res images automatically 
-\usepackage[block=ragged, 
+\usepackage[block=ragged, 			% referencing with biblatex
 			backend=biber, 
 			style=ieee, 
 			sortcites=true, 
