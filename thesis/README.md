@@ -54,16 +54,16 @@ thesis
 
 
 ```
-**henrik@X1carbon:~> which pdflatex**
-/usr/local/texlive/2019/bin/x86_64-linux/pdflatex
+henrik@X1carbon:~> which pdflatex
+    /usr/local/texlive/2019/bin/x86_64-linux/pdflatex
 henrik@X1carbon:~> which biber
-/usr/local/texlive/2019/bin/x86_64-linux/biber
+    /usr/local/texlive/2019/bin/x86_64-linux/biber
 henrik@X1carbon:~> which bibtex
-/usr/local/texlive/2019/bin/x86_64-linux/bibtex
+    /usr/local/texlive/2019/bin/x86_64-linux/bibtex
 henrik@X1carbon:~> pdflatex --version
-pdfTeX 3.14159265-2.6-1.40.20 (TeX Live 2019)
+    pdfTeX 3.14159265-2.6-1.40.20 (TeX Live 2019)
 henrik@X1carbon:~> biber --version
-biber version: 2.12
+    biber version: 2.12
 henrik@X1carbon:~> bibtex --version
-BibTeX 0.99d (TeX Live 2019)
+    BibTeX 0.99d (TeX Live 2019)
 ```
