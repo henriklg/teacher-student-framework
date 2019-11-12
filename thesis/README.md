@@ -1,8 +1,11 @@
 # How to compile thesis.tex
 
 ## Setup
-1. Install texlive: sudo apt install texlive-latex-extra
-2. Make sure the editor running Biber, not BibTeX: biber build/%
+1. Install texlive: sudo apt install texlive-latex-extra 
+[How to install LaTex on Ubuntu 18.04](https://linuxconfig.org/how-to-install-latex-on-ubuntu-18-04-bionic-beaver-linux "Latex installation")
+2. Set up editor (TexMaker) to export to build folder
+3. Make sure the editor running Biber, not BibTeX: biber build/%
+4. Configure editor to run quick build: "pdflatex + biblatex + pdflatex (x2) + view pdf"
 
 ## Structure tree
 ```
@@ -40,8 +43,7 @@ thesis
 
 ## Compile
 1. First compile each subfile with pdflatex to generate aux files
-2. Compile the thesis.tex with quick build 
-3. pdflatex + bibtex + pdflatex (x2) + view pdf
+2. Compile the thesis.tex with quick build from setup step 4.
 
 
 ### Requirements:
@@ -50,10 +52,9 @@ thesis
 - Biblatex 3.8
 - Biber 2.12
 
-[How to install LaTex on Ubuntu 18.04 Bionic Beaver Linux](https://linuxconfig.org/how-to-install-latex-on-ubuntu-18-04-bionic-beaver-linux "Latex installation")
 
 ```
-henrik@X1carbon:~> which pdflatex
+**henrik@X1carbon:~> which pdflatex**
 /usr/local/texlive/2019/bin/x86_64-linux/pdflatex
 henrik@X1carbon:~> which biber
 /usr/local/texlive/2019/bin/x86_64-linux/biber
