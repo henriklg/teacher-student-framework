@@ -4,7 +4,7 @@
 1. Install texlive: sudo apt install texlive-latex-extra
 2. Make sure the editor running Biber, not BibTeX: biber build/%
 
-## Tree
+## Structure tree
 ```
 thesis
     ├── 01-introduction.tex
