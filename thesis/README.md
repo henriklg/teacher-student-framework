@@ -5,7 +5,38 @@
 2. Make sure the editor running Biber, not BibTeX: biber build/%
 
 ## Tree
-- TODO
+```
+thesis
+    ├── 01-introduction.tex
+    ├── 02-background.tex
+    ├── 03-methodology.tex
+    ├── 04-experiments.tex
+    ├── 05-conclusions.tex
+    ├── build
+    │   ├── 01-introduction.aux
+    │   ├── 01-introduction.bcf
+    ...
+    │   ├── thesis.aux
+    │   ├── thesis.lot
+    │   ├── thesis.out
+    │   ├── thesis.pdf
+    │   └── thesis.toc
+    ├── duo
+    │   ├── duo_forside_example.tex
+    │   ├── duoforside.sty
+    │   ├── duoforside.tex
+    │   ├── duomasterforside.sty
+    │   ├── DUO_UiO_segl.eps.bb
+    │   ├── DUO_UiO_segl.eps.gz
+    │   └── DUO_UiO_segl.png
+    ├── figures
+    ├── ifimaster
+    │   ├── ifimaster.cls
+    │   ├── mymaster.pdf
+    │   └── mymaster.tex
+    ├── README.md
+    └── thesis.tex
+```
 
 ## Compile
 1. First compile each subfile with pdflatex to generate aux files
@@ -18,6 +49,7 @@
 - Texmaker 5.0.2
 - Biblatex 3.8
 - Biber 2.12
+
 [How to install LaTex on Ubuntu 18.04 Bionic Beaver Linux](https://linuxconfig.org/how-to-install-latex-on-ubuntu-18-04-bionic-beaver-linux "Latex installation")
 
 ```
