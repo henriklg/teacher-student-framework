@@ -10,7 +10,7 @@
 \usepackage[font=small,
 			labelfont=bf]{caption}	% nice figure captions
 \usepackage{subfiles}
-\usepackage{fancyhdr}
+%\usepackage{fancyhdr}				% header - activate with pagestyle{fancy}
 \usepackage[english]{babel}         % Ordelingsregler, osv (velg språk her)
 \usepackage{duo/duomasterforside}	% DUO master-forside
 \usepackage[utf8]{inputenc}         % Riktig tegnsett
@@ -28,7 +28,23 @@
 			style=ieee, 
 			sortcites=true, 
 			]{biblatex}
+\usepackage[symbols,
+			nogroupskip,
+			nonumberlist,
+			sort=use]
+			{glossaries-extra}		% list of symbols
+
+
 % ---------------------------------------------------------
+% make the glossaries for list of symbols
+\makenoidxglossaries
+
+\glsxtrnewsymbol[description={position}]{x}{\ensuremath{x}}
+%\glsxtrnewsymbol[description={velocity}]{v}{\ensuremath{v}}
+%\glsxtrnewsymbol[description={acceleration}]{a}{\ensuremath{a}}
+%\glsxtrnewsymbol[description={time}]{t}{\ensuremath{t}}
+%\glsxtrnewsymbol[description={force}]{F}{\ensuremath{F}}
+
 % Folder for figures
 \graphicspath{ {figures/} }
 % Convert high res .pdf to low res .png
@@ -113,10 +129,16 @@ Finally, I would like to thank my parents for their encouragement and everlastin
 
 
 \tableofcontents
-\addcontentsline{toc}{section}{\listfigurename}
+
 \listoffigures
-\addcontentsline{toc}{section}{\listtablename}
+\addcontentsline{toc}{chapter}{\listfigurename}
+
 \listoftables
+\addcontentsline{toc}{chapter}{\listtablename}
+
+\printnoidxglossary[type=symbols,
+			style=long,
+			title={List of Symbols}]
 % -----------------------END--------------------------------
 
 
@@ -125,7 +147,7 @@ Finally, I would like to thank my parents for their encouragement and everlastin
 % -------------------The main body--------------------------
 % ----------------------------------------------------------
 \cleardoublepage
-\pagestyle{fancy}
+%\pagestyle{fancy}  NB: need fancyhdr package
 \pagenumbering{arabic}
 
 \subfile{01-introduction}
