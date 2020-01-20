@@ -68,7 +68,11 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# tf.cache
+*.tfcache*
+
 
 # folders
 resources/
 data/
+logs/
