@@ -42,8 +42,6 @@ def create_dataset(data_dir, outcasts=None, binary=False, neg_class=None, verbos
             print ("Negative class names: ", neg_class)
             print ()
     
-    else: 
-        continue()
+    ds = tf.data.Dataset.list_files(files)
     
-    return_dict = {'ds': tf.data.Dataset.list_files(files),
-                   'ds_size': DS_SIZE}
+    return [ds, DS_SIZE]
