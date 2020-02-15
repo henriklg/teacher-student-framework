@@ -23,42 +23,63 @@ def create_dataset(config):
     data_dir = config["data_dir"]
     AUTOTUNE = tf.data.experimental.AUTOTUNE
 
-    DS_SIZE = len(list(data_dir.glob('*/*/*.*g')))
-
-    directories = np.array([item.name for item in data_dir.glob('train/*') if item.name != 'metadata.json'])
-
-    class_names = directories
-    NUM_CLASSES = len(directories)
+    DS_SIZE = len(list(data_dir.glob('*/*.*g')))
+    directories = np.array([item.name for item in data_dir.glob('*') if item.name != 'metadata.json'])
     
-    # Create a dataset of the file paths
-    list_ds = tf.data.Dataset.list_files(str(data_dir/'*/*'))
+    # Remove the outcast folder
+    outcast = config["outcast"]
+    if outcast != None:
+        directories = np.delete(directories, np.where(outcast == directories))
+        if config["verbosity"] > 0: print ("Removed outcast:", outcast)
+
+    if config["DS_INFO"] == 'binary':
+        class_names = np.array(['Negative','Positive'])
+        neg_class_name = ['ship'] # 'normal'-class
+        pos_class_names = np.delete(directories, np.where(neg_class_name == directories))
+        # Print info about neg/pos split
+        if config["verbosity"] > 0: print_class_info(directories, data_dir, DS_SIZE, class_names, neg_class_name, pos_class_names)
+    else:     
+        class_names = directories
+    
+    NUM_CLASSES = len(directories)
     
     # Print info about classes
     if config["verbosity"] > 0:
-        print ("Class names: ", class_names)
+        print ("Directories: ", directories, end='\n\n')
         
         samples_per_class = []
         for class_name in class_names:
-            class_samples = len(list(data_dir.glob('*/'+class_name+'/*.*g')))
+            class_samples = len(list(data_dir.glob(class_name+'/*.*g')))
             samples_per_class.append(class_samples)
             print('{0:18}: {1:3d}'.format(class_name, class_samples))
 
         print ('\nTotal number of images: {}, in {} classes'.format(DS_SIZE, NUM_CLASSES))
 
         # If one class contains more than half of the entire sample size
-        if np.max(samples_per_class) > DATASET_SIZE//2:
+        if np.max(samples_per_class) > DS_SIZE//2:
             print ("But the dataset is mainly shit")
 
     # Create a dataset of the file paths
-    list_ds = tf.data.Dataset.list_files(str(data_dir/'*/*/*.png'))
+    list_ds = tf.data.Dataset.list_files(str(data_dir/'[!')+str(outcast+']*/*'))
+#     list_ds = tf.data.Dataset.list_files(str(data_dir/'*/*.*g'))
         
     def get_label(file_path):
-        # convert the path to a list of path components
-        parts = tf.strings.split(file_path, os.path.sep)
-        # get class integer from class-list
-        label_int = tf.reduce_min(tf.where(tf.equal(parts[-2], class_names)))
-        # cast to tensor array with dtype=uint8
-        return tf.dtypes.cast(label_int, tf.int32)
+        # if binary ds
+        if config["DS_INFO"] == 'binary':
+            parts = tf.strings.split(file_path, os.path.sep)
+            bc = parts[-2] == pos_class_names
+            nz_cnt = tf.math.count_nonzero(bc)
+            if (nz_cnt > 0):
+                return tf.constant(1, tf.int32)
+            return tf.constant(0, tf.int32)
+        # if complete ds
+        else:
+            # convert the path to a list of path components
+            parts = tf.strings.split(file_path, os.path.sep)
+            # get class integer from class-list
+            label_int = tf.reduce_min(tf.where(tf.equal(parts[-2], class_names)))
+            # cast to tensor array with dtype=uint8
+            return tf.dtypes.cast(label_int, tf.int32)
 
     def decode_img(img):
         # convert the compressed string to a 3D uint8 tensor
@@ -92,12 +113,13 @@ def create_dataset(config):
     # Create training, test and validation dataset
     cache_dir = config["cache_dir"]
     img_width = config["IMG_SIZE"][0]
+    ds_info = config["DS_INFO"]
     train_ds = prepare_for_training(
-        train_ds, config["BATCH_SIZE"], cache="{}/{}_train.tfcache".format(cache_dir, img_width))
+        train_ds, config["BATCH_SIZE"], cache="{}/{}_train.tfcache".format(cache_dir, img_width, ds_info))
     test_ds = prepare_for_training(
-        test_ds, config["BATCH_SIZE"],cache="{}/{}_test.tfcache".format(cache_dir, img_width))
+        test_ds, config["BATCH_SIZE"],cache="{}/{}_test.tfcache".format(cache_dir, img_width, ds_info))
     val_ds = prepare_for_training(
-        val_ds, config["BATCH_SIZE"],cache="{}/{}_val.tfcache".format(cache_dir, img_width))
+        val_ds, config["BATCH_SIZE"],cache="{}/{}_val.tfcache".format(cache_dir, img_width, ds_info))
     
     return_config = {
         "NUM_CLASSES": NUM_CLASSES,
@@ -137,26 +159,26 @@ def prepare_for_training(ds, bs, cache=True, shuffle_buffer_size=3000):
     
     
     
-def print_class_info(directories_ex_outcast, data_dir, pos_class, neg_class):
+def print_class_info(directories, data_dir, DS_SIZE, class_names, pos_class, neg_class):
     # Extract and print info about the class split 
     
-    for i, class_ in enumerate([neg,pos]):
+    for i, class_ in enumerate([neg_class, pos_class]):
         print ("{} class names:".format(class_names[i]))
         for cl in class_:
             print ("{}- {}".format(" "*8, cl))
     
     neg_count = pos_count = 0
-    for dir_name in directories_ex_outcast:
+    for dir_name in directories:
         # Number of samples in 'class_name' folder
         class_samples = len(list(data_dir.glob(dir_name+'/*.*g')))
 
-        if (dir_name == neg_class_name[0]):
+        if (dir_name == neg_class[0]):
             neg_count += class_samples
         else:
             pos_count += class_samples
 
-    print ('\nNegative samples: {0:5} | {1:5.2f}%'.format(neg_count, neg_count/DATASET_SIZE*100))
-    print ('Positive samples: {0:5} | {1:5.2f}%'.format(pos_count, pos_count/DATASET_SIZE*100))
+    print ('\nNegative samples: {0:5} | {1:5.2f}%'.format(neg_count, neg_count/DS_SIZE*100))
+    print ('Positive samples: {0:5} | {1:5.2f}%'.format(pos_count, pos_count/DS_SIZE*100))
     # Print number of images in dataset (excluded samples in outcast)
     print ('\nTotal number of images:', DS_SIZE)
     
