@@ -7,7 +7,7 @@ import os
 import pathlib
 import matplotlib.pyplot as plt
 
-def create_dataset():
+def create_dataset(config):
     """
     Create a tf.data dataset
     
@@ -20,48 +20,34 @@ def create_dataset():
     Return:
     tf.data.Dataset   
     """
+    data_dir = config["data_dir"]
     AUTOTUNE = tf.data.experimental.AUTOTUNE
 
-    MODEL = 'cnn' 
-    DS_INFO = 'complete'
-    NUM_EPOCHS = 50
-    BATCH_SIZE = 64
-
-    IMG_HEIGHT = 32
-    IMG_WIDTH = 32
-    NUM_CHANNELS = 3
-    IMG_SIZE = (IMG_HEIGHT, IMG_WIDTH, NUM_CHANNELS)
-
-    # epoch*batch_size*img_size
-    model_name = '{}x{}x{}_{}_{}'.format(NUM_EPOCHS, BATCH_SIZE, IMG_WIDTH, DS_INFO, MODEL)
-
-    data_dir = pathlib.Path('/mnt/sdb/cifar10/')
-    outcast = 'None'
-
-    DATASET_SIZE = len(list(data_dir.glob('*/*/*.*g')))
-    STEPS_PER_EPOCH = np.ceil(DATASET_SIZE/BATCH_SIZE)
+    DS_SIZE = len(list(data_dir.glob('*/*/*.*g')))
 
     directories = np.array([item.name for item in data_dir.glob('train/*') if item.name != 'metadata.json'])
 
     class_names = directories
     NUM_CLASSES = len(directories)
-    print ("Class names: ", class_names)
-
     
     # Create a dataset of the file paths
     list_ds = tf.data.Dataset.list_files(str(data_dir/'*/*'))
     
-    samples_per_class = []
-    for class_name in class_names:
-        class_samples = len(list(data_dir.glob('*/'+class_name+'/*.*g')))
-        samples_per_class.append(class_samples)
-        print('{0:18}: {1:3d}'.format(class_name, class_samples))
+    # Print info about classes
+    if config["verbosity"] > 0:
+        print ("Class names: ", class_names)
+        
+        samples_per_class = []
+        for class_name in class_names:
+            class_samples = len(list(data_dir.glob('*/'+class_name+'/*.*g')))
+            samples_per_class.append(class_samples)
+            print('{0:18}: {1:3d}'.format(class_name, class_samples))
 
-    print ('\nTotal number of images: {}, in {} classes'.format(DATASET_SIZE, NUM_CLASSES))
+        print ('\nTotal number of images: {}, in {} classes'.format(DS_SIZE, NUM_CLASSES))
 
-    # If one class contains more than half of the entire sample size
-    if np.max(samples_per_class) > DATASET_SIZE//2:
-        print ("But the dataset is mainly shit")
+        # If one class contains more than half of the entire sample size
+        if np.max(samples_per_class) > DATASET_SIZE//2:
+            print ("But the dataset is mainly shit")
 
     # Create a dataset of the file paths
     list_ds = tf.data.Dataset.list_files(str(data_dir/'*/*/*.png'))
@@ -80,7 +66,7 @@ def create_dataset():
         # Use `convert_image_dtype` to convert to floats in the [0,1] range.
         img = tf.image.convert_image_dtype(img, tf.float32)
         # resize the image to the desired size.
-        return tf.image.resize(img, [IMG_WIDTH, IMG_HEIGHT])
+        return tf.image.resize(img, [config["IMG_SIZE"][0], config["IMG_SIZE"][1]])
 
     def process_path(file_path):
         label = get_label(file_path)
@@ -93,9 +79,9 @@ def create_dataset():
     labeled_ds = list_ds.map(process_path, num_parallel_calls=AUTOTUNE)
     
     
-    train_size = int(0.7 * DATASET_SIZE)
-    val_size = int(0.15 * DATASET_SIZE)
-    test_size = int(0.15 * DATASET_SIZE)
+    train_size = int(0.7 * DS_SIZE)
+    val_size = int(0.15 * DS_SIZE)
+    test_size = int(0.15 * DS_SIZE)
 
     train_ds = labeled_ds.take(train_size)
     test_ds = labeled_ds.skip(train_size)
@@ -103,14 +89,26 @@ def create_dataset():
     test_ds = test_ds.take(test_size)
     
     
-    
-
     # Create training, test and validation dataset
-    train_ds = prepare_for_training(train_ds, BATCH_SIZE, cache="./cache/{}_train.tfcache".format(IMG_WIDTH))
-    test_ds = prepare_for_training(test_ds, BATCH_SIZE,cache="./cache/{}_test.tfcache".format(IMG_WIDTH))
-    val_ds = prepare_for_training(val_ds, BATCH_SIZE,cache="./cache/{}_val.tfcache".format(IMG_WIDTH))
+    cache_dir = config["cache_dir"]
+    img_width = config["IMG_SIZE"][0]
+    train_ds = prepare_for_training(
+        train_ds, config["BATCH_SIZE"], cache="{}/{}_train.tfcache".format(cache_dir, img_width))
+    test_ds = prepare_for_training(
+        test_ds, config["BATCH_SIZE"],cache="{}/{}_test.tfcache".format(cache_dir, img_width))
+    val_ds = prepare_for_training(
+        val_ds, config["BATCH_SIZE"],cache="{}/{}_val.tfcache".format(cache_dir, img_width))
     
-    return train_ds, test_ds, val_ds
+    return_config = {
+        "NUM_CLASSES": NUM_CLASSES,
+        "DS_SIZE": DS_SIZE,
+        "train_size": train_size,
+        "test_size": test_size,
+        "val_size": val_size,
+        "class_names": class_names
+    }
+    
+    return train_ds, test_ds, val_ds, return_config
     
     
     
@@ -139,40 +137,41 @@ def prepare_for_training(ds, bs, cache=True, shuffle_buffer_size=3000):
     
     
     
-def print_class_info(directories, data_dir, pos_class, neg_class):
+def print_class_info(directories_ex_outcast, data_dir, pos_class, neg_class):
     # Extract and print info about the class split 
     
-    idx = 0
-    for class_ in [pos_class, neg_class]:
-        print ("{} class names:".format(['Positive', 'Negative'][idx]))
+    for i, class_ in enumerate([neg,pos]):
+        print ("{} class names:".format(class_names[i]))
         for cl in class_:
             print ("{}- {}".format(" "*8, cl))
-        idx += 1
     
-    neg_count = 0
-    pos_count = 0
-    for class_name in directories:
+    neg_count = pos_count = 0
+    for dir_name in directories_ex_outcast:
         # Number of samples in 'class_name' folder
-        class_samples = len(list(data_dir.glob(class_name+'/*.jpg')))
-        
-        if (class_name == neg_class[0]):
+        class_samples = len(list(data_dir.glob(dir_name+'/*.*g')))
+
+        if (dir_name == neg_class_name[0]):
             neg_count += class_samples
         else:
             pos_count += class_samples
 
-    DS_SIZE = neg_count+pos_count
-    print ('\nNegative samples: {0:5} | {1:5.2f}%'.format(neg_count, neg_count/DS_SIZE*100))
-    print ('Positive samples: {0:5} | {1:5.2f}%'.format(pos_count, pos_count/DS_SIZE*100))
+    print ('\nNegative samples: {0:5} | {1:5.2f}%'.format(neg_count, neg_count/DATASET_SIZE*100))
+    print ('Positive samples: {0:5} | {1:5.2f}%'.format(pos_count, pos_count/DATASET_SIZE*100))
     # Print number of images in dataset (excluded samples in outcast)
     print ('\nTotal number of images:', DS_SIZE)
     
     
     
 def show_image(img, class_names):
-    for image, label in img:
-        class_index = int(label.numpy()[0])
-        plt.figure()
+    if (isinstance(img, tf.data.Dataset)):
+        for image, label in img:
+            plt.figure(frameon=False, facecolor='white')
+            title = class_names[label.numpy()]+" ["+str(label.numpy())+"]"
+            plt.title(title, fontdict={'color':'white','size':20})
+            plt.imshow(image.numpy())
+            plt.axis('off')
+    else:
         plt.figure(frameon=False, facecolor='white')
-        plt.title(class_names[class_index], fontdict={'color':'white','size':20})
-        plt.imshow(image.numpy())
+        plt.title("None", fontdict={'color':'white','size':20})
+        plt.imshow(img.numpy())
         plt.axis('off')
