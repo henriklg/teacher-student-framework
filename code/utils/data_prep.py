@@ -149,6 +149,23 @@ def create_dataset(config):
         print ("{:32} {:>5}".format("Test dataset sample size:", get_size(test_ds)))
         print ("{:32} {:>5}".format("Validation dataset sample size:", get_size(val_ds)))
     
+    
+#     def augment(img, label):
+#         # Augment the image using tf.image
+#         # Standardize
+#         img = tf.image.per_image_standardization(img)
+#         # Pad with 8 pixels
+#         img = tf.image.resize_with_crop_or_pad(img, IMG_HEIGHT + 8, IMG_WIDTH + 8)
+#         # Randomly crop the image back to original size
+#         img = tf.image.random_crop(img, [IMG_HEIGHT, IMG_WIDTH, NUM_CHANNELS])
+#         # Randomly flip image
+#         img = tf.image.random_flip_left_right(img)
+#         return img, label
+
+#     # Augment the training data
+#     train_ds = train_ds.map(augment, num_parallel_calls=AUTOTUNE)
+    
+    
     # Create training, test and validation dataset
     cache_dir = config["cache_dir"]
     img_width = config["IMG_SIZE"][0]
