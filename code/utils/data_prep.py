@@ -21,48 +21,42 @@ def create_dataset(config):
     tf.data.Dataset   
     """
     data_dir = config["data_dir"]
+    outcast = config["outcast"]
+    verbosity = config["verbosity"]
     AUTOTUNE = tf.data.experimental.AUTOTUNE
 
     DS_SIZE = len(list(data_dir.glob('*/*.*g')))
     directories = np.array([item.name for item in data_dir.glob('*') if item.name != 'metadata.json'])
     
     # Remove the outcast folder
-    outcast = config["outcast"]
     if outcast != None:
         directories = np.delete(directories, np.where(outcast == directories))
-        if config["verbosity"] > 0: print ("Removed outcast:", outcast)
+        if verbosity > 0: print ("Removed outcast:", outcast, end="\n\n")
 
+    # If the dataset is to be split in two classes
     if config["DS_INFO"] == 'binary':
         class_names = np.array(['Negative','Positive'])
+        NUM_CLASSES = len(class_names)
         neg_class_name = ['ship'] # 'normal'-class
         pos_class_names = np.delete(directories, np.where(neg_class_name == directories))
         # Print info about neg/pos split
-        if config["verbosity"] > 0: print_class_info(directories, data_dir, DS_SIZE, class_names, neg_class_name, pos_class_names)
+        if verbosity > 0: 
+            DS_SIZE = print_bin_class_info(directories, data_dir, DS_SIZE, outcast, class_names, neg_class_name, pos_class_names)
     else:     
         class_names = directories
+        NUM_CLASSES = len(class_names)
+        # Print info about classes
+        if verbosity > 0: 
+            DS_SIZE = print_class_info(directories, data_dir, DS_SIZE, outcast, NUM_CLASSES)
     
-    NUM_CLASSES = len(directories)
-    
-    # Print info about classes
-    if config["verbosity"] > 0:
-        print ("Directories: ", directories, end='\n\n')
-        
-        samples_per_class = []
-        for class_name in class_names:
-            class_samples = len(list(data_dir.glob(class_name+'/*.*g')))
-            samples_per_class.append(class_samples)
-            print('{0:18}: {1:3d}'.format(class_name, class_samples))
-
-        print ('\nTotal number of images: {}, in {} classes'.format(DS_SIZE, NUM_CLASSES))
-
-        # If one class contains more than half of the entire sample size
-        if np.max(samples_per_class) > DS_SIZE//2:
-            print ("But the dataset is mainly shit")
-
     # Create a dataset of the file paths
-    list_ds = tf.data.Dataset.list_files(str(data_dir/'[!')+str(outcast+']*/*'))
-#     list_ds = tf.data.Dataset.list_files(str(data_dir/'*/*.*g'))
-        
+    if outcast == None:
+        files_string = str(data_dir/'*/*.*g')
+    else:
+        files_string = str(data_dir/'[!{}]*/*'.format(outcast))
+    if verbosity > 0: print ("Dataset.list_files: ",files_string)
+    list_ds = tf.data.Dataset.list_files(files_string)
+    
     def get_label(file_path):
         # if binary ds
         if config["DS_INFO"] == 'binary':
@@ -159,10 +153,10 @@ def prepare_for_training(ds, bs, cache=True, shuffle_buffer_size=3000):
     
     
     
-def print_class_info(directories, data_dir, DS_SIZE, class_names, pos_class, neg_class):
+def print_bin_class_info(directories, data_dir, DS_SIZE, outcast, class_names, neg, pos):
     # Extract and print info about the class split 
     
-    for i, class_ in enumerate([neg_class, pos_class]):
+    for i, class_ in enumerate([neg, pos]):
         print ("{} class names:".format(class_names[i]))
         for cl in class_:
             print ("{}- {}".format(" "*8, cl))
@@ -172,17 +166,36 @@ def print_class_info(directories, data_dir, DS_SIZE, class_names, pos_class, neg
         # Number of samples in 'class_name' folder
         class_samples = len(list(data_dir.glob(dir_name+'/*.*g')))
 
-        if (dir_name == neg_class[0]):
+        if (dir_name == neg[0]):
             neg_count += class_samples
         else:
             pos_count += class_samples
 
+    DS_SIZE = neg_count+pos_count
     print ('\nNegative samples: {0:5} | {1:5.2f}%'.format(neg_count, neg_count/DS_SIZE*100))
     print ('Positive samples: {0:5} | {1:5.2f}%'.format(pos_count, pos_count/DS_SIZE*100))
     # Print number of images in dataset (excluded samples in outcast)
     print ('\nTotal number of images:', DS_SIZE)
+    return DS_SIZE
+
     
-    
+def print_class_info(directories, data_dir, DS_SIZE, outcast, NUM_CLASSES):
+    print ("Directories: ", directories, end='\n\n')
+
+    samples_per_class = []
+    for dir_name in directories:
+        class_samples = len(list(data_dir.glob(dir_name+'/*.*g')))
+        samples_per_class.append(class_samples)
+        print('{0:18}: {1:3d}'.format(dir_name, class_samples))
+
+    DS_SIZE = sum(samples_per_class)
+    print ('\nTotal number of images: {}, in {} classes'.format(DS_SIZE, NUM_CLASSES))
+
+    # If one class contains more than half of the entire sample size
+    if np.max(samples_per_class) > DS_SIZE//2:
+        print ("But the dataset is mainly shit")
+    return DS_SIZE
+
     
 def show_image(img, class_names):
     if (isinstance(img, tf.data.Dataset)):
