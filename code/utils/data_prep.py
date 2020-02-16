@@ -54,7 +54,7 @@ def create_dataset(config):
         files_string = str(data_dir/'*/*.*g')
     else:
         files_string = str(data_dir/'[!{}]*/*'.format(outcast))
-    if verbosity > 0: print ("Dataset.list_files: ",files_string)
+    if verbosity > 0: print ("Dataset.list_files: ",files_string, "\n")
     list_ds = tf.data.Dataset.list_files(files_string)
     
     def get_label(file_path):
@@ -93,6 +93,42 @@ def create_dataset(config):
     # Set 'num_parallel_calls' so multiple images are loaded and processed in parallel
     labeled_ds = list_ds.map(process_path, num_parallel_calls=AUTOTUNE)
     
+    if verbosity > 0:
+        for images, labels in labeled_ds.batch(10).take(10):
+            print(labels.numpy())
+    
+    if config["resample"] and config["DS_INFO"] == 'binary':
+        print ("\nResamplng the dataset..")
+        labeled_ds = labeled_ds.batch(1024)
+        
+        counts = labeled_ds.take(10).reduce(
+        initial_state={'class_0': 0, 'class_1': 0},
+        reduce_func = count)
+
+        counts = np.array([counts['class_0'].numpy(),
+                   counts['class_1'].numpy()]).astype(np.float32)
+
+        counts_sum = counts.sum()
+        assert counts_sum != 0, "Can't divide by zero"
+
+        fractions = counts/counts_sum
+        if verbosity > 0:
+            print("\nFractions: ", fractions)
+            print("Counts: ", counts, end="\n\n")
+        
+        negative_ds = labeled_ds.unbatch().filter(lambda image, label: label==0).repeat()
+        positive_ds = labeled_ds.unbatch().filter(lambda image, label: label==1).repeat()
+    
+        balanced_ds = tf.data.experimental.sample_from_datasets(
+            [negative_ds, positive_ds], [0.5, 0.5])
+        
+        if verbosity > 0:
+            for images, labels in balanced_ds.batch(10).take(10):
+                print(labels.numpy())
+        
+        # Overwrite the old dataset with the new and resampled one
+        labeled_ds = balanced_ds
+    
     
     train_size = int(0.7 * DS_SIZE)
     val_size = int(0.15 * DS_SIZE)
@@ -102,18 +138,29 @@ def create_dataset(config):
     test_ds = labeled_ds.skip(train_size)
     val_ds = test_ds.skip(val_size)
     test_ds = test_ds.take(test_size)
-    
+
+    # Print info about the dataset split
+    if verbosity > 0:
+        def get_size(ds):
+            return tf.data.experimental.cardinality(ds).numpy()
+
+        print ("\n{:32} {:>5}".format("Full dataset sample size:", get_size(labeled_ds)))
+        print ("{:32} {:>5}".format("Train dataset sample size:", get_size(train_ds)))
+        print ("{:32} {:>5}".format("Test dataset sample size:", get_size(test_ds)))
+        print ("{:32} {:>5}".format("Validation dataset sample size:", get_size(val_ds)))
     
     # Create training, test and validation dataset
     cache_dir = config["cache_dir"]
     img_width = config["IMG_SIZE"][0]
     ds_info = config["DS_INFO"]
     train_ds = prepare_for_training(
-        train_ds, config["BATCH_SIZE"], cache="{}/{}_train.tfcache".format(cache_dir, img_width, ds_info))
+        train_ds, config["BATCH_SIZE"], cache="{}/{}_{}_train.tfcache".format(cache_dir, img_width, ds_info))
     test_ds = prepare_for_training(
-        test_ds, config["BATCH_SIZE"],cache="{}/{}_test.tfcache".format(cache_dir, img_width, ds_info))
+        test_ds, config["BATCH_SIZE"],cache="{}/{}_{}_test.tfcache".format(cache_dir, img_width, ds_info))
     val_ds = prepare_for_training(
-        val_ds, config["BATCH_SIZE"],cache="{}/{}_val.tfcache".format(cache_dir, img_width, ds_info))
+        val_ds, config["BATCH_SIZE"],cache="{}/{}_{}_val.tfcache".format(cache_dir, img_width, ds_info))
+    
+   
     
     return_config = {
         "NUM_CLASSES": NUM_CLASSES,
@@ -210,3 +257,17 @@ def show_image(img, class_names):
         plt.title("None", fontdict={'color':'white','size':20})
         plt.imshow(img.numpy())
         plt.axis('off')
+        
+def count(counts, batch):
+    images, labels = batch
+    
+    class_1 = labels == 1
+    class_1 = tf.cast(class_1, tf.int32)
+    
+    class_0 = labels == 0
+    class_0 = tf.cast(class_0, tf.int32)
+
+    counts['class_0'] += tf.reduce_sum(class_0)
+    counts['class_1'] += tf.reduce_sum(class_1)
+
+    return counts
