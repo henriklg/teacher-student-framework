@@ -274,7 +274,9 @@ def show_image(img, class_names):
         plt.title("None", fontdict={'color':'white','size':20})
         plt.imshow(img.numpy())
         plt.axis('off')
-        
+    
+
+    
 def count(counts, batch):
     images, labels = batch
     
