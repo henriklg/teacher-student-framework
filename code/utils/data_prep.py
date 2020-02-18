@@ -37,7 +37,7 @@ def create_dataset(config):
     if config["DS_INFO"] == 'binary':
         class_names = np.array(['Negative','Positive'])
         NUM_CLASSES = len(class_names)
-        neg_class_name = ['ship'] # 'normal'-class
+        neg_class_name = config['neg_class'] # 'normal'-class
         pos_class_names = np.delete(directories, np.where(neg_class_name == directories))
         # Print info about neg/pos split
         if verbosity > 0: 
@@ -140,7 +140,7 @@ def create_dataset(config):
     test_ds = test_ds.take(test_size)
 
     # Print info about the dataset split
-    if verbosity > 0:
+    if verbosity > 0 and not config["resample"]:
         def get_size(ds):
             return tf.data.experimental.cardinality(ds).numpy()
 
