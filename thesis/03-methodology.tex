@@ -55,7 +55,32 @@ The Kvasir dataset \cite{KVASIRMultiClass17} contains images from inside the gas
 
 
 \subsection{Hyper Kvasir} \label{hyper_kvasir}
-The Hyper-Kvasir dataset is one of the largest medical datasets containing 110.079 images and 373 videos where it captures anatomical landmarks and pathological and normal findings. Resulting in more than 1.1 million images and video frames all together. The dataset contain four parts, labeled images, unlabeled images, segmented imagesa and lastly, videos.
+The Hyper-Kvasir dataset \cite{HyperKvasirComprehensive19} is one of the largest medical datasets containing 110.079 images and 373 videos where it captures anatomical landmarks and pathological and normal findings. Resulting in more than 1.1 million images and video frames all together. The dataset contain four parts, labeled images, unlabeled images, segmented images and lastly, videos. In total the dataset is 70 GB in size, but can be downloaded and stored in parts from \url{https://datasets.simula.no/hyper-kvasir/}.
+
+
+\subsubsection{Labeled images}
+Hyper-Kvasir contains 10.662 labeled images. The images are split into 23 different classes, and are stored in a folder with the same name as its corresponding class. All of the images are stored in JPEG format \cite{JPEGStill92}, which means it has some image quality loss but quite insignificant compared to the reduction in file size. Like in situations most often encountered the classes has a different number of samples, this is a challenge in the medical field because some findings occur more often than others.
+
+% ask Pål for the figure with class/sample distribution from original hyper-kvasir paper
+
+\subsubsection{Unlabeled images}
+This part of the dataset contains 99.417 images
+
+\subsubsection{segmented images}
+In figure \ref{fig:kvasir_seg_example} we can see an example of the segmented Kvasir images.
+
+\begin{figure}[H] % kvasir_seg_example
+  \begin{center}
+    \includegraphics[width=0.7\textwidth]{kvasir_seg_example.png}
+    \caption{Example of a segmented image from Hyper-Kvasir dataset.}
+    \label{fig:kvasir_seg_example}
+  \end{center}
+\end{figure}
+
+
+\subsubsection{Videos}
+
+
 
 
 % ----------------------------------------------------------
