@@ -23,6 +23,7 @@ def create_dataset(config):
     data_dir = config["data_dir"]
     outcast = config["outcast"]
     verbosity = config["verbosity"]
+    neg_count = pos_count = 0
     AUTOTUNE = tf.data.experimental.AUTOTUNE
 
     DS_SIZE = len(list(data_dir.glob('*/*.*g')))
@@ -34,14 +35,15 @@ def create_dataset(config):
         if verbosity > 0: print ("Removed outcast:", outcast, end="\n\n")
 
     # If the dataset is to be split in two classes
-    if config["DS_INFO"] == 'binary':
+    if config["ds_info"] == 'binary':
         class_names = np.array(['Negative','Positive'])
         NUM_CLASSES = len(class_names)
         neg_class_name = config['neg_class'] # 'normal'-class
         pos_class_names = np.delete(directories, np.where(neg_class_name == directories))
         # Print info about neg/pos split
         if verbosity > 0: 
-            DS_SIZE = print_bin_class_info(directories, data_dir, DS_SIZE, outcast, class_names, neg_class_name, pos_class_names)
+            DS_SIZE, neg_count, pos_count = print_bin_class_info(directories, data_dir, 
+                                            DS_SIZE, outcast, class_names, neg_class_name, pos_class_names)
     else:     
         class_names = directories
         NUM_CLASSES = len(class_names)
@@ -59,7 +61,7 @@ def create_dataset(config):
     
     def get_label(file_path):
         # if binary ds
-        if config["DS_INFO"] == 'binary':
+        if config["ds_info"] == 'binary':
             parts = tf.strings.split(file_path, os.path.sep)
             bc = parts[-2] == pos_class_names
             nz_cnt = tf.math.count_nonzero(bc)
@@ -81,7 +83,7 @@ def create_dataset(config):
         # Use `convert_image_dtype` to convert to floats in the [0,1] range.
         img = tf.image.convert_image_dtype(img, tf.float32)
         # resize the image to the desired size.
-        return tf.image.resize(img, [config["IMG_SIZE"][0], config["IMG_SIZE"][1]])
+        return tf.image.resize(img, [config["img_shape"][0], config["img_shape"][1]])
 
     def process_path(file_path):
         label = get_label(file_path)
@@ -97,7 +99,7 @@ def create_dataset(config):
         for images, labels in labeled_ds.batch(10).take(10):
             print(labels.numpy())
     
-    if config["resample"] and config["DS_INFO"] == 'binary':
+    if config["resample"] and config["ds_info"] == 'binary':
         print ("\nResamplng the dataset..")
         labeled_ds = labeled_ds.batch(1024)
         
@@ -168,24 +170,26 @@ def create_dataset(config):
     
     # Create training, test and validation dataset
     cache_dir = config["cache_dir"]
-    img_width = config["IMG_SIZE"][0]
-    ds_info = config["DS_INFO"]
+    img_width = config["img_shape"][0]
+    ds_info = config["ds_info"]
     train_ds = prepare_for_training(
-        train_ds, config["BATCH_SIZE"], cache="{}/{}_{}_train.tfcache".format(cache_dir, img_width, ds_info))
+        train_ds, config["batch_size"], cache="{}/{}_{}_train.tfcache".format(cache_dir, img_width, ds_info))
     test_ds = prepare_for_training(
-        test_ds, config["BATCH_SIZE"],cache="{}/{}_{}_test.tfcache".format(cache_dir, img_width, ds_info))
+        test_ds, config["batch_size"],cache="{}/{}_{}_test.tfcache".format(cache_dir, img_width, ds_info))
     val_ds = prepare_for_training(
-        val_ds, config["BATCH_SIZE"],cache="{}/{}_{}_val.tfcache".format(cache_dir, img_width, ds_info))
+        val_ds, config["batch_size"],cache="{}/{}_{}_val.tfcache".format(cache_dir, img_width, ds_info))
     
    
     
     return_config = {
-        "NUM_CLASSES": NUM_CLASSES,
-        "DS_SIZE": DS_SIZE,
+        "num_classes": NUM_CLASSES,
+        "ds_size": DS_SIZE,
         "train_size": train_size,
         "test_size": test_size,
         "val_size": val_size,
-        "class_names": class_names
+        "class_names": class_names,
+        "neg_count": neg_count,
+        "pos_count": pos_count
     }
     
     return train_ds, test_ds, val_ds, return_config
@@ -240,7 +244,7 @@ def print_bin_class_info(directories, data_dir, DS_SIZE, outcast, class_names, n
     print ('Positive samples: {0:5} | {1:5.2f}%'.format(pos_count, pos_count/DS_SIZE*100))
     # Print number of images in dataset (excluded samples in outcast)
     print ('\nTotal number of images:', DS_SIZE)
-    return DS_SIZE
+    return DS_SIZE, neg_count, pos_count
 
     
 def print_class_info(directories, data_dir, DS_SIZE, outcast, NUM_CLASSES):
