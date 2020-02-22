@@ -24,7 +24,8 @@
 \usepackage{xcolor}					% colors
 \usepackage{epstopdf}				% convert high res images to low res images automatically 
 \usepackage[block=ragged, 			% referencing with biblatex
-			backend=biber, 
+			backend=biber,
+			backref=true, 
 			style=ieee, 
 			sortcites=true, 
 			]{biblatex}
@@ -36,6 +37,12 @@
 
 
 % ---------------------------------------------------------
+% Change "(cit. on p. x)" to "(page x, y)"
+%\DefineBibliographyStrings{english}{%
+%  backrefpage = {page},% originally "cited on page"
+%  backrefpages = {pages},% originally "cited on pages"
+%}
+
 % make the glossaries for list of symbols
 \makenoidxglossaries
 
