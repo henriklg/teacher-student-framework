@@ -1,5 +1,6 @@
 \documentclass[thesis.tex]{subfiles}
 
+
 \begin{document}
 
 % ----------------------------------------------------------
@@ -14,6 +15,14 @@
 % ----------------------------------------------------------
 
 
+\subsection{Colon cancer} \label{colon_cancer}
+% ----------------------------------------------------------
+% what are colon cancer, and other lesions in GI tract 
+% doing to the effected patients, what are death rates
+% and the cost to society etc
+% ----------------------------------------------------------
+
+
 \subsection{The digestive system}  \label{the_digestive_system}
 % ----------------------------------------------------------
 % what to look for when analyzing videos from the digestive system
@@ -24,7 +33,7 @@ The most common way of screening patients is with a endoscope. When this tool is
 
 These diseases have varying patterns and while some can be easy to split apart, some are more similar in pattern. While for an untrained eye it can be easy to spot that something is wrong it is very difficult to describe with words what that might be or even harder to write a program to detect the correct characteristic features of the disease. This is why we rely on having good amount of labeled data for this project to work. For increased accuracy we may have to look closer at a couple of diseases. Preferably two irregularities that both have different characteristics and lots of labeled training data.
 
-\begin{figure}[ht] % digestive-system
+\begin{figure}[ht] % fig:digestive-system
   \begin{center}
     \includegraphics[width=0.5\textwidth]{digestive-system}
     \caption[An overview of the terms used to describe the digestive system]{An overview of the terms used to describe the digestive system\footnotemark.}
@@ -96,8 +105,17 @@ That is why in the year \citeyear{WirelessCapsule00} \citeauthor*{WirelessCapsul
 % ----------------------------------------------------------
 
 As apposed to using regular optic-fiber endoscopy, it can be difficult to know the location and orientation of the capsule when it is traveling through the digestive system. In a paper by \citeauthor*{ClassifyingDigestive15} it is shown that by using Deep Convolutional Networks (DCNN) it is possible to classify the digestive organs in wireless capsule endoscopy with about 95\% classification accuracy on average \cite{ClassifyingDigestive15}.
-The DCNN-based WCE digestive organ classifiaction system is constructed of three stages of convolution, pooling and two fully-connected layers. This is illustrated in Figure 3 in the paper \cite{ClassifyingDigestive15}. The main steps of this convolutional neural network are described in detail in section \ref{convolutional_neural_network}.
+The DCNN-based WCE digestive organ classification system is constructed of three stages of convolution, pooling and two fully-connected layers. This is illustrated in Figure 3 in the paper \cite{ClassifyingDigestive15}. The main steps of this convolutional neural network are described in detail in section \ref{convolutional_neural_network}.
 
+\subsection{Imbalanced data}
+
+\subsection{TensorFlow}
+
+\subsection{Data pipeline}
+
+\subsection{How to evaluate a model}
+
+\subsection{Performance metrics}
 
 \subsection{Convolutional Neural Network} \label{convolutional_neural_network}
 % write some general stuff about CNN's
