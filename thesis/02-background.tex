@@ -219,13 +219,20 @@ Now with regards to $z_i^L$
 
 \begin{equation}
   \begin{aligned}
-  \frac{\partial C}{\partial z_i^L} &= \sum_k^N \frac{\partial C}{\partial y_k}\frac{\partial y_k}{\partial z_i^L} \\
+  \frac{\partial C}{\partial z_i^L} ={} & \sum_k^N \frac{\partial C}{\partial y_k}\frac{\partial y_k}{\partial z_i^L} \\
   &= \frac{\partial C}{\partial y_i}\frac{\partial y_i}{\partial z_i^L} - \sum_k^N \frac{\partial C}{\partial y_k}\frac{\partial y_k}{\partial z_i^L} \\
   &= -t_i(1 - y_i) + \sum_{k \ne i}t_ky_i \\
   &= y_i - t_i
   \end{aligned}
 \end{equation}
-
+teest 
+\begin{equation}
+\begin{aligned}
+F ={} & \{F_{x} \in  F_{c} : (|S| > |C|) \\
+      & \cap (\mathrm{minPixels}  < |S| < \mathrm{maxPixels}) \\
+      & \cap (|S_{\mathrm{conected}}| > |S| - \epsilon)\}
+\end{aligned}
+\end{equation}
 And finally with regards to the weights
 
 \begin{equation}
