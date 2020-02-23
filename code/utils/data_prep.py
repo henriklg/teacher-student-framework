@@ -212,7 +212,7 @@ def prepare_for_training(ds, bs, cache=True, shuffle_buffer_size=3000):
     # Repeat forever
     ds = ds.repeat()
 
-    ds = ds.batch(bs)
+    ds = ds.batch(bs, drop_remainder=False)
 
     # `prefetch` lets the dataset fetch batches in the background while the model
     # is training.
@@ -265,18 +265,19 @@ def print_class_info(directories, data_dir, DS_SIZE, outcast, NUM_CLASSES):
     return DS_SIZE
 
     
-def show_image(img, class_names):
+def show_image(img, class_names=None, title=None):
     if (isinstance(img, tf.data.Dataset)):
         for image, label in img:
             plt.figure(frameon=False, facecolor='white')
-            title = class_names[label.numpy()]+" ["+str(label.numpy())+"]"
-            plt.title(title, fontdict={'color':'white','size':20})
+            class_name = class_names[label.numpy()]+" ["+str(label.numpy())+"]"
+            plt.title(class_name, fontdict={'color':'white','size':20})
             plt.imshow(image.numpy())
             plt.axis('off')
     else:
         plt.figure(frameon=False, facecolor='white')
-        plt.title("None", fontdict={'color':'white','size':20})
-        plt.imshow(img.numpy())
+        if type(title) == str:
+            plt.title(title, fontdict={'color':'white','size':20})
+        plt.imshow(img)
         plt.axis('off')
     
 
