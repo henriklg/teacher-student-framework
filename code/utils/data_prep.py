@@ -142,9 +142,9 @@ def create_dataset(config):
     
     # Split into train, test and validation data
     train_size = int(0.7 * DS_SIZE)
-    val_size = int(0.15 * DS_SIZE)
     test_size = int(0.15 * DS_SIZE)
-
+    val_size = int(0.15 * DS_SIZE)
+    
     train_ds = labeled_ds.take(train_size)
     test_ds = labeled_ds.skip(train_size)
     val_ds = test_ds.skip(val_size)
@@ -159,6 +159,11 @@ def create_dataset(config):
         print ("{:32} {:>5}".format("Train dataset sample size:", get_size(train_ds)))
         print ("{:32} {:>5}".format("Test dataset sample size:", get_size(test_ds)))
         print ("{:32} {:>5}".format("Validation dataset sample size:", get_size(val_ds)))
+    elif verbosity > 0 and config["resample"]:
+        print ("\n{:32} {:>5}".format("Full dataset sample size:", DS_SIZE))
+        print ("{:32} {:>5}".format("Train dataset sample size:", train_size))
+        print ("{:32} {:>5}".format("Test dataset sample size:", test_size))
+        print ("{:32} {:>5}".format("Validation dataset sample size:", val_size))
     
     
 #     def augment(img, label):
@@ -231,31 +236,34 @@ def prepare_for_training(ds, bs, cache=True, shuffle_buffer_size=4000):
     
     
 def print_bin_class_info(directories, data_dir, DS_SIZE, outcast, class_names, neg, pos):
-    # Extract and print info about the class split 
-    
-    for i, class_ in enumerate([neg, pos]):
-        print ("{} class names:".format(class_names[i]))
-        for cl in class_:
-            class_samples = len(list(data_dir.glob(cl+'/*.*g')))
-            print ("{}- {} : {}".format(" "*8, cl, class_samples))
-    
-    neg_count = pos_count = 0
+    """
+    Extract and print info about the class split of binary dataset
+    """
+    # Count the samples in each folder
+    count_dir = {}
+    negpos = [0, 0]
     for dir_name in directories:
         # Number of samples in 'class_name' folder
-        class_samples = len(list(data_dir.glob(dir_name+'/*.*g')))
-
+        count = len(list(data_dir.glob(dir_name+'/*.*g')))
+        count_dir[dir_name] = count
+        
         if (dir_name == neg[0]):
-            neg_count += class_samples
+            negpos[0] += count
         else:
-            pos_count += class_samples
+            negpos[1] += count
+    
+    tot = np.sum(negpos)
+    # Print folder name and amount of samples
+    for i, class_ in enumerate([neg, pos]):
+        print ("\n{:27} : {:5} | {:2.2f}%".format(class_names[i], negpos[i], negpos[i]/tot*100))
+        print ("-"*45)
+        for cl in class_:
+            print ("{:5}- {:20} : {:5} | {:>2.2f}%".format(" "*5, cl, count_dir[cl], count_dir[cl]/tot*100))
+    print ('\nTotal number of image {} : {}\n'.format(" "*5, tot))
+    
+    return tot, negpos[0], negpos[1]
 
-    DS_SIZE = neg_count+pos_count
-    print ('\nNegative samples: {0:5} | {1:5.2f}%'.format(neg_count, neg_count/DS_SIZE*100))
-    print ('Positive samples: {0:5} | {1:5.2f}%'.format(pos_count, pos_count/DS_SIZE*100))
-    # Print number of images in dataset (excluded samples in outcast)
-    print ('\nTotal number of images:', DS_SIZE)
-    return DS_SIZE, neg_count, pos_count
-
+    
     
 def print_class_info(directories, data_dir, DS_SIZE, outcast, NUM_CLASSES):
     print ("Directories: ", directories, end='\n\n')
