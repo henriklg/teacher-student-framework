@@ -20,12 +20,12 @@ def create_dataset(config):
     Return:
     tf.data.Dataset   
     """
+    # Some parameters
     data_dir = config["data_dir"]
     outcast = config["outcast"]
     verbosity = config["verbosity"]
     neg_count = pos_count = 0
     AUTOTUNE = tf.data.experimental.AUTOTUNE
-
     DS_SIZE = len(list(data_dir.glob('*/*.*g')))
     directories = np.array([item.name for item in data_dir.glob('*') if item.name != 'metadata.json'])
     
@@ -34,7 +34,8 @@ def create_dataset(config):
         directories = np.delete(directories, np.where(outcast == directories))
         if verbosity > 0: print ("Removed outcast:", outcast, end="\n\n")
 
-    # If the dataset is to be split in two classes
+    ## Print info about the dataset
+    # Binary dataset
     if config["ds_info"] == 'binary':
         class_names = np.array(['Negative','Positive'])
         NUM_CLASSES = len(class_names)
@@ -44,6 +45,7 @@ def create_dataset(config):
         if verbosity > 0: 
             DS_SIZE, neg_count, pos_count = print_bin_class_info(directories, data_dir, 
                                             DS_SIZE, outcast, class_names, neg_class_name, pos_class_names)
+    # Full dataset
     else:     
         class_names = directories
         NUM_CLASSES = len(class_names)
@@ -51,7 +53,7 @@ def create_dataset(config):
         if verbosity > 0: 
             DS_SIZE = print_class_info(directories, data_dir, DS_SIZE, outcast, NUM_CLASSES)
     
-    # Create a dataset of the file paths
+    # Create a tf.dataset of the file paths
     if outcast == None:
         files_string = str(data_dir/'*/*.*g')
     else:
@@ -59,6 +61,7 @@ def create_dataset(config):
     if verbosity > 0: print ("Dataset.list_files: ",files_string, "\n")
     list_ds = tf.data.Dataset.list_files(files_string)
     
+    # Functions for the data pipeline
     def get_label(file_path):
         # if binary ds
         if config["ds_info"] == 'binary':
@@ -92,17 +95,20 @@ def create_dataset(config):
         img = decode_img(img)
         return img, label
 
-    # Set 'num_parallel_calls' so multiple images are loaded and processed in parallel
+    # Create dataset of label, image pairs from the tf.dataset of image paths
     labeled_ds = list_ds.map(process_path, num_parallel_calls=AUTOTUNE)
     
+    # Print some labels (to check the class-distribution)
     if verbosity > 0:
         for images, labels in labeled_ds.batch(10).take(10):
             print(labels.numpy())
     
+    # Resample the binary dataset
     if config["resample"] and config["ds_info"] == 'binary':
         print ("\nResamplng the dataset..")
         labeled_ds = labeled_ds.batch(1024)
         
+        # Count the samples of negative and positive images
         counts = labeled_ds.take(10).reduce(
         initial_state={'class_0': 0, 'class_1': 0},
         reduce_func = count)
@@ -118,20 +124,23 @@ def create_dataset(config):
             print("\nFractions: ", fractions)
             print("Counts: ", counts, end="\n\n")
         
+        # Create dataset for each class
         negative_ds = labeled_ds.unbatch().filter(lambda image, label: label==0).repeat()
         positive_ds = labeled_ds.unbatch().filter(lambda image, label: label==1).repeat()
-    
+        
+        # Sample from the two datasets in a 50/50 distribution
         balanced_ds = tf.data.experimental.sample_from_datasets(
             [negative_ds, positive_ds], [0.5, 0.5])
         
+        # Print some labels (to check the class-distribution)
         if verbosity > 0:
             for images, labels in balanced_ds.batch(10).take(10):
                 print(labels.numpy())
         
-        # Overwrite the old dataset with the new and resampled one
+        # Overwrite the old dataset with the new, resampled one
         labeled_ds = balanced_ds
     
-    
+    # Split into train, test and validation data
     train_size = int(0.7 * DS_SIZE)
     val_size = int(0.15 * DS_SIZE)
     test_size = int(0.15 * DS_SIZE)
@@ -180,8 +189,8 @@ def create_dataset(config):
         val_ds, config["batch_size"],cache="{}/{}_{}_val.tfcache".format(cache_dir, img_width, ds_info))
     
    
-    
-    return_config = {
+    # Return some of the data
+    return_params = {
         "num_classes": NUM_CLASSES,
         "ds_size": DS_SIZE,
         "train_size": train_size,
@@ -192,12 +201,12 @@ def create_dataset(config):
         "pos_count": pos_count
     }
     
-    return train_ds, test_ds, val_ds, return_config
+    return train_ds, test_ds, val_ds, return_params
     
     
     
 
-def prepare_for_training(ds, bs, cache=True, shuffle_buffer_size=3000):
+def prepare_for_training(ds, bs, cache=True, shuffle_buffer_size=4000):
     # This is a small dataset, only load it once, and keep it in memory.
     # use `.cache(filename)` to cache preprocessing work for datasets that don't
     # fit in memory.
@@ -227,7 +236,8 @@ def print_bin_class_info(directories, data_dir, DS_SIZE, outcast, class_names, n
     for i, class_ in enumerate([neg, pos]):
         print ("{} class names:".format(class_names[i]))
         for cl in class_:
-            print ("{}- {}".format(" "*8, cl))
+            class_samples = len(list(data_dir.glob(cl+'/*.*g')))
+            print ("{}- {} : {}".format(" "*8, cl, class_samples))
     
     neg_count = pos_count = 0
     for dir_name in directories:
