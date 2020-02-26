@@ -58,6 +58,7 @@ def create_dataset(config):
         files_string = str(data_dir/'*/*.*g')
     else:
         files_string = str(data_dir/'[!{}]*/*'.format(outcast))
+    
     if verbosity > 0: print ("Dataset.list_files: ",files_string, "\n")
     list_ds = tf.data.Dataset.list_files(files_string)
     
@@ -186,6 +187,9 @@ def create_dataset(config):
     cache_dir = config["cache_dir"]
     img_width = config["img_shape"][0]
     ds_info = config["ds_info"]
+    # Create cache-dir if not already exists
+    pathlib.Path(cache_dir).mkdir(parents=True, exist_ok=True)
+    
     train_ds = prepare_for_training(
         train_ds, config["batch_size"], cache="{}/{}_{}_train.tfcache".format(cache_dir, img_width, ds_info))
     test_ds = prepare_for_training(
@@ -253,6 +257,8 @@ def print_bin_class_info(directories, data_dir, DS_SIZE, outcast, class_names, n
             negpos[1] += count
     
     tot = np.sum(negpos)
+    assert tot != 0, "Can't divide by zero."
+    
     # Print folder name and amount of samples
     for i, class_ in enumerate([neg, pos]):
         print ("\n{:27} : {:5} | {:2.2f}%".format(class_names[i], negpos[i], negpos[i]/tot*100))
@@ -267,20 +273,21 @@ def print_bin_class_info(directories, data_dir, DS_SIZE, outcast, class_names, n
     
 def print_class_info(directories, data_dir, DS_SIZE, outcast, NUM_CLASSES):
     print ("Directories: ", directories, end='\n\n')
-
-    samples_per_class = []
+    
+    # Count number of samples for each folder
+    count_dir = {}
     for dir_name in directories:
-        class_samples = len(list(data_dir.glob(dir_name+'/*.*g')))
-        samples_per_class.append(class_samples)
-        print('{0:18}: {1:3d}'.format(dir_name, class_samples))
+        count_dir[dir_name] = len(list(data_dir.glob(dir_name+'/*.*g')))
 
-    DS_SIZE = sum(samples_per_class)
-    print ('\nTotal number of images: {}, in {} classes'.format(DS_SIZE, NUM_CLASSES))
+    tot = sum(count_dir.values())
+    assert tot != 0, "Can't divide by zero."
+    
+    for folder, count in count_dir.items():
+        print ("{:28}: {:4d} | {:2.2f}%".format(folder, count, count/tot*100))
+        
+    print ('\nTotal number of images: {}, in {} classes.\n'.format(DS_SIZE, NUM_CLASSES))
 
-    # If one class contains more than half of the entire sample size
-    if np.max(samples_per_class) > DS_SIZE//2:
-        print ("But the dataset is mainly shit")
-    return DS_SIZE
+    return tot
 
     
 def show_image(img, class_names=None, title=None):
