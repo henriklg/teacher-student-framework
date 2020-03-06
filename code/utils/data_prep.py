@@ -158,11 +158,20 @@ def create_dataset(config):
     pathlib.Path(cache_dir).mkdir(parents=True, exist_ok=True)
     
     train_ds = prepare_for_training(
-        train_ds, config["batch_size"], cache="{}/{}_{}_train.tfcache".format(cache_dir, img_width, ds_info))
+        train_ds, config["batch_size"], 
+        cache="{}/{}_{}_train.tfcache".format(cache_dir, img_width, ds_info),
+        shuffle_buffer_size=config["shuffle_buffer_size"]
+    )
     test_ds = prepare_for_training(
-        test_ds, config["batch_size"],cache="{}/{}_{}_test.tfcache".format(cache_dir, img_width, ds_info))
+        test_ds, config["batch_size"], 
+        cache="{}/{}_{}_test.tfcache".format(cache_dir, img_width, ds_info),
+        shuffle_buffer_size=config["shuffle_buffer_size"]
+    )
     val_ds = prepare_for_training(
-        val_ds, config["batch_size"],cache="{}/{}_{}_val.tfcache".format(cache_dir, img_width, ds_info))
+        val_ds, config["batch_size"], 
+        cache="{}/{}_{}_val.tfcache".format(cache_dir, img_width, ds_info),
+        shuffle_buffer_size=config["shuffle_buffer_size"]
+    )
     
    
     # Return some of the data
@@ -191,8 +200,9 @@ def prepare_for_training(ds, bs, cache=True, shuffle_buffer_size=4000):
             ds = ds.cache(cache)
         else:
             ds = ds.cache()
-
-    ds = ds.shuffle(buffer_size=shuffle_buffer_size)
+    
+    if shuffle_buffer_size > 0:
+        ds = ds.shuffle(buffer_size=shuffle_buffer_size)
 
     # Repeat forever
     ds = ds.repeat()
