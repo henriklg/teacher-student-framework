@@ -362,7 +362,8 @@ def _get_model_by_name(model_name, input_shape=None, include_top=True, weights=N
         raise ValueError('Parameter `weights` should be one of [None, "imagenet"]')
 
     if weights == 'imagenet' and model_name not in IMAGENET_WEIGHTS:
-        raise ValueError('There are not pretrained weights for {} model.'.format(model_name))
+        #raise ValueError('There are not pretrained weights for {} model.'.format(model_name))
+        pass
 
     if weights == 'imagenet' and include_top and classes != 1000:
         raise ValueError('If using `weights` and `include_top`'
