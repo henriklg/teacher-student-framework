@@ -1,21 +1,20 @@
 \documentclass[thesis.tex]{subfiles}
 
-
 \begin{document}
 
 % ----------------------------------------------------------
-\chapter{Background} \label{background}
+\chapter{Background} \label{chap:background}
 % ----------------------------------------------------------
 % Present the background
 % ----------------------------------------------------------
 
 
 % ----------------------------------------------------------
-\section{Medical scenario} \label{medical_scenario}
+\section{Medical scenario} \label{sec:medical_scenario}
 % ----------------------------------------------------------
 
 
-\subsection{Colon cancer} \label{colon_cancer}
+\subsection{Colon cancer} \label{sec:colon_cancer}
 % ----------------------------------------------------------
 % what are colon cancer, and other lesions in GI tract 
 % doing to the effected patients, what are death rates
@@ -23,7 +22,7 @@
 % ----------------------------------------------------------
 
 
-\subsection{The digestive system}  \label{the_digestive_system}
+\subsection{The digestive system}  \label{sec:the_digestive_system}
 % ----------------------------------------------------------
 % what to look for when analyzing videos from the digestive system
 % ----------------------------------------------------------
@@ -50,7 +49,8 @@ These diseases have varying patterns and while some can be easy to split apart, 
 \subsection{Traditional Endoscopy}
 % ----------------------------------------------------------
 
-\subsection{Wireless Capsule Endoscopy}  \label{wireless_capsule_endoscopy}
+
+\subsection{Wireless Capsule Endoscopy}  \label{sec:wireless_capsule_endoscopy}
 % ----------------------------------------------------------
 % general info about WCE, some history etc
 % ----------------------------------------------------------
@@ -70,7 +70,7 @@ Before the year 2000 the only option you had to visualize the food pipe, stomach
 \text{Image credit: Jacaranda Physics 1 2nd Edition © John Wiley \& Sons, Inc.}
 }
 
-That is why in the year \citeyear{WirelessCapsule00} \citeauthor*{WirelessCapsule00} developed a new type of video-telemetry capsule endoscope that was swallowable \cite{WirelessCapsule00}. It could travel through the entire digestive system because it had no external wires, fiber-optic bundles or cables of any sort. The capsule travels by peristalsis\footnote{Peristalsis is a radially symmetrical contraction and relaxation of muscles that propagates in a wave down a tube, in an anterograde direction.} through the gastrointestinal tract, which takes from 10 to 48 hours, and transmit images on a regular interval to receivers attached around the outside of the patients stomach for as long as the battery allows, usually in the range 6 to 8 hours. Two example images taken by WCE are presented in Figure \ref{fig:pillcam_examples}. By triangulating the signal strength and the location of the receivers taped on the body it is possible to roughly estimate the position of the capsule. This is however not very precise and can not tell us the rotation or direction of the capsule. Regardless, that information will not be available for us in this study as we only have access to the images themselves. Therefore we could implement an algorithm to predict which region of the digestive system the image is taken from (see section \ref{mapping}).
+That is why in the year \citeyear{WirelessCapsule00} \citeauthor*{WirelessCapsule00} developed a new type of video-telemetry capsule endoscope that was swallowable \cite{WirelessCapsule00}. It could travel through the entire digestive system because it had no external wires, fiber-optic bundles or cables of any sort. The capsule travels by peristalsis\footnote{Peristalsis is a radially symmetrical contraction and relaxation of muscles that propagates in a wave down a tube, in an anterograde direction.} through the gastrointestinal tract, which takes from 10 to 48 hours, and transmit images on a regular interval to receivers attached around the outside of the patients stomach for as long as the battery allows, usually in the range 6 to 8 hours. Two example images taken by WCE are presented in Figure \ref{fig:pillcam_examples}. By triangulating the signal strength and the location of the receivers taped on the body it is possible to roughly estimate the position of the capsule. This is however not very precise and can not tell us the rotation or direction of the capsule. Regardless, that information will not be available for us in this study as we only have access to the images themselves. Therefore we could implement an algorithm to predict which region of the digestive system the image is taken from (see section \ref{sec:mapping}).
 
 \begin{figure} % fig:pillcam_examples (double figure)
   \centering
@@ -101,7 +101,7 @@ That is why in the year \citeyear{WirelessCapsule00} \citeauthor*{WirelessCapsul
 
 
 % ----------------------------------------------------------
-\section{Artificial intelligence and Machine learning}
+\section{Artificial intelligence and Machine learning} \label{sec:ai_and_ml}
 % ----------------------------------------------------------
 
 As apposed to using regular optic-fiber endoscopy, it can be difficult to know the location and orientation of the capsule when it is traveling through the digestive system. In a paper by \citeauthor*{ClassifyingDigestive15} it is shown that by using Deep Convolutional Networks (DCNN) it is possible to classify the digestive organs in wireless capsule endoscopy with about 95\% classification accuracy on average \cite{ClassifyingDigestive15}.
@@ -296,7 +296,7 @@ Object tracking is one of the harder problem to overcome in computer vision and 
 Our hope is that by implementing an object-tracking algorithm we can use it to classify irregularities in the colonoscopy video, and then track that object in the later frames until it disappear out of frame. This will hopefully help with reducing the robustness of the network so that the classifier will not have to check every frame for irregularities. 
 
 
-\subsection{Segmentation} \label{segmentation}
+\subsection{Segmentation} \label{sec:segmentation}
 %-----------------------------------------------------------
 % Image/video segmentation. Specially related to the paper "U-Net: Convolutional Networks for Biomedical Image Segmentation" citekey UNetConvolutional15
 Image segmentation is the process of partitioning a image into multiple segments of pixel, usually each segment describing some feature of the image or an entire object or class of objects. The goal of segmentation is to simplify the image and make it easier to analyze or further process. \citeauthor*{UNetConvolutional15} propose a method in the paper \citetitle*{UNetConvolutional15} \cite{UNetConvolutional15} for using a network and training strategy that relies on the strong use of data augmentation to use the available labeled samples more efficiently. This network outperform the old method of sliding-window-convolution by a great deal. They extend the "fully convolutional network" \cite{FullyConvolutional15} such that it works with very few training images and yields more precise segmentations. The way this is achieved is to supplement a contracting network by successive layers, where instead of using pooling operators, upsampling operators are used. This means that these successive layers increase the resolution of the output. The high resolution features from the contracting path are combined with the upsampled output to localize objects and with that a convolution layer can then learn to produce more precise output based on this information. 
@@ -323,10 +323,10 @@ A common problem in training neural networks are too little labeled training dat
 \end{table}
 
 
-\subsection{Mapping} \label{mapping}
+\subsection{Mapping} \label{sec:mapping}
 %-----------------------------------------------------------
 % Mapping of the intestine. Specially related to the paper "Deep EndoVO: A recurrent convolutional neural network (RCNN) based visual odometry approach for endoscopic capsule robots" citekey DeepEndoVO18
-As mentioned in section \ref{wireless_capsule_endoscopy}, a concern when processing the images taken with a WCE is not having the spatial data you get when using a normal fiber-optic endoscope. This is why \citeauthor*{DeepEndoVO18} has recently made substantial progress in converting passive capsule endoscopes to active capsule robots, enabling more accurate, precise, and intuitive detection of the location and size of the diseased areas by developing reliable real time pose estimation functionality of the capsule with RCNN's\footnote{Deep recurrent convolutional neural networks} \cite{DeepEndoVO18}. See Figure \ref{fig:deep_endovo_example} for an example.
+As mentioned in section \ref{sec:wireless_capsule_endoscopy}, a concern when processing the images taken with a WCE is not having the spatial data you get when using a normal fiber-optic endoscope. This is why \citeauthor*{DeepEndoVO18} has recently made substantial progress in converting passive capsule endoscopes to active capsule robots, enabling more accurate, precise, and intuitive detection of the location and size of the diseased areas by developing reliable real time pose estimation functionality of the capsule with RCNN's\footnote{Deep recurrent convolutional neural networks} \cite{DeepEndoVO18}. See Figure \ref{fig:deep_endovo_example} for an example.
 
 This architecture uses inception modules for feature extraction and a RNN for sequential modelling of motion dynamics to regress the robot's orientation and position in real time. By taking multiple of RGB Depth images with timestamps it can calculate the 6-DoF pose of the capsule without the need of any extra sensors. For obtaining the depth images \citeauthor*{DeepEndoVO18} use the shape from shading (SfS) technique of \citeauthor{ShapeShading94} \cite{ShapeShading94}. This model outperforms state-of-the-art models like LSD SLAM and ORB SLAM.
 
@@ -352,7 +352,7 @@ This architecture uses inception modules for feature extraction and a RNN for se
 
 
 % ----------------------------------------------------------
-\section{Summary} \label{02summary}
+\section{Summary} \label{sec:C2-summary}
 % ----------------------------------------------------------
 
 
