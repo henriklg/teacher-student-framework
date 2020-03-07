@@ -105,41 +105,8 @@ def create_dataset(config):
             print(labels.numpy())
     
     # Resample the binary dataset
-    if config["resample"] and config["ds_info"] == 'binary':
-        print ("\nResamplng the dataset..")
-        labeled_ds = labeled_ds.batch(1024)
-        
-        # Count the samples of negative and positive images
-        counts = labeled_ds.take(10).reduce(
-        initial_state={'class_0': 0, 'class_1': 0},
-        reduce_func = count)
-
-        counts = np.array([counts['class_0'].numpy(),
-                   counts['class_1'].numpy()]).astype(np.float32)
-
-        counts_sum = counts.sum()
-        assert counts_sum != 0, "Can't divide by zero"
-
-        fractions = counts/counts_sum
-        if verbosity > 0:
-            print("\nFractions: ", fractions)
-            print("Counts: ", counts, end="\n\n")
-        
-        # Create dataset for each class
-        negative_ds = labeled_ds.unbatch().filter(lambda image, label: label==0).repeat()
-        positive_ds = labeled_ds.unbatch().filter(lambda image, label: label==1).repeat()
-        
-        # Sample from the two datasets in a 50/50 distribution
-        balanced_ds = tf.data.experimental.sample_from_datasets(
-            [negative_ds, positive_ds], [0.5, 0.5])
-        
-        # Print some labels (to check the class-distribution)
-        if verbosity > 0:
-            for images, labels in balanced_ds.batch(10).take(10):
-                print(labels.numpy())
-        
-        # Overwrite the old dataset with the new, resampled one
-        labeled_ds = balanced_ds
+    if config["resample"]:
+        labeled_ds = resample(labeled_ds.batch(1024), NUM_CLASSES, verbosity=1)
     
     # Split into train, test and validation data
     train_size = int(0.7 * DS_SIZE)
@@ -191,11 +158,20 @@ def create_dataset(config):
     pathlib.Path(cache_dir).mkdir(parents=True, exist_ok=True)
     
     train_ds = prepare_for_training(
-        train_ds, config["batch_size"], cache="{}/{}_{}_train.tfcache".format(cache_dir, img_width, ds_info))
+        train_ds, config["batch_size"], 
+        cache="{}/{}_{}_train.tfcache".format(cache_dir, img_width, ds_info),
+        shuffle_buffer_size=config["shuffle_buffer_size"]
+    )
     test_ds = prepare_for_training(
-        test_ds, config["batch_size"],cache="{}/{}_{}_test.tfcache".format(cache_dir, img_width, ds_info))
+        test_ds, config["batch_size"], 
+        cache="{}/{}_{}_test.tfcache".format(cache_dir, img_width, ds_info),
+        shuffle_buffer_size=config["shuffle_buffer_size"]
+    )
     val_ds = prepare_for_training(
-        val_ds, config["batch_size"],cache="{}/{}_{}_val.tfcache".format(cache_dir, img_width, ds_info))
+        val_ds, config["batch_size"], 
+        cache="{}/{}_{}_val.tfcache".format(cache_dir, img_width, ds_info),
+        shuffle_buffer_size=config["shuffle_buffer_size"]
+    )
     
    
     # Return some of the data
@@ -224,8 +200,9 @@ def prepare_for_training(ds, bs, cache=True, shuffle_buffer_size=4000):
             ds = ds.cache(cache)
         else:
             ds = ds.cache()
-
-    ds = ds.shuffle(buffer_size=shuffle_buffer_size)
+    
+    if shuffle_buffer_size > 0:
+        ds = ds.shuffle(buffer_size=shuffle_buffer_size)
 
     # Repeat forever
     ds = ds.repeat()
@@ -272,7 +249,7 @@ def print_bin_class_info(directories, data_dir, DS_SIZE, outcast, class_names, n
     
     
 def print_class_info(directories, data_dir, DS_SIZE, outcast, NUM_CLASSES):
-    print ("Directories: ", directories, end='\n\n')
+    # print ("Directories: ", directories, end='\n\n')
     
     # Count number of samples for each folder
     count_dir = {}
@@ -306,17 +283,75 @@ def show_image(img, class_names=None, title=None):
         plt.axis('off')
     
 
-    
-def count(counts, batch):
-    images, labels = batch
-    
-    class_1 = labels == 1
-    class_1 = tf.cast(class_1, tf.int32)
-    
-    class_0 = labels == 0
-    class_0 = tf.cast(class_0, tf.int32)
 
-    counts['class_0'] += tf.reduce_sum(class_0)
-    counts['class_1'] += tf.reduce_sum(class_1)
+def resample(ds, num_classes, verbosity=0):
+    """
+    Resample the dataset
+    
+    Args:
+    - ds: dataset to balance/resample. Should be batched to ~1024 samples per batch
+    - number of classes
+    - verbosity
+    
+    Returns:
+    - Resampled, repeated, and unbatched dataset
+    """
+    certainty_bs = 5
+    
+    if verbosity > 0: print ("\nBeginning resampling..")
+    def count(counts, batch):
+        images, labels = batch
 
-    return counts
+        for i in range(num_classes):
+            counts['class_{}'.format(i)] += tf.reduce_sum(tf.cast(labels == i, tf.int32))
+
+        return counts
+    
+    # Set the initial states
+    initial_state = {}
+    for i in range(num_classes):
+        initial_state['class_{}'.format(i)] = 0
+
+    # Count samples
+    counts = ds.take(certainty_bs).reduce(
+        initial_state = initial_state,
+        reduce_func = count)
+
+    final_counts = []
+    for class_, value in counts.items():
+        final_counts.append(value.numpy().astype(np.float32))
+
+    final_counts = np.asarray(final_counts)
+
+    fractions = final_counts/final_counts.sum()
+    if verbosity > 0:
+        print ("---- Fractions ---- ")
+        print (fractions)
+        
+    
+    # Beginning resampling
+    datasets = []
+    for i in range(num_classes):
+        data = ds.unbatch().filter(lambda image, label: label==i).repeat()
+        datasets.append(data)
+    
+    target_dist = [1.0/num_classes] * num_classes
+    
+    balanced_ds = tf.data.experimental.sample_from_datasets(datasets, target_dist)
+    
+    if verbosity > 0:
+        print ("\n---- Fractions after resampling ---.")
+        counts = balanced_ds.batch(10).take(certainty_bs).reduce(
+            initial_state = initial_state,
+            reduce_func = count)
+
+        final_counts = []
+        for class_, value in counts.items():
+            final_counts.append(value.numpy().astype(np.float32))
+
+        final_counts = np.asarray(final_counts)
+
+        fractions = final_counts/final_counts.sum()
+        print (fractions)
+    
+    return balanced_ds
