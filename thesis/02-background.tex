@@ -19,7 +19,7 @@ In the next part will focus on deep learning and its various architectures and b
 % ----------------------------------------------------------
 \section{Medical scenario} \label{sec:medical_scenario}
 % ----------------------------------------------------------
-Here we will go through 
+Here we will go through the medical aspect of our problem statement. 
 
 
 \subsection{Colon cancer} \label{sec:colon_cancer}
@@ -66,7 +66,7 @@ The basic technology behind the modern endoscope was developed in the early 1950
 
 Before the year 2000 the only option you had to visualize the food pipe, stomach, duodenum, colon and terminal ileum (see Figure \ref{fig:digestive_system} for details) was to use a fiber-optic endoscope, which is a tool with a relatively wide cable that is pushed into the bowel with as much as 50 000 optic fibers (as seen on Figure \ref{fig:fiber-optic-endoscopy}). These cables have to carry fiber optic bundles, water pipes, operations channel and control cables. Although these cables can be quite flexible there is a limit for how far they can advance into the small bowel. This method cause pain and discomfort for the patient, and there was a clinical need for an improved methods.
 
-\begin{figure} % fibre-optic-endoscope
+\begin{figure} % fig:fibre-optic-endoscope
   \begin{center}
     \includegraphics[width=0.7\textwidth]{fiber-optic-endoscope.jpg}
     \caption[Image of a fiber optic endoscope with explanation of different parts of the tool]{Image of a fiber optic endoscope with explanation of different parts of the tool\footnotemark.}
@@ -109,17 +109,19 @@ That is why in the year \citeyear{WirelessCapsule00} \citeauthor*{WirelessCapsul
 
 
 % ----------------------------------------------------------
-\section{Artificial intelligence and Machine learning} \label{sec:ai_and_ml}
+\section{Deep learning} \label{sec:deep_learning}
 % ----------------------------------------------------------
-
 As apposed to using regular optic-fiber endoscopy, it can be difficult to know the location and orientation of the capsule when it is traveling through the digestive system. In a paper by \citeauthor*{ClassifyingDigestive15} it is shown that by using Deep Convolutional Networks (DCNN) it is possible to classify the digestive organs in wireless capsule endoscopy with about 95\% classification accuracy on average \cite{ClassifyingDigestive15}.
 The DCNN-based WCE digestive organ classification system is constructed of three stages of convolution, pooling and two fully-connected layers. This is illustrated in Figure 3 in the paper \cite{ClassifyingDigestive15}. The main steps of this convolutional neural network are described in detail in section \ref{convolutional_neural_network}.
 
 \subsection{Imbalanced data}
 
-\subsection{TensorFlow}
+\subsection{TensorFlow Framework} % ?? Perhaps add everything under framework/libraries?
+%\subsection{Keras}
+\subsection{Data pipeline} % ??
 
-\subsection{Data pipeline}
+\subsection{Machine learning types}
+% reinforcement learning, supervised, unsupervised and semi-supervised
 
 \subsection{How to evaluate a model}
 
@@ -137,19 +139,19 @@ The first step in a convolutional neural network is to extract features from the
 
 The convolution of \textit{f} and \textit{g} is written as $f*g$, and is defined as the integral of the product of the two functions after one (usually the filter) is reversed and shifted.
 
-\begin{equation} % convolution_func
+\begin{equation} % eq:convolution_func
   (f*g)(t) = \int_{-\infty}^{\infty} f(\tau) g(t-\tau) d\tau
-  \label{convolution_func}
+  \label{eq:convolution_func}
 \end{equation}
 
 
 \subsubsection{Non Linearity (ReLU)}
 % ----------------------------------------------------------
-Rectified Linear unit function, known as simply ReLU, is an activation function represented by equation (\ref{relu_func}). It sets all negative numbers to zero, by discarding them from the activation map entirely. In this way, ReLU increases the nonlinear properties of the decision function and thus of the overall network without affecting the receptive fields of the convolution layer.
+Rectified Linear unit function, known as simply ReLU, is an activation function represented by equation (\ref{eq:relu_func}). It sets all negative numbers to zero, by discarding them from the activation map entirely. In this way, ReLU increases the nonlinear properties of the decision function and thus of the overall network without affecting the receptive fields of the convolution layer.
 
-\begin{equation} % relu_func
+\begin{equation} % eq:relu_func
     ReLU(x) = max(0, x)
-    \label{relu_func}
+    \label{eq:relu_func}
 \end{equation}
 
 
@@ -157,9 +159,9 @@ Rectified Linear unit function, known as simply ReLU, is an activation function 
 % ----------------------------------------------------------
 Pooling layers are applied to reduce the number of parameters when the images are considerably large. Spatial pooling, or merely down sampling, reduces the dimensionality of each image but it keeps the important information. The most used down sampling is max pooling. It extracts the largest element from the rectified feature map and thus reduces computational complexity of the algorithm. In addition average pooling is also frequently used, this method computes the average value of the input map. The input-output model is denoted as:
 
-\begin{equation} % pool_func
+\begin{equation} % eq:pool_func
   y_i = f(pool(x_i))
-  \label{pool_func}
+  \label{eq:pool_func}
 \end{equation}
 
 
@@ -171,7 +173,7 @@ In a FC-layer every neuron in one layer is connected to every neuron in the prev
   f(z) = \frac{1}{1+exp(-z)} \quad \text{or} \quad f(z) = tanh(z) = \frac{e^{z} - e^{-z}}{e^{z} + e^{-z}}
 \end{equation}
 
-At the end of FC-layer we have an activation function such as softmax (equation \ref{softmax}) to calculate probability of the predicted classes.
+At the end of FC-layer we have an activation function such as softmax (equation \ref{eq:softmax}) to calculate probability of the predicted classes.
 
 
 \subsubsection{Feed Forward}
@@ -182,7 +184,7 @@ In the feed forward algorithm input image will be processed through all the laye
     \hat{z}_i^l = I * \hat{F}_i^l + b^l, 
 \end{equation}
 
-where $*$ (asterisk) is the convolution operator in equation \ref{convolution_func}. The final output of each convolutional layer $l$ is $a^l$,
+where $*$ (asterisk) is the convolution operator in equation \ref{eq:convolution_func}. The final output of each convolutional layer $l$ is $a^l$,
 
 \begin{equation}
     \hat{a}_i^l = f(z_i^l), 
@@ -192,28 +194,28 @@ where $f$ represents the ReLU activation function. After going through the convo
 Before getting our final output $\hat{y}$, we need to collect the outputs from all the filters, which will be an input to a fully connected layer. 
 The fully connected layer use the softmax activation function to classify the input image, much like a neural network would. The softmax function is an accepted standard probability function for a multiclass classifier \cite{NotesBackpropagation16}. The total sum of the probabilities will always add up to 1 when using softmax. 
 
-\begin{equation} % softmax
+\begin{equation} % eq:softmax
   \sigma(z)_j = \frac{e^{z_j}}{\sum_{k=1}^{K} e^{z_k}} \quad \text{for } j = 1, ..., K.
-  \label{softmax}
+  \label{eq:softmax}
 \end{equation}
 
 To calculate the error of the forward propagation it is common to use cross-entropy error function.
 
-\begin{equation} % loss
+\begin{equation} % eq:loss
   C(\hat{y}) = - \sum_{i=1}^N t_i log(y_i)
-  \label{loss}
+  \label{eq:loss}
 \end{equation}
 
 
 \subsubsection{Back propagation}
 % ----------------------------------------------------------
-Starting from the last layer $L$, we calculate the derivative of the loss function (function \ref{loss}) with regards to the activation function in order to update the weights. Computing the gradient of the loss function yields
+Starting from the last layer $L$, we calculate the derivative of the loss function (function \ref{eq:loss}) with regards to the activation function in order to update the weights. Computing the gradient of the loss function yields
 
 \begin{equation}
   \frac{\partial C}{\partial y_i} = - \frac{t_i}{y_i}
 \end{equation}
 
-We also require the gradient of the output of the final layer $y_i$ with regards to the input $z_k^L$ of the activation function (equation \ref{softmax})
+We also require the gradient of the output of the final layer $y_i$ with regards to the input $z_k^L$ of the activation function (equation \ref{eq:softmax})
 
 \begin{equation}
   \frac{\partial y_i}{\partial z_k^L} = 
@@ -241,13 +243,13 @@ And finally with regards to the weights
 
 where $\hat{a}_{j}^{L-1}$ is the vectorized output from the previous layer. From here, we will propagate the error throughout the layers. The error with regards to the input $a_i^L$ to the fully connected layer is:
 
-\begin{equation} % back_error func
+\begin{equation} % eq:back_error
   \delta^{L-1} = \frac{\partial C}{\partial a_i^L} = \sum_i^N (y_i - t_i)w_{ji}^{L}
-  \label{back_error}
+  \label{eq:back_error}
 \end{equation}
 
 Thus the error is propagated backwards through each layer. If max pooling was used in a pooling layer, the error will only be propagated to the input that had the highest value in the forward pass. The other values will be set to zero. If average pooling was used, the error is averaged in the backwards pass.
-In equation \ref{back_error} $a^l$ is the output of a convolutional layer $l$. Since a convolutional layer is always preceded and followed by a activation layer, the input to layer $l$ is $a^{l-1} = \sigma(z^l)$. Now consider the error with regards to $z^l$.
+In equation \ref{eq:back_error} $a^l$ is the output of a convolutional layer $l$. Since a convolutional layer is always preceded and followed by a activation layer, the input to layer $l$ is $a^{l-1} = \sigma(z^l)$. Now consider the error with regards to $z^l$.
 
 \begin{equation}
   \begin{aligned}
