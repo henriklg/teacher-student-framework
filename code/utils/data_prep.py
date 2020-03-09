@@ -296,7 +296,7 @@ def resample(ds, num_classes, verbosity=0):
     Returns:
     - Resampled, repeated, and unbatched dataset
     """
-    certainty_bs = 5
+    certainty_bs = 15
     
     if verbosity > 0: print ("\nBeginning resampling..")
     def count(counts, batch):
