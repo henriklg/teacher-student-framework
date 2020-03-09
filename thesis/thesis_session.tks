@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TexmakerSession quickmode="12">
-    <document file="/home/henrik/master-thesis/thesis/02-background.tex" bookmark1="0" master="false" hasfocus="false" bookmark2="0" line="0" bookmark3="0"/>
-    <document file="/home/henrik/master-thesis/thesis/thesis.tex" bookmark1="0" master="false" hasfocus="true" bookmark2="0" line="0" bookmark3="0"/>
-    <document file="/home/henrik/master-thesis/thesis/03-methodology.tex" bookmark1="0" master="false" hasfocus="false" bookmark2="0" line="16" bookmark3="0"/>
-    <document file="/home/henrik/master-thesis/thesis/01-introduction.tex" bookmark1="0" master="false" hasfocus="false" bookmark2="0" line="0" bookmark3="0"/>
-    <document file="/home/henrik/master-thesis/thesis/04-experiments.tex" bookmark1="0" master="false" hasfocus="false" bookmark2="0" line="0" bookmark3="0"/>
-    <document file="/home/henrik/master-thesis/thesis/05-conclusions.tex" bookmark1="0" master="false" hasfocus="false" bookmark2="0" line="11" bookmark3="0"/>
+    <document bookmark2="0" line="5" master="false" file="/home/henriklg/master-thesis/thesis/05-conclusions.tex" bookmark1="0" bookmark3="0" hasfocus="false"/>
+    <document bookmark2="0" line="5" master="false" file="/home/henriklg/master-thesis/thesis/04-experiments.tex" bookmark1="0" bookmark3="0" hasfocus="false"/>
+    <document bookmark2="0" line="153" master="false" file="/home/henriklg/master-thesis/thesis/thesis.tex" bookmark1="0" bookmark3="0" hasfocus="false"/>
+    <document bookmark2="0" line="108" master="false" file="/home/henriklg/master-thesis/thesis/03-methodology.tex" bookmark1="0" bookmark3="0" hasfocus="false"/>
+    <document bookmark2="0" line="81" master="false" file="/home/henriklg/master-thesis/thesis/01-introduction.tex" bookmark1="0" bookmark3="0" hasfocus="false"/>
+    <document bookmark2="0" line="342" master="false" file="/home/henriklg/master-thesis/thesis/02-background.tex" bookmark1="0" bookmark3="0" hasfocus="true"/>
 </TexmakerSession>

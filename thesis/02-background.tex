@@ -1,21 +1,28 @@
 \documentclass[thesis.tex]{subfiles}
 
-
 \begin{document}
 
 % ----------------------------------------------------------
-\chapter{Background}
+\chapter{Background} \label{chap:background}
 % ----------------------------------------------------------
 % Present the background
 % ----------------------------------------------------------
+In recent years there have been many proposed methods to use automated object tracking, segmentation, deep learning and artificially intelligence to produce a better, and cheaper health care system. Many of the methods used are state of the art systems within the fields of deep learning. One requirement for such a system to work in reality is a good flow of data. Ideally all the data should be labeled by a doctor before it is used for training deep neural networks but this is rarely the case. The method which we propose takes advantage of this unlabeled data which is more readily available.
+
+In this chapter we will present the necessary background and related works to understand how such a semi supervised model can be built. This will be covered over two main parts; one where we go through the related background and works to understand the medical aspect of this topic and the other will cover the technical use of deep learning in mission-critical fields such as the medical domain.
+
+We begin with the digestive system and how it operates to aid the human body with digestion of food. Next we will cover disease detection by using various types of endoscopes. We will look at how the current state of lesion detection and how it could be improved by using deep learning. 
+
+In the next part will focus on deep learning and its various architectures and building blocks. To fully understand this we need to have a look at its inner workings and output. We begin with looking at a basic three layer neural network and build from there up to CNNs and some of the most advanced architectures most recently proposed. This will give a good understanding of how and why we use deep learning to classify medical images.
 
 
 % ----------------------------------------------------------
-\section{Medical scenario} \label{medicalscenario}
+\section{Medical scenario} \label{sec:medical_scenario}
 % ----------------------------------------------------------
+Here we will go through the medical aspect of our problem statement. 
 
 
-\subsection{Colon cancer} \label{colon_cancer}
+\subsection{Colon cancer} \label{sec:colon_cancer}
 % ----------------------------------------------------------
 % what are colon cancer, and other lesions in GI tract 
 % doing to the effected patients, what are death rates
@@ -23,7 +30,7 @@
 % ----------------------------------------------------------
 
 
-\subsection{The digestive system}  \label{the_digestive_system}
+\subsection{The digestive system}  \label{sec:the_digestive_system}
 % ----------------------------------------------------------
 % what to look for when analyzing videos from the digestive system
 % ----------------------------------------------------------
@@ -50,7 +57,8 @@ These diseases have varying patterns and while some can be easy to split apart, 
 \subsection{Traditional Endoscopy}
 % ----------------------------------------------------------
 
-\subsection{Wireless Capsule Endoscopy}  \label{wireless_capsule_endoscopy}
+
+\subsection{Wireless Capsule Endoscopy}  \label{sec:wireless_capsule_endoscopy}
 % ----------------------------------------------------------
 % general info about WCE, some history etc
 % ----------------------------------------------------------
@@ -58,7 +66,7 @@ The basic technology behind the modern endoscope was developed in the early 1950
 
 Before the year 2000 the only option you had to visualize the food pipe, stomach, duodenum, colon and terminal ileum (see Figure \ref{fig:digestive_system} for details) was to use a fiber-optic endoscope, which is a tool with a relatively wide cable that is pushed into the bowel with as much as 50 000 optic fibers (as seen on Figure \ref{fig:fiber-optic-endoscopy}). These cables have to carry fiber optic bundles, water pipes, operations channel and control cables. Although these cables can be quite flexible there is a limit for how far they can advance into the small bowel. This method cause pain and discomfort for the patient, and there was a clinical need for an improved methods.
 
-\begin{figure} % fibre-optic-endoscope
+\begin{figure} % fig:fibre-optic-endoscope
   \begin{center}
     \includegraphics[width=0.7\textwidth]{fiber-optic-endoscope.jpg}
     \caption[Image of a fiber optic endoscope with explanation of different parts of the tool]{Image of a fiber optic endoscope with explanation of different parts of the tool\footnotemark.}
@@ -70,7 +78,7 @@ Before the year 2000 the only option you had to visualize the food pipe, stomach
 \text{Image credit: Jacaranda Physics 1 2nd Edition © John Wiley \& Sons, Inc.}
 }
 
-That is why in the year \citeyear{WirelessCapsule00} \citeauthor*{WirelessCapsule00} developed a new type of video-telemetry capsule endoscope that was swallowable \cite{WirelessCapsule00}. It could travel through the entire digestive system because it had no external wires, fiber-optic bundles or cables of any sort. The capsule travels by peristalsis\footnote{Peristalsis is a radially symmetrical contraction and relaxation of muscles that propagates in a wave down a tube, in an anterograde direction.} through the gastrointestinal tract, which takes from 10 to 48 hours, and transmit images on a regular interval to receivers attached around the outside of the patients stomach for as long as the battery allows, usually in the range 6 to 8 hours. Two example images taken by WCE are presented in Figure \ref{fig:pillcam_examples}. By triangulating the signal strength and the location of the receivers taped on the body it is possible to roughly estimate the position of the capsule. This is however not very precise and can not tell us the rotation or direction of the capsule. Regardless, that information will not be available for us in this study as we only have access to the images themselves. Therefore we could implement an algorithm to predict which region of the digestive system the image is taken from (see section \ref{mapping}).
+That is why in the year \citeyear{WirelessCapsule00} \citeauthor*{WirelessCapsule00} developed a new type of video-telemetry capsule endoscope that was swallowable \cite{WirelessCapsule00}. It could travel through the entire digestive system because it had no external wires, fiber-optic bundles or cables of any sort. The capsule travels by peristalsis\footnote{Peristalsis is a radially symmetrical contraction and relaxation of muscles that propagates in a wave down a tube, in an anterograde direction.} through the gastrointestinal tract, which takes from 10 to 48 hours, and transmit images on a regular interval to receivers attached around the outside of the patients stomach for as long as the battery allows, usually in the range 6 to 8 hours. Two example images taken by WCE are presented in Figure \ref{fig:pillcam_examples}. By triangulating the signal strength and the location of the receivers taped on the body it is possible to roughly estimate the position of the capsule. This is however not very precise and can not tell us the rotation or direction of the capsule. Regardless, that information will not be available for us in this study as we only have access to the images themselves. Therefore we could implement an algorithm to predict which region of the digestive system the image is taken from (see section \ref{sec:mapping}).
 
 \begin{figure} % fig:pillcam_examples (double figure)
   \centering
@@ -101,17 +109,19 @@ That is why in the year \citeyear{WirelessCapsule00} \citeauthor*{WirelessCapsul
 
 
 % ----------------------------------------------------------
-\section{Artificial intelligence and Machine learning}
+\section{Deep learning} \label{sec:deep_learning}
 % ----------------------------------------------------------
-
 As apposed to using regular optic-fiber endoscopy, it can be difficult to know the location and orientation of the capsule when it is traveling through the digestive system. In a paper by \citeauthor*{ClassifyingDigestive15} it is shown that by using Deep Convolutional Networks (DCNN) it is possible to classify the digestive organs in wireless capsule endoscopy with about 95\% classification accuracy on average \cite{ClassifyingDigestive15}.
 The DCNN-based WCE digestive organ classification system is constructed of three stages of convolution, pooling and two fully-connected layers. This is illustrated in Figure 3 in the paper \cite{ClassifyingDigestive15}. The main steps of this convolutional neural network are described in detail in section \ref{convolutional_neural_network}.
 
 \subsection{Imbalanced data}
 
-\subsection{TensorFlow}
+\subsection{TensorFlow Framework} % ?? Perhaps add everything under framework/libraries?
+%\subsection{Keras}
+\subsection{Data pipeline} % ??
 
-\subsection{Data pipeline}
+\subsection{Machine learning types}
+% reinforcement learning, supervised, unsupervised and semi-supervised
 
 \subsection{How to evaluate a model}
 
@@ -129,19 +139,19 @@ The first step in a convolutional neural network is to extract features from the
 
 The convolution of \textit{f} and \textit{g} is written as $f*g$, and is defined as the integral of the product of the two functions after one (usually the filter) is reversed and shifted.
 
-\begin{equation} % convolution_func
+\begin{equation} % eq:convolution_func
   (f*g)(t) = \int_{-\infty}^{\infty} f(\tau) g(t-\tau) d\tau
-  \label{convolution_func}
+  \label{eq:convolution_func}
 \end{equation}
 
 
 \subsubsection{Non Linearity (ReLU)}
 % ----------------------------------------------------------
-Rectified Linear unit function, known as simply ReLU, is an activation function represented by equation (\ref{relu_func}). It sets all negative numbers to zero, by discarding them from the activation map entirely. In this way, ReLU increases the nonlinear properties of the decision function and thus of the overall network without affecting the receptive fields of the convolution layer.
+Rectified Linear unit function, known as simply ReLU, is an activation function represented by equation (\ref{eq:relu_func}). It sets all negative numbers to zero, by discarding them from the activation map entirely. In this way, ReLU increases the nonlinear properties of the decision function and thus of the overall network without affecting the receptive fields of the convolution layer.
 
-\begin{equation} % relu_func
+\begin{equation} % eq:relu_func
     ReLU(x) = max(0, x)
-    \label{relu_func}
+    \label{eq:relu_func}
 \end{equation}
 
 
@@ -149,9 +159,9 @@ Rectified Linear unit function, known as simply ReLU, is an activation function 
 % ----------------------------------------------------------
 Pooling layers are applied to reduce the number of parameters when the images are considerably large. Spatial pooling, or merely down sampling, reduces the dimensionality of each image but it keeps the important information. The most used down sampling is max pooling. It extracts the largest element from the rectified feature map and thus reduces computational complexity of the algorithm. In addition average pooling is also frequently used, this method computes the average value of the input map. The input-output model is denoted as:
 
-\begin{equation} % pool_func
+\begin{equation} % eq:pool_func
   y_i = f(pool(x_i))
-  \label{pool_func}
+  \label{eq:pool_func}
 \end{equation}
 
 
@@ -163,7 +173,7 @@ In a FC-layer every neuron in one layer is connected to every neuron in the prev
   f(z) = \frac{1}{1+exp(-z)} \quad \text{or} \quad f(z) = tanh(z) = \frac{e^{z} - e^{-z}}{e^{z} + e^{-z}}
 \end{equation}
 
-At the end of FC-layer we have an activation function such as softmax (equation \ref{softmax}) to calculate probability of the predicted classes.
+At the end of FC-layer we have an activation function such as softmax (equation \ref{eq:softmax}) to calculate probability of the predicted classes.
 
 
 \subsubsection{Feed Forward}
@@ -174,7 +184,7 @@ In the feed forward algorithm input image will be processed through all the laye
     \hat{z}_i^l = I * \hat{F}_i^l + b^l, 
 \end{equation}
 
-where $*$ (asterisk) is the convolution operator in equation \ref{convolution_func}. The final output of each convolutional layer $l$ is $a^l$,
+where $*$ (asterisk) is the convolution operator in equation \ref{eq:convolution_func}. The final output of each convolutional layer $l$ is $a^l$,
 
 \begin{equation}
     \hat{a}_i^l = f(z_i^l), 
@@ -184,28 +194,28 @@ where $f$ represents the ReLU activation function. After going through the convo
 Before getting our final output $\hat{y}$, we need to collect the outputs from all the filters, which will be an input to a fully connected layer. 
 The fully connected layer use the softmax activation function to classify the input image, much like a neural network would. The softmax function is an accepted standard probability function for a multiclass classifier \cite{NotesBackpropagation16}. The total sum of the probabilities will always add up to 1 when using softmax. 
 
-\begin{equation} % softmax
+\begin{equation} % eq:softmax
   \sigma(z)_j = \frac{e^{z_j}}{\sum_{k=1}^{K} e^{z_k}} \quad \text{for } j = 1, ..., K.
-  \label{softmax}
+  \label{eq:softmax}
 \end{equation}
 
 To calculate the error of the forward propagation it is common to use cross-entropy error function.
 
-\begin{equation} % loss
+\begin{equation} % eq:loss
   C(\hat{y}) = - \sum_{i=1}^N t_i log(y_i)
-  \label{loss}
+  \label{eq:loss}
 \end{equation}
 
 
 \subsubsection{Back propagation}
 % ----------------------------------------------------------
-Starting from the last layer $L$, we calculate the derivative of the loss function (function \ref{loss}) with regards to the activation function in order to update the weights. Computing the gradient of the loss function yields
+Starting from the last layer $L$, we calculate the derivative of the loss function (function \ref{eq:loss}) with regards to the activation function in order to update the weights. Computing the gradient of the loss function yields
 
 \begin{equation}
   \frac{\partial C}{\partial y_i} = - \frac{t_i}{y_i}
 \end{equation}
 
-We also require the gradient of the output of the final layer $y_i$ with regards to the input $z_k^L$ of the activation function (equation \ref{softmax})
+We also require the gradient of the output of the final layer $y_i$ with regards to the input $z_k^L$ of the activation function (equation \ref{eq:softmax})
 
 \begin{equation}
   \frac{\partial y_i}{\partial z_k^L} = 
@@ -233,13 +243,13 @@ And finally with regards to the weights
 
 where $\hat{a}_{j}^{L-1}$ is the vectorized output from the previous layer. From here, we will propagate the error throughout the layers. The error with regards to the input $a_i^L$ to the fully connected layer is:
 
-\begin{equation} % back_error func
+\begin{equation} % eq:back_error
   \delta^{L-1} = \frac{\partial C}{\partial a_i^L} = \sum_i^N (y_i - t_i)w_{ji}^{L}
-  \label{back_error}
+  \label{eq:back_error}
 \end{equation}
 
 Thus the error is propagated backwards through each layer. If max pooling was used in a pooling layer, the error will only be propagated to the input that had the highest value in the forward pass. The other values will be set to zero. If average pooling was used, the error is averaged in the backwards pass.
-In equation \ref{back_error} $a^l$ is the output of a convolutional layer $l$. Since a convolutional layer is always preceded and followed by a activation layer, the input to layer $l$ is $a^{l-1} = \sigma(z^l)$. Now consider the error with regards to $z^l$.
+In equation \ref{eq:back_error} $a^l$ is the output of a convolutional layer $l$. Since a convolutional layer is always preceded and followed by a activation layer, the input to layer $l$ is $a^{l-1} = \sigma(z^l)$. Now consider the error with regards to $z^l$.
 
 \begin{equation}
   \begin{aligned}
@@ -296,7 +306,7 @@ Object tracking is one of the harder problem to overcome in computer vision and 
 Our hope is that by implementing an object-tracking algorithm we can use it to classify irregularities in the colonoscopy video, and then track that object in the later frames until it disappear out of frame. This will hopefully help with reducing the robustness of the network so that the classifier will not have to check every frame for irregularities. 
 
 
-\subsection{Segmentation} \label{segmentation}
+\subsection{Segmentation} \label{sec:segmentation}
 %-----------------------------------------------------------
 % Image/video segmentation. Specially related to the paper "U-Net: Convolutional Networks for Biomedical Image Segmentation" citekey UNetConvolutional15
 Image segmentation is the process of partitioning a image into multiple segments of pixel, usually each segment describing some feature of the image or an entire object or class of objects. The goal of segmentation is to simplify the image and make it easier to analyze or further process. \citeauthor*{UNetConvolutional15} propose a method in the paper \citetitle*{UNetConvolutional15} \cite{UNetConvolutional15} for using a network and training strategy that relies on the strong use of data augmentation to use the available labeled samples more efficiently. This network outperform the old method of sliding-window-convolution by a great deal. They extend the "fully convolutional network" \cite{FullyConvolutional15} such that it works with very few training images and yields more precise segmentations. The way this is achieved is to supplement a contracting network by successive layers, where instead of using pooling operators, upsampling operators are used. This means that these successive layers increase the resolution of the output. The high resolution features from the contracting path are combined with the upsampled output to localize objects and with that a convolution layer can then learn to produce more precise output based on this information. 
@@ -323,10 +333,10 @@ A common problem in training neural networks are too little labeled training dat
 \end{table}
 
 
-\subsection{Mapping} \label{mapping}
+\subsection{Mapping} \label{sec:mapping}
 %-----------------------------------------------------------
 % Mapping of the intestine. Specially related to the paper "Deep EndoVO: A recurrent convolutional neural network (RCNN) based visual odometry approach for endoscopic capsule robots" citekey DeepEndoVO18
-As mentioned in section \ref{wireless_capsule_endoscopy}, a concern when processing the images taken with a WCE is not having the spatial data you get when using a normal fiber-optic endoscope. This is why \citeauthor*{DeepEndoVO18} has recently made substantial progress in converting passive capsule endoscopes to active capsule robots, enabling more accurate, precise, and intuitive detection of the location and size of the diseased areas by developing reliable real time pose estimation functionality of the capsule with RCNN's\footnote{Deep recurrent convolutional neural networks} \cite{DeepEndoVO18}. See Figure \ref{fig:deep_endovo_example} for an example.
+As mentioned in section \ref{sec:wireless_capsule_endoscopy}, a concern when processing the images taken with a WCE is not having the spatial data you get when using a normal fiber-optic endoscope. This is why \citeauthor*{DeepEndoVO18} has recently made substantial progress in converting passive capsule endoscopes to active capsule robots, enabling more accurate, precise, and intuitive detection of the location and size of the diseased areas by developing reliable real time pose estimation functionality of the capsule with RCNN's\footnote{Deep recurrent convolutional neural networks} \cite{DeepEndoVO18}. See Figure \ref{fig:deep_endovo_example} for an example.
 
 This architecture uses inception modules for feature extraction and a RNN for sequential modelling of motion dynamics to regress the robot's orientation and position in real time. By taking multiple of RGB Depth images with timestamps it can calculate the 6-DoF pose of the capsule without the need of any extra sensors. For obtaining the depth images \citeauthor*{DeepEndoVO18} use the shape from shading (SfS) technique of \citeauthor{ShapeShading94} \cite{ShapeShading94}. This model outperforms state-of-the-art models like LSD SLAM and ORB SLAM.
 
@@ -352,7 +362,7 @@ This architecture uses inception modules for feature extraction and a RNN for se
 
 
 % ----------------------------------------------------------
-\section{Summary} \label{02summary}
+\section{Summary} \label{sec:C2-summary}
 % ----------------------------------------------------------
 
 

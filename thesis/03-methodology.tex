@@ -3,20 +3,20 @@
 \begin{document}
 
 % ----------------------------------------------------------
-\chapter{Methodology} \label{methodology}
+\chapter{Methodology} \label{chap:methodology}
 % ----------------------------------------------------------
 % Present the method and system. Basically write everything you've done.
 % ----------------------------------------------------------
 
 
 % ----------------------------------------------------------
-\section{Data collection} \label{datacollection}
+\section{Data collection} \label{sec:data_collection}
 % ----------------------------------------------------------
 % Present how you gathered the data and labels
 % ----------------------------------------------------------
 The datasets used in our experiments are Kvasir Pillcam, Kvasir and Hyper-Kvasir. This section will demonstrate the main differences between the three datasets and explain how they can be found and used for fact checking. All three datasets are collected using endoscopic equipment at Vestre Viken Health Trust in Norway. The VV consists of 4 hospitals and provides health care for 470.000 people. One of the hospitals is Bærum Hospital, which has a large gastroenterology department from where the data is collected. 
 
-\subsection{Kvasir PillCam} \label{kvasir_pillcam}
+\subsection{Kvasir PillCam} \label{sec:kvasir_pillcam}
 The dataset we used in our experiments consist of endoscopic videos collected from Bærum Hospital. Unlike Kvasir and Hyper-Kvasir datasets we have made the Kvasir PillCam dataset for the purpose of this thesis. In total we have 44 videos which have gone through some re encoding to reduce the file sizes, and also because the original encoding is proprietary Sony technology. After that the videos are uploaded to Augere Medical \footnote{\url{https://augere.md/}} tagging tool. The data export from Bærum also contains some findings for each video (if there is any) and are extracted, converted to frame number and that helped us a great deal with tagging the videos. We also have Thomas de Lange to thank, because he helped us a lot with the medical aspect of the classification process. When all 44 videos have been precisely labeled the dataset is exported from Augeres tagging tool and split into folders for each class. The folders/classes are given in table \ref{table:kvasir_pillcam}. In total we have 44 000 labeled images in 8 classes. The sample distribution across the eight classes is skewed depending on how many findings there are in the videos. Some findings occur often and some very rarely. The dataset also contain one class for 'normal' images, which there is quite a bit more of than findings. 
 
 Imbalanced dataset pose a challenge for predictive algorithms as most learning algorithms are based on the assumption of an equal number of samples for each class. This results in models that have poor predictive performance, especially for minority class or classes. This is a great problem because in many medical datasets the minority class is the most important and therefore more sensitive for classification errors.
@@ -39,7 +39,7 @@ In addition to labeling the images the dataset also contain a JSON format file w
 \end{table}
 
 
-\subsection{Kvasir} \label{kvasir}
+\subsection{Kvasir} \label{sec:kvasir}
 The Kvasir dataset \cite{KVASIRMultiClass17} contains images from inside the gastrointestinal (GI) tract. The samples are classified into three important anatomical landmarks and three clinically significant findings. In addition it has two classes related to the removal procedure of polyps. The dataset is sorted and annotated is performed by medical doctors. The class names and findings for each class is given in table \ref{table:kvasir}. One of the most important aspects of the Kvasir dataset is that it makes it easy to reproduce and compare results in scientific computing.
 
 \begin{table}
@@ -58,7 +58,7 @@ The Kvasir dataset \cite{KVASIRMultiClass17} contains images from inside the gas
 \end{table}
 
 
-\subsection{Hyper Kvasir} \label{hyper_kvasir}
+\subsection{Hyper Kvasir} \label{sec:hyper_kvasir}
 The Hyper-Kvasir dataset \cite{HyperKvasirComprehensive19} is one of the largest medical datasets containing 110.079 images and 373 videos where it captures anatomical landmarks and pathological and normal findings. Resulting in more than 1.1 million images and video frames all together. The dataset contain four parts, labeled images, unlabeled images, segmented images and lastly, videos. In total the dataset is 70 GB in size, but can be downloaded and stored in parts from \url{https://datasets.simula.no/hyper-kvasir/}.
 
 
@@ -88,7 +88,7 @@ In figure \ref{fig:kvasir_seg_example} we can see an example of the segmented Kv
 
 
 % ----------------------------------------------------------
-\section{Data process} \label{data_pipeline}
+\section{Data process} \label{sec:data_pipeline}
 % ----------------------------------------------------------
 % Present everything related to working with data files
 % ----------------------------------------------------------
@@ -101,12 +101,12 @@ In figure \ref{fig:kvasir_seg_example} we can see an example of the segmented Kv
 
 
 % ----------------------------------------------------------
-\section{System implementation} \label{systemimplementation}
+\section{System implementation} \label{sec:system_implementation}
 % ----------------------------------------------------------
 
 
 % ----------------------------------------------------------
-\section{Summary} \label{03summary}
+\section{Summary} \label{sec:C3-summary}
 % ----------------------------------------------------------
 
 
