@@ -165,12 +165,12 @@ def create_dataset(config):
     test_ds = prepare_for_training(
         test_ds, config["batch_size"], 
         cache="{}/{}_{}_test.tfcache".format(cache_dir, img_width, ds_info),
-        shuffle_buffer_size=config["shuffle_buffer_size"]
+        shuffle_buffer_size=0
     )
     val_ds = prepare_for_training(
         val_ds, config["batch_size"], 
         cache="{}/{}_{}_val.tfcache".format(cache_dir, img_width, ds_info),
-        shuffle_buffer_size=config["shuffle_buffer_size"]
+        shuffle_buffer_size=0
     )
     
    
