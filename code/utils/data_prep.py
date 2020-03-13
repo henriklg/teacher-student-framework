@@ -205,13 +205,13 @@ def prepare_for_training(ds, bs, cache=True, shuffle_buffer_size=4000):
         ds = ds.shuffle(buffer_size=shuffle_buffer_size)
 
     # Repeat forever
-    ds = ds.repeat()
+#     ds = ds.repeat()
 
     ds = ds.batch(bs, drop_remainder=False)
 
     # `prefetch` lets the dataset fetch batches in the background while the model
-    # is training.
-    ds = ds.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+    # is training. TODO: potential memory leak when buffersize is 1. Check
+#     ds = ds.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
     return ds
     
     
