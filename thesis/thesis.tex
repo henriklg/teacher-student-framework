@@ -121,7 +121,8 @@
 \externaldocument[C5-]{build/05-conclusions}
 
 \section*{Abstract}
-This is the abstract part. How does it look? This is the abstract part. How does it look? This is the abstract part. How does it look? This is the abstract part. How does it look?
+Colorectal Cancer (CRC) is the third most common diagnosed cancer in both men and women. And a leading cause for CRC mortality is that patients in early stages have few and defuse symptoms which makes CRC hard to detect before later stages of the disease. To combat this the health care implemented regular screening for population most at risk. Yet for some the treatment come too late. 
+We propose a system for automatically detection of diseases in the gastrointestal tract (GI-tract) using wireless capsule endoscopy and deep learning. A system like this requires a large amount of labeled data to train the prediction models. Although the health sector collects large amount of patient data, the most used deep learning systems need to have access to labeled data to properly train. This labeled data is difficult to create as doctors and other professionals need to manually inspect and annotate. Our proposal uses a model which only need a small amount of labeled data to operate, and an additional bulk of unlabeled data to advance. 
 
 \cleardoublepage
 
@@ -143,9 +144,12 @@ Finally, I would like to thank my parents for their encouragement and everlastin
 \listoftables
 \addcontentsline{toc}{chapter}{\listtablename}
 
-\printnoidxglossary[type=symbols,
+\printnoidxglossary[
+			type=symbols,
 			style=long,
-			title={List of Symbols}]
+			title={List of Symbols}
+			]
+% example of gls usage: Reference symbols: $\gls{x}$
 % -----------------------END--------------------------------
 
 

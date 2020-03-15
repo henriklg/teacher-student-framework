@@ -56,9 +56,9 @@ By researching an automatic system for a camera pill the aim is to greatly incre
 %- looking at only some AI models
 %- compare atomatic classification systems against eachother
 % ----------------------------------------------------------
-Based on the described problem statement the scope of this thesis is to compare some prior selected automatic systems, with a focus on machine learning, for classification tasks in the medical domain. We will test the systems on video and still images taken from a wireless capsule endoscopy system, provided by Bærum Hospital. This data is generated with PillCam$^{TM}$ SB 3 System \footnote{\url{https://www.medtronic.com/covidien/en-us/products/capsule-endoscopy/pillcam-sb-3-system.html}} and gives us a wide view of the GI-tract. A limitation for our research will therefore be that our dataset lack a great deal of diversity. While we might have a wide range of 'patient' all the data contributions stem from one provider in one location. This might not be much of an issue due to GI-tract being quite homegenous over large populations. 
+Based on the described problem statement the scope of this thesis is to compare some prior selected automatic systems with focus on machine learning, for classification tasks in the medical domain. We will test the systems on video and still images taken from a wireless capsule endoscopy system, provided by Bærum Hospital. This data is generated with PillCam$^{TM}$ SB 3 System \footnote{\url{https://www.medtronic.com/covidien/en-us/products/capsule-endoscopy/pillcam-sb-3-system.html}} and gives us a wide view of the GI-tract. A limitation for our research will therefore be that our dataset lack a great deal of diversity. While we might have a wide range of patients all the data contributions stem from one provider in one location. This might not be much of an issue due to GI-tract being quite homegenous over large populations. But can presumably cause biasing issues in our deep learning models. % mention ethnicity and age
 
-By using a tool provided by Augere Medical, we have sequencially classified each frame in some 45 PillCam videos. Although being assisted by doctor Thomas de Lange, with many years of experience, the dataset might not be perfectly labeled due to time constraints. But to the best of our efforts we managed to divide the data into 10 classes which we later will train our networks on.
+By using a tool provided by Augere Medical, we have sequentially classified each frame in some 45 PillCam videos. Although being assisted by doctor Thomas de Lange, with many years of experience, the dataset might not be perfectly labeled due to time constraints. But to the best of our efforts we managed to divide the data into 10 classes which we later will train our networks on.
 
 Considering the scope of this thesis, we will limit ourselves to use some of the more common deep convolutional neural networks and a more novel stacked hourglass network. There are many other more common network used in the field of object classification like NN, RNN, stastisctial methods, but these methods are widely tested and we wish to push the envelope of machine learning systems on medical videos and also have a wide variety of ways to score our model against previously tested algorithms.
 
@@ -66,7 +66,8 @@ Considering the scope of this thesis, we will limit ourselves to use some of the
 % ----------------------------------------------------------
 \section{Research methods} \label{sec:research_methods}
 % ----------------------------------------------------------
-Reference symbols: $\gls{x}$
+We have based this paper on Association for Computing Machinerys (ACMs) research
+methodology. In the spring of 1986 ACM president Adele Goldberg and ACM Education Board Chairman Robert Aiken appointed a task force with the prime objective of describing the core fundamentals of computer science and computer engineering. And introduced the phrase "discipline of computing" to embrace the two fields.
 
 % ----------------------------------------------------------
 \section{Main Contributions} \label{sec:main_contributions}
