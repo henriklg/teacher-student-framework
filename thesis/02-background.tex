@@ -120,8 +120,42 @@ The DCNN-based WCE digestive organ classification system is constructed of three
 %\subsection{Keras}
 \subsection{Data pipeline} % ??
 
-\subsection{Machine learning types}
+
+\subsection{Machine learning types} \label{sec:machine_learning_types}
 % reinforcement learning, supervised, unsupervised and semi-supervised
+% ----------------------------------------------------------
+In deep learning it is common to differentiate between three types of machine learning models. In this section we will go through them and explain how they function and which use cases suites them best.
+
+\subsubsection{Supervised learning} \label{sec:supervised_learnign}
+% https://blogs.nvidia.com/blog/2018/08/02/supervised-unsupervised-learning/
+The first category of machine learning is supervised learning. If you imagine yourself work under supervision of a leader or boss, it would mean someone is present and judging whether you are doing the correct work. Similarly to this, when a learning algorithm is under supervision is has a fully labeled dataset to work on; continuously updating the algorithm whether the answer is correct or wrong after every test.
+
+Fully labeled dataset means that for every sample in the dataset, it is known what the true answer is to the problem at hand. Example if the dataset is images to classify you can think of it as having the correct answer written on the back of the image, but the algorithm will pick up the image front side up, and not look at the correct answer until after it has had a go.
+
+%TODO reference to the image or create own?
+\begin{figure}[h] % fig:supervised_machine_learning
+  \begin{center}
+    \includegraphics[width=0.7\textwidth]{supervised_machine_learning.png}
+    \caption[Workflow of supervised machine learning.]{Workflow of supervised learning; 1. the dataset is labeled by observers; 2. the samples is split into training and test sets; 3. algorithm is learning on the training set; 4. checking the predictions on the 'unseen' test set to understand how the model performs.}
+    \label{fig:supervised_machine_learning}
+  \end{center}
+\end{figure}
+
+This method is best suited for classification problems and regression problems, where there is a set of available reference points or a ground truth with which to train the algorithm, but this is not always accessible, or too expensive to create.
+
+
+\subsubsection{Unsupervised learning} \label{sec:unsupervised_learning}
+% https://blogs.nvidia.com/blog/2018/08/02/supervised-unsupervised-learning/
+Large, cleanly labeled datasets are not does not always easy to come by. And sometimes the answers we are looking for are not discrete, but discontinuous and hard to define. This is where unsupervised learning come in.
+
+In unsupervised learning, the algorithm is handed non-labeled data without any instructions on what to do with it. It is the algorithms job to automatically find which features that best separates the data and find a structure within it.	An example of a problem well suited for unsupervised learning is;
+
+ Since the training data has not been reviewed by a human beforehand it is difficult to say with certainty how good the final model perform like it is with supervised learning.
+
+
+\subsubsection{Reinforcement learning} \label{sec:reinforcement learning}
+
+
 
 \subsection{How to evaluate a model}
 
