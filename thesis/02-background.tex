@@ -163,6 +163,18 @@ It is common to further categorize unsupervised learning into four additional gr
 Since the training data has not been reviewed by a human beforehand it is difficult to say with certainty how good the final model perform like it is with supervised learning. But for problem areas where there is little to none labeled data it is a valuable tool.
 
 
+\subsubsection{Semi-supervised learning} \label{semi_supervised_learning}
+%https://machinelearningmastery.com/supervised-and-unsupervised-machine-learning-algorithms/
+This is not its own category, but a combination of the two categories just mentioned. It is good for dealing with problems where you have some labeled data and a lot of unlabeled data.
+
+Many real world problems fall into this problem as large, fully labeled datasets are difficult to obtain. To create one is both expensive and time consuming and often require domain experts like analysts or doctors. Whereas unlabeled data is cheap and easy to collect and store.
+
+Our problem is in this realm and is therefor also a good example of a semi-supervised problem. We have a relatively small dataset of labeled medical images and almost an unlimited quantity of unlabeled images.
+
+The goal of the semi-supervised machine learning technique is to make best predictions on unlabeled data. This is done by first using a trained supervised model to best predict unlabeled data and then feed that back into the supervised learning algorithm as training data. Then use the newly trained model to make predictions on the new unseen data. To get the best result this process can be repeated until accuracy converges.
+
+
+
 \subsubsection{Reinforcement learning} \label{sec:reinforcement learning}
 
 
@@ -174,7 +186,7 @@ Since the training data has not been reviewed by a human beforehand it is diffic
 \subsection{Convolutional Neural Network} \label{convolutional_neural_network}
 % write some general stuff about CNN's
 % ----------------------------------------------------------
-One of the most used neural networks for image classifcation is the Convolutional Neural Network (CNN). The model was first proposed by \citeauthor*{ImageNetClassification12} in \citeyear{ImageNetClassification12} \cite{ImageNetClassification12} where they trained a deep convolutional neural network and used it to classify 1.2 million high-resolution images in the ImageNet LSVRC-2010 contest into the 1000 different classes with top-1 and top-5 error rates of 37.5\% and 17.0\% which far surpassed all other models at the time. Next we will get into a bit of the details of a CNN.
+One of the most used neural networks for image classification is the Convolutional Neural Network (CNN). The model was first proposed by \citeauthor*{ImageNetClassification12} in \citeyear{ImageNetClassification12} \cite{ImageNetClassification12} where they trained a deep convolutional neural network and used it to classify 1.2 million high-resolution images in the ImageNet LSVRC-2010 contest into the 1000 different classes with top-1 and top-5 error rates of 37.5\% and 17.0\% which far surpassed all other models at the time. Next we will get into a bit of the details of a CNN.
 
 
 \subsubsection{Convolution layer}
@@ -382,7 +394,7 @@ A common problem in training neural networks are too little labeled training dat
 % Mapping of the intestine. Specially related to the paper "Deep EndoVO: A recurrent convolutional neural network (RCNN) based visual odometry approach for endoscopic capsule robots" citekey DeepEndoVO18
 As mentioned in section \ref{sec:wireless_capsule_endoscopy}, a concern when processing the images taken with a WCE is not having the spatial data you get when using a normal fiber-optic endoscope. This is why \citeauthor*{DeepEndoVO18} has recently made substantial progress in converting passive capsule endoscopes to active capsule robots, enabling more accurate, precise, and intuitive detection of the location and size of the diseased areas by developing reliable real time pose estimation functionality of the capsule with RCNN's\footnote{Deep recurrent convolutional neural networks} \cite{DeepEndoVO18}. See Figure \ref{fig:deep_endovo_example} for an example.
 
-This architecture uses inception modules for feature extraction and a RNN for sequential modelling of motion dynamics to regress the robot's orientation and position in real time. By taking multiple of RGB Depth images with timestamps it can calculate the 6-DoF pose of the capsule without the need of any extra sensors. For obtaining the depth images \citeauthor*{DeepEndoVO18} use the shape from shading (SfS) technique of \citeauthor{ShapeShading94} \cite{ShapeShading94}. This model outperforms state-of-the-art models like LSD SLAM and ORB SLAM.
+This architecture uses inception modules for feature extraction and a RNN for sequential modelling of motion dynamics to regress the robot's orientation and position in real time. By taking multiple of RGB Depth images with time stamps it can calculate the 6-DoF pose of the capsule without the need of any extra sensors. For obtaining the depth images \citeauthor*{DeepEndoVO18} use the shape from shading (SfS) technique of \citeauthor{ShapeShading94} \cite{ShapeShading94}. This model outperforms state-of-the-art models like LSD SLAM and ORB SLAM.
 
 \begin{figure}[h] % fig:deep_endovo_example
   \centering
