@@ -146,11 +146,21 @@ This method is best suited for classification problems and regression problems, 
 
 \subsubsection{Unsupervised learning} \label{sec:unsupervised_learning}
 % https://blogs.nvidia.com/blog/2018/08/02/supervised-unsupervised-learning/
-Large, cleanly labeled datasets are not does not always easy to come by. And sometimes the answers we are looking for are not discrete, but discontinuous and hard to define. This is where unsupervised learning come in.
+% https://www.guru99.com/unsupervised-machine-learning.html
+Large, cleanly labeled datasets are not does not always easy to come by. And sometimes the answers we are looking for are not discrete, but discontinuous and hard to define. This is where unsupervised learning comes in.
 
-In unsupervised learning, the algorithm is handed non-labeled data without any instructions on what to do with it. It is the algorithms job to automatically find which features that best separates the data and find a structure within it.	An example of a problem well suited for unsupervised learning is; %TODO add example
+In unsupervised learning, the algorithm is handed non-labeled data without any instructions on what to do with it. It is the algorithms job to automatically find which features that best separates the data and find a structure within it.	An example of a problem well suited for unsupervised learning is; using anomaly detection to discover unusual data points in a dataset, like fraudulent bank transactions.
 
-Since the training data has not been reviewed by a human beforehand it is difficult to say with certainty how good the final model perform like it is with supervised learning.
+It is common to further categorize unsupervised learning into four additional groups;
+
+\begin{itemize}
+\item \textbf{Clustering}: The deep learning model looks for data that are similar to each other and group them together.
+\item \textbf{Anomaly detection}: Used to flag outliers in a dataset. Samples that does not fit well in with the rest.
+\item \textbf{Association}: The model looks at how a certain feature of a data sample correlates with other features.
+\item \textbf{Autoencoders}: Autoencoders take input data, compress it into code and then try to recreate that same input data only using the compressed code.
+\end{itemize}
+
+Since the training data has not been reviewed by a human beforehand it is difficult to say with certainty how good the final model perform like it is with supervised learning. But for problem areas where there is little to none labeled data it is a valuable tool.
 
 
 \subsubsection{Reinforcement learning} \label{sec:reinforcement learning}
