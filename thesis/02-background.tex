@@ -164,7 +164,8 @@ Since the training data has not been reviewed by a human beforehand it is diffic
 
 
 \subsubsection{Semi-supervised learning} \label{semi_supervised_learning}
-%https://machinelearningmastery.com/supervised-and-unsupervised-machine-learning-algorithms/
+%Source: https://machinelearningmastery.com/supervised-and-unsupervised-machine-learning-algorithms/
+%TODO refer to our implementation
 This is not its own category, but a combination of the two categories just mentioned. It is good for dealing with problems where you have some labeled data and a lot of unlabeled data.
 
 Many real world problems fall into this problem as large, fully labeled datasets are difficult to obtain. To create one is both expensive and time consuming and often require domain experts like analysts or doctors. Whereas unlabeled data is cheap and easy to collect and store.
@@ -176,7 +177,26 @@ The goal of the semi-supervised machine learning technique is to make best predi
 
 
 \subsubsection{Reinforcement learning} \label{sec:reinforcement learning}
+%Source1: https://blogs.nvidia.com/blog/2018/08/02/supervised-unsupervised-learning/
+%Source2: https://intellipaat.com/blog/supervised-learning-vs-unsupervised-learning-vs-reinforcement-learning/
+%Source3: https://medium.com/@machadogj/ml-basics-supervised-unsupervised-and-reinforcement-learning-b18108487c5a
+In Reinforcement Learning (RL) algorithms learn how to react to the environment on their own and is neither supervised nor unsupervised. Instead the algorithm rely on being able to monitor response of its action and measure against a defined "reward".
 
+Reinforcement learning is a type of machine learning where AI agents are attempting to find the optimal way through an environment, to accomplish a set goal or to improve on a specific task. As the agent take an action in the environment it receives a reward, as seen in Figure \ref{fig:reinforcement_learning}. If the action improved on the last agent state it gets a positive reward and if the new state of the agent is worse than the previous it get a negative reward. The goal is to predict which next step to take to get the biggest final reward.
+
+%TODO reference to the image or create own?
+%Source: https://www.researchgate.net/figure/Reinforcement-Learning-Agent-and-Environment_fig2_323867253
+\begin{figure}[h] % fig:reinforcement_learning
+  \begin{center}
+    \includegraphics[width=0.5\textwidth]{reinforcement_learning.png}
+    \caption[Reinforcement learning: Agent and environment.]{Reinforcement learning: Agent and environment.}
+    \label{fig:reinforcement_learning}
+  \end{center}
+\end{figure}
+
+To make these predictions the agent need to rely on what it has previously learned, and be able to explore uncharted territory. For example if the first option for the agent is to pick a left or right turn on a road which leads to two different cities, and it gets a positive reward for picking left, the agent will never explore the other city. Therefore the agent must try to maximize the cumulative reward and not only the immediate reward.
+
+To achieve good cumulative reward the algorithm must iterate over the problem many times. For each iteration, and each round of feedback, the agents strategy incrementally improves. This works really good for problems that can be simulated, where iterating the problem only cost computer power. A good example of a good RL problem is video games and autonomous driving.
 
 
 \subsection{How to evaluate a model}
