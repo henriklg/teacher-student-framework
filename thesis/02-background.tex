@@ -19,7 +19,7 @@ In the next part will focus on deep learning and its various architectures and b
 % ----------------------------------------------------------
 \section{Medical scenario} \label{sec:medical_scenario}
 % ----------------------------------------------------------
-To detect irregularities in the digestive system (Figure \ref{fig:digestive_system}) is a difficult and time-consuming task. To classify irregularities correctly and precisely require expert knowledge. To fully understand the necessity of an automated system for detection lesions in the GI-tract we will go through the medical aspect of our problem statement, beginning with the anatomical explanation of the digestive tract. Then we will get to know the details of lesions in the small intestine, and the equipment currently in use to detect them.
+To detect irregularities in the digestive system (Figure \ref{fig:digestive_system}) is a difficult and time-consuming task. To classify irregularities correctly and precisely require expert knowledge. To fully understand the necessity of an automated system for detection lesions in the GI-tract we will go through the medical aspect of our problem statement, beginning with the anatomical explanation of the digestive tract. Then we will get to know the details of lesions in the small intestine, and the equipment currently in use to observe them.
 
 
 \subsection{The digestive system}  \label{sec:the_digestive_system}
@@ -29,26 +29,22 @@ To detect irregularities in the digestive system (Figure \ref{fig:digestive_syst
 %Source3: https://en.wikipedia.org/wiki/Gastrointestinal_tract
 
 % What is it
-The digestive system is made up of the gastrointestinal tract (GI tract), and the liver, pancreas and gallbladder. The GI tract is a series of hollow organs joined in a long and twisting tube beginning at your mouth and end with the anus, covering a distance of about 9 meters. The organs that make up the GI tract is the mouth, esophagus, stomach, small intestine, large intestine and anus.
+The digestive system is made up of the gastrointestinal tract (GI tract), and the liver, pancreas and gallbladder. The GI tract is a series of hollow organs joined in a long and twisting tube beginning at your mouth and end with the anus, covering a distance of about 9 meters. The organs that make up the GI tract is the mouth, esophagus, stomach, small intestine, large intestine and rectum.
 
 % Structure
 Clinicians commonly divide the gastrointestinal tract in upper and lower regions called upper gastrointestinal tract and lower gastrointestinal tract. The upper gastrointestinal tract consist of mouth, esophagus, stomach and duodenum while the lower gastrointestinal tract consist of most of the small intestine and large intestine. Next we will explain the function for each organ in the GI tract in the order of which food is processed.
 
 \begin{enumerate}
-\item \textbf{Mouth}
-\item \textbf{Esophagus}
-\item \textbf{Stomach}
-\item \textbf{Small intestine}
-\item \textbf{Large intestine}
-\item \textbf{Anus}
+\item \textbf{Mouth}; this is where food enters the GI tract and where the digestive process begin. After being split apart by chewing the food is swallowed and enters the esophagus.
+\item \textbf{Esophagus}; after the swallow the brain signal the esophagus to begin the peristalsis, which is the process of contraction and relaxation of muscles that propagates the food (now called \textit{bolus}, a ball of saliva and food) down towards the stomach. At the bottom of the esophagus you'll find a sphincter which opens to let the food into the stomach and normally keep the fluids in the stomach from traveling back up the esophagus.
+\item \textbf{Stomach}; upon entering the stomach the stomach muscles begin to mix the bolus with gastric acid which begins the digestion of proteins. The stomach is lined with gastric folds, which helps the stomach to expand to hold about one liter of food. After an hour or two the pyloric valve opens and the contents (called \textit{chyme}, a liquid of partially digested food and acids) are emptied into the small intestine.
+\item \textbf{Small intestine}; the small intestine mix chyme from the stomach with digestive juices from the pancreas, liver and intestine and push the mixture forward for further digestion. The walls of the small intestine, covered with intestinal villi (to increase the absorption area), absorb 95\% of the nutrients, and carries it to the bloodstream. Whats left, the waste product, move into the large intestine by the peristalsis forces.
+\item \textbf{Large intestine}; undigested parts of food, fluids and old cells from the GI tract lining enters the large intestine. The large intestine absorbs water and minerals back into the blood in the colon and changes the waste from liquid into stool.
+\item \textbf{Rectum}; the rectum stores stool until it is pushed out of anus during a bower movement.
 \end{enumerate}
 
 % Purpose
 The main purpose of the digestive system is so that the cells in the body can extract the nutrients from the food we eat and dispose of the waste which the body can't process. The digestive system is normally divided into smaller sub-systems. We will briefly explain the function of each sub-system in the order of consumed food passes through them, beginning with the mouth. 
-
-
-% Ehm,, diseases?
-These diseases have varying patterns and while some can be easy to split apart, some are more similar in pattern. While for an untrained eye it can be easy to spot that something is wrong it is very difficult to describe with words what that might be or even harder to write a program to detect the correct characteristic features of the disease. This is why we rely on having good amount of labeled data for this project to work. For increased accuracy we may have to look closer at a couple of diseases. Preferably two irregularities that both have different characteristics and lots of labeled training data.
 
 %TODO use same figures as Steven?
 \begin{figure}[h] % fig:digestive-system
@@ -66,7 +62,7 @@ These diseases have varying patterns and while some can be easy to split apart, 
 
 
 
-\subsection{Colon cancer} \label{sec:colon_cancer}
+\subsection{Colon cancer and other diseases} \label{sec:colon_cancer}
 % \subsection{Case study: Screening} \label{sec:screening}
 % ----------------------------------------------------------
 % what are colon cancer, and other lesions in GI tract 
@@ -78,6 +74,9 @@ Given the severity of colorectal cancer we have dedicated this section to give s
 %TODO add image of polyp etc? or a graph of death rate?
 
 morbidity and mortality rates in the united states
+
+% Ehm,, diseases?
+These diseases have varying patterns and while some can be easy to split apart, some are more similar in pattern. While for an untrained eye it can be easy to spot that something is wrong it is very difficult to describe with words what that might be or even harder to write a program to detect the correct characteristic features of the disease. This is why we rely on having good amount of labeled data for this project to work. For increased accuracy we may have to look closer at a couple of diseases. Preferably two irregularities that both have different characteristics and lots of labeled training data.
 
 
 
