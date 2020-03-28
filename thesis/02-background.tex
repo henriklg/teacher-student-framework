@@ -92,10 +92,10 @@ These diseases have varying patterns and while some can be easy to split apart, 
 %TODO : add reference to endoscopy_types table
 
 % Why it is used
-The most common way of screening patients is with a endoscope. When this tool is used by a professional some of the irregularities that can be spotted are; \textit{Colon polyp}, \textit{Colorectal Cancer}, \textit{Ulcerative Colitis}, \textit{Crohn's Disease}, \textit{Familial adenomatous polypsis}, \textit{Diverticulosis} and \textit{Diverticula Bleeding}.
+The most common way of screening patients is with a endoscope. When this tool is used by a professional some of the irregularities that can be spotted are; \textit{Colon polyp}, \textit{Colorectal Cancer}, \textit{Ulcerative Colitis}, \textit{Crohn's Disease}, \textit{Familial adenomatous polypsis}, \textit{Diverticulosis} and \textit{Diverticula Bleeding}. See section \ref{sec:colon_cancer} for a more detailed list of diseases.
 
 % History
-The basic technology behind the modern endoscope was developed in the early 1950s by English physicist Harold Hopkins and his student Narinder Kapany which let light travel through flexible pieces of glass, now known as optical fibers \cite{NewMethod54}. These fibers can be packed very dense and allow for light to be transported over long distances with a high resolution. 
+The basic technology behind the modern endoscope was developed in the early 1950s by English physicist Harold Hopkins and his student Narinder Kapany which let light travel through flexible pieces of glass, now known as optical fibers \cite{NewMethod54}. These fibers, as many as 50 000 optic fibers, can be packed very dense and allow for light to be transported over long distances with a high resolution. Later iterations of the endoscope allows for recording images through an added camera recorder connected at the end of the tool, water pipes, control cables and operation channels. See figure \ref{fig:fiber-optic-endoscopy} for a detailed look at the endoscope and its functions.
 
 The clever design of the tool allows it to be used for both ends of the GI tract, but also ears, nose and urinary tract. See table \ref{tab:endoscope_types} for a more detailed list of endoscope types. There also are some special forms of endoscopy which combines an endoscope with other medical applications, like fluoroscopy and ultrasound, to take medical imaging of special tricky parts of the body.
 
@@ -115,7 +115,7 @@ An lower endoscopy is a procedure used to examine the lower gastrointestinal tra
 
 
 %Source: https://www.cancer.net/navigating-cancer-care/diagnosing-cancer/tests-and-procedures/types-endoscopy
-%TODO : remove procedure name to shorten table width?
+%TODO : fit table to linewidth. remove procedure names?
 \begin{table} % tab:endoscope_types
   \centering
   \begin{tabular}{ l l l l}
@@ -152,10 +152,8 @@ An lower endoscopy is a procedure used to examine the lower gastrointestinal tra
 \noindent
 An endoscopy is usually a safe procedure, and the risk of serious complications is very low. Rare complications are; an infection in the part of the body the endoscope is used, or piercing or tearing in an organ, or bleeding, or reaction to the sedation used.
 
-% Intro to wireless capsule endoscopy 
-Before the year 2000 the only option you had to visualize the food pipe, stomach, duodenum, colon and terminal ileum (see Figure \ref{fig:digestive_system} for details) was to use a fiber-optic endoscope, which is a tool with a relatively wide cable that is pushed into the bowel with as much as 50 000 optic fibers (as seen on Figure \ref{fig:fiber-optic-endoscopy}). These cables have to carry fiber optic bundles, water pipes, operations channel and control cables. Although these cables can be quite flexible there is a limit for how far they can advance into the small bowel. This method cause pain and discomfort for the patient, and there was a clinical need for an improved methods.
 
-\begin{figure} % fig:fibre-optic-endoscope
+\begin{figure}[h] % fig:fibre-optic-endoscope
   \begin{center}
     \includegraphics[width=0.7\textwidth]{fiber-optic-endoscope.jpg}
     \caption[Image of a fiber optic endoscope with explanation of different parts of the tool]{Image of a fiber optic endoscope with explanation of different parts of the tool\footnotemark.}
@@ -173,9 +171,41 @@ Before the year 2000 the only option you had to visualize the food pipe, stomach
 % ----------------------------------------------------------
 % general info about WCE, some history etc and info about our system
 % ----------------------------------------------------------
-That is why in the year \citeyear{WirelessCapsule00} \citeauthor*{WirelessCapsule00} developed a new type of video-telemetry capsule endoscope that was swallowable \cite{WirelessCapsule00}. It could travel through the entire digestive system because it had no external wires, fiber-optic bundles or cables of any sort. The capsule travels by peristalsis\footnote{Peristalsis is a radially symmetrical contraction and relaxation of muscles that propagates in a wave down a tube, in an anterograde direction.} through the gastrointestinal tract, which takes from 10 to 48 hours, and transmit images on a regular interval to receivers attached around the outside of the patients stomach for as long as the battery allows, usually in the range 6 to 8 hours. Two example images taken by WCE are presented in Figure \ref{fig:pillcam_examples}. By triangulating the signal strength and the location of the receivers taped on the body it is possible to roughly estimate the position of the capsule. This is however not very precise and can not tell us the rotation or direction of the capsule. Regardless, that information will not be available for us in this study as we only have access to the images themselves. Therefore we could implement an algorithm to predict which region of the digestive system the image is taken from (see section \ref{sec:mapping}).
+% Intro to wireless capsule endoscopy 
+Before the year 2000 the only option you had to visualize the food pipe, stomach, duodenum, colon and terminal ileum (see Figure \ref{fig:digestive_system} for details) was to use a fiber-optic endoscope. These cables have to carry fiber optic bundles, water pipes, operations channel and control cables. Although these cables can be quite flexible there is a limit for how far they can advance into the small bowel. This method cause pain and discomfort for the patient, and there was a clinical need for an improved methods.
 
-%TODO write about our specific pillcam system and add images of the equipement
+% Some history
+That is why in the year \citeyear{WirelessCapsule00} \citeauthor*{WirelessCapsule00} developed a new type of video-telemetry capsule endoscope which the patients were able to swallow \cite{WirelessCapsule00}. It could travel through the entire digestive system because it had no external wires, fiber-optic bundles or cables of any sort. The capsule travels by peristalsis\footnote{Peristalsis is a radially symmetrical contraction and relaxation of muscles that propagates in a wave down a tube, in an anterograde direction.} through the gastrointestinal tract, which takes from 10 to 48 hours, and transmit images on a regular interval to receivers attached around the outside of the patients stomach for as long as the battery allows, usually in the range 6 to 8 hours. Two example images taken by WCE are presented in Figure \ref{fig:pillcam_examples}. By triangulating the signal strength and the location of the receivers taped on the body it is possible to roughly estimate the position of the capsule. This is however not very precise and can not tell us the rotation or direction of the capsule. Regardless, that information will not be available for us in this study as we only have access to the images themselves. By looking at some of the anatomical landmarks in the images we still might be able to predict when the capsule exits the stomach through the pylorus. 
+
+% Mapping
+There is also ongoing research done in the field of map prediction (see section \ref{sec:mapping})which could be of great interest for WCE technology as it would allow us to better predict where inside a patient a disease is found.
+
+% Other systems
+The WCE devices come in a variety of different versions. Depending on travel speed through the GI tract, the purpose of the device and the localization it will capture between 1 and 30 images every second, produced with pixel resolution in the range of 256x256 to 512x512. They are specialized for different parts of the GI-tract and come from different vendors. The most known manufactures are Given Imaging (Medtronics), Ankon Technologies, Chongqing Science, IntroMedic, CapsoVision and Olympus.
+
+% Used system
+The data used for this study is collected by the Olympus Endocapsule 10 System \footnote{\url{https://www.olympus-europa.com/medical/en/Products-and-Solutions/Products/Product/ENDOCAPSULE-10-System.html}} using the Olympus EC-S10 endocapsule (Figure \ref{fig:ec-s10}) and the Olympus RE-10 endocapsule recorder (Figure \ref{fig:re-10}). This system has a 160$^{\circ}$ wide-angle lens, a light source, a minimum of 12 hours battery life (sometimes up to 20 hours), captures between 80 000 and 140 000 images and user friendly functionalities like Omni-selected Mode. Omni-selected Mode skips images that overlay with previous ones and therefore reduce review time for clinicians. To reduce drain on battery the light source will only emit light just as the camera is taking a picture. Its dimensions are 11 mm (diameter) x 26 mm (length) and it weight 3.3 gram.
+
+\begin{figure} % fig:olympus_endocapsule_10 (double figure)
+  \centering
+  \begin{subfigure}[b]{0.4\linewidth}
+    \centering
+    \includegraphics[trim=9cm 9cm 9cm 9cm, 
+    clip,height=2.7in]{PillCam_IMG_1425.JPG}
+    \caption{Olympus EC-S10 endocapsule}
+    \label{fig:ec-s10}
+  \end{subfigure}
+%	-- 
+  \begin{subfigure}[b]{0.4\linewidth}
+    \centering
+    \includegraphics[height=2.7in]{PillCam_IMG_1371.JPG}
+    \caption{Olympus RE-10 endocapsule recorder}
+    \label{fig:re-10}
+  \end{subfigure}
+  \caption[Used WCE equipment.]{Used WCE equipment.}
+  \label{fig:olympus_endocapsule_10}
+\end{figure}
+
 
 %TODO add own images from pillcam dataset and remove links/footnote
 \begin{figure} % fig:pillcam_examples (double figure)
