@@ -14,6 +14,8 @@
 % ----------------------------------------------------------
 % Present how you gathered the data and labels
 % ----------------------------------------------------------
+%TODO : add list of diseases from datasets (like stated in \ref{sec:colon_cancer})
+
 The datasets used in our experiments are Kvasir Pillcam, Kvasir and Hyper-Kvasir. This section will demonstrate the main differences between the three datasets and explain how they can be found and used for fact checking. All three datasets are collected using endoscopic equipment at Vestre Viken Health Trust in Norway. The VV consists of 4 hospitals and provides health care for 470.000 people. One of the hospitals is Bærum Hospital, which has a large gastroenterology department from where the data is collected. 
 
 \subsection{Kvasir PillCam} \label{sec:kvasir_pillcam}
@@ -39,7 +41,7 @@ In addition to labeling the images the dataset also contain a JSON format file w
 \end{table}
 
 
-\subsection{Kvasir} \label{sec:kvasir}
+\subsection{Kvasir-V2} \label{sec:kvasir-v2}
 The Kvasir dataset \cite{KVASIRMultiClass17} contains images from inside the gastrointestinal (GI) tract. The samples are classified into three important anatomical landmarks and three clinically significant findings. In addition it has two classes related to the removal procedure of polyps. The dataset is sorted and annotated is performed by medical doctors. The class names and findings for each class is given in table \ref{table:kvasir}. One of the most important aspects of the Kvasir dataset is that it makes it easy to reproduce and compare results in scientific computing.
 
 \begin{table}
