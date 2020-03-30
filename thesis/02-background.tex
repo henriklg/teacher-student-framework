@@ -47,8 +47,8 @@ Clinicians commonly divide the gastrointestinal tract in upper and lower regions
 \end{enumerate}
 
 
-%TODO use same figures as Steven?
-\begin{figure}[h] % fig:digestive-system
+%TODO use same figures as Steven? or have Petra make one
+\begin{figure}[ht!] % fig:digestive-system
   \begin{center}
     \includegraphics[width=0.5\textwidth]{digestive-system}
     \caption[An overview of the terms used to describe the digestive system]{An overview of the terms used to describe the digestive system\footnotemark.}
@@ -56,6 +56,7 @@ Clinicians commonly divide the gastrointestinal tract in upper and lower regions
   \end{center}
 \end{figure}
 
+%TODO : get footnote on same page (or is it ok as is?)
 \footnotetext{
 \text{By Mariana Ruiz, edited by Joaquim Gaspar. Released into public domain by author.} \newline
 \url{https://en.wikipedia.org/wiki/File:Digestive_system_diagram_edit.svg}
@@ -89,13 +90,12 @@ These diseases have varying patterns and while some can be easy to split apart, 
 %source: https://www.nhs.uk/conditions/endoscopy/
 %source: https://www.medicalnewstoday.com/articles/153737#preparation
 %TODO : find a new beginning of section
-%TODO : add reference to endoscopy_types table
 
 % Why it is used
 The most common way of screening patients is with a endoscope. When this tool is used by a professional some of the irregularities that can be spotted are; \textit{Colon polyp}, \textit{Colorectal Cancer}, \textit{Ulcerative Colitis}, \textit{Crohn's Disease}, \textit{Familial adenomatous polypsis}, \textit{Diverticulosis} and \textit{Diverticula Bleeding}. See section \ref{sec:colon_cancer} for a more detailed list of diseases.
 
 % History
-The basic technology behind the modern endoscope was developed in the early 1950s by English physicist Harold Hopkins and his student Narinder Kapany which let light travel through flexible pieces of glass, now known as optical fibers \cite{NewMethod54}. These fibers, as many as 50 000 optic fibers, can be packed very dense and allow for light to be transported over long distances with a high resolution. Later iterations of the endoscope allows for recording images through an added camera recorder connected at the end of the tool, water pipes, control cables and operation channels. See figure \ref{fig:fiber-optic-endoscopy} for a detailed look at the endoscope and its functions.
+The basic technology behind the modern endoscope was developed in the early 1950s by English physicist Harold Hopkins and his student Narinder Kapany which let light travel through flexible pieces of glass, now known as optical fibers \cite{NewMethod54}. These fibers, as many as 50 000 optic fibers, can be packed very dense and allow for light to be transported over long distances with a high resolution. Later iterations of the endoscope allows for recording images through an added camera recorder connected at the end of the tool, water pipes, control cables and operation channels. See Figure \ref{fig:fiber-optic-endoscopy} for a detailed look at the endoscope and its functions.
 
 The clever design of the tool allows it to be used for both ends of the GI tract, but also ears, nose and urinary tract. See table \ref{tab:endoscope_types} for a more detailed list of endoscope types. There also are some special forms of endoscopy which combines an endoscope with other medical applications, like fluoroscopy and ultrasound, to take medical imaging of special tricky parts of the body.
 
@@ -112,7 +112,6 @@ An upper endoscopy is a procedure used to examine the upper gastrointestinal tra
 %source: https://www.saintlukeskc.org/health-library/lower-gi-endoscopy
 An lower endoscopy is a procedure used to examine the lower gastrointestinal tract, which is  most of the small intestine, the large intestine and the rectum. The procedure may include rectum and entire colon, in which case it is a colonoscopy, or just the rectum and sigmoid colon, then it is called a sigmoidoscopy. Treatments that may be performed in the lower digestive system include biopsy (collecting tissue sample), polyp removal, cauterize a bleeding vessel and other medical procedures.
 \bigbreak \noindent
-
 
 %Source: https://www.cancer.net/navigating-cancer-care/diagnosing-cancer/tests-and-procedures/types-endoscopy
 %TODO : fit table to linewidth. remove procedure names?
@@ -146,7 +145,6 @@ An lower endoscopy is a procedure used to examine the lower gastrointestinal tra
   \caption[list of the most common types of endoscopy.]{list of the most common types of endoscopy.}
   \label{tab:endoscope_types}
 \end{table}
-
 
 
 \noindent
@@ -206,32 +204,25 @@ The data used for this study is collected by the Olympus Endocapsule 10 System \
   \label{fig:olympus_endocapsule_10}
 \end{figure}
 
-
-%TODO add own images from pillcam dataset and remove links/footnote
+%TODO add ref to dataset in caption
 \begin{figure} % fig:pillcam_examples (double figure)
   \centering
-  \begin{subfigure}[b]{0.4\linewidth}%
+  \begin{subfigure}[b]{0.4\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{pillcam_small_intestine}%
-    \caption{Small Intestine}%
-    \label{fig:pillcam_small_intestine}%
-  \end{subfigure}%
+    \includegraphics[width=\linewidth]{pillcam_stomach}
+    \caption{Stomach}
+    \label{fig:pillcam_stomach}
+  \end{subfigure}
   \quad
-  \begin{subfigure}[b]{0.4\linewidth}%
+  \begin{subfigure}[b]{0.4\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{pillcam_colon}%
-    \caption{Colon}%
-    \label{fig:pillcam_colon}%
-  \end{subfigure}%
-  \caption[Images taken with WCE]{Images taken with WCE\footnotemark.}%
-  \label{fig:pillcam_examples}%
-\end{figure}%
-
-\footnotetext{
-\text{CC BY-SA 3.0 / Attribution to Dr.HH.Krause at English Wikipedia;} \newline
-\url{https://commons.wikimedia.org/wiki/File:Normales_Colon.PNG} \newline
-\url{https://commons.wikimedia.org/wiki/File:Dunndarm.PNG} %Dünndarm
-}
+    \includegraphics[width=\linewidth]{pillcam_small-intestine}
+    \caption{Small intestine}
+    \label{fig:pillcam_colon}
+  \end{subfigure}
+  \caption[Images taken with WCE]{Images from Kvasir PillCam (See Section \ref{sec:kvasir_pillcam}) dataset taken with WCE.}
+  \label{fig:pillcam_examples}
+\end{figure}
 
 
 
