@@ -64,20 +64,26 @@ Clinicians commonly divide the gastrointestinal tract in upper and lower regions
 
 
 
-\subsection{Colon cancer and other diseases} \label{sec:colon_cancer}
+\subsection{Colorectal Cancer and Screening} \label{sec:colon_cancer}
 % \subsection{Case study: Screening} \label{sec:screening}
 % ----------------------------------------------------------
 % what are colorectal cancer, and other lesions in GI tract 
 % doing to the effected patients, what are death rates
 % and the cost to society etc, write about importance and cost of screening.
 % ----------------------------------------------------------
-The GI tract may be home to a multitude of diseases, including infections, inflammations and cancers. Given our problem statement and the severity of the disease, we are going to focus on colorectal cancer (CRC). See section \ref{sec:data_collection} for list of other diseases from the datasets we have used during our experiments.
+% Intro to Colorectal Cancer
+The GI tract may be home to a multitude of diseases, including infections, inflammations and cancers. Given our problem statement and the severity of the disease, we are going to focus on colorectal cancer (CRC). See section \ref{sec:data_collection} for list of other diseases from the datasets we have used during our experiments. One of the most substantially significant factors for lowering morbidity and mortality in GI tract diseases are early screening and treatment \cite{ColorectalCancer14, CancerStatistics10}. And in this section we will therefore explain the importance of screening and the difficulties that the current methods inflict upon the medical sector.
 
-A study from 2014 found 
+% CRC
+A study from 2014 found that CRC were the leading cause of cancer death in the United States in the late 1940 and early 1960 \cite{CancerStatistics10}, but CRC mortality has since been slowly decreasing due to historical changes in risk factors (E.g decreased smoking and red meat consumption) and better use of screening and early treatment. Today CRC is the third most common cause of cancer death in both men and women. 
 
+% Intro to screening
 Another study used a microsimulation called MISCAN-COLON \cite{HowMuch06} to simulate the 2000 U.S population with regards to the CRC risk factor prevalence, screening use, and treatment use. They used the model to project age-standardized CRC mortality from the year 2000 to 2020 for 3 intervention scenarios and found that without any changes the risk factor would decrease by 17\% by the year 2020. However, if screening use was improved to 70\% of the population and the use of chemotherapy increased for all age groups, then the reduction of CRC mortality was estimated to be close to 50\% by the year 2020. They found that the highest contributor to the reduced mortality rate was high level of screening (23\%).
 
-%TODO add image of graph of death rate?
+% Screenig
+At the current state screening is too expensive for the medical sector. This could be improved by the use of cheaper screening methods like VCE and Artificial Intelligence (A.I).
+
+%TODO add graph of death rate etc?
 \begin{figure}[h!] % fig:kvasirv2_polyp
   \begin{center}
     \includegraphics[width=0.5\textwidth]{kvasirv2_polyp.jpg}
@@ -86,9 +92,8 @@ Another study used a microsimulation called MISCAN-COLON \cite{HowMuch06} to sim
   \end{center}
 \end{figure}
 
-morbidity and mortality rates in the united states
 
-% Ehm,, diseases?
+% Other diseases?
 These diseases have varying patterns and while some can be easy to split apart, some are more similar in pattern. While for an untrained eye it can be easy to spot that something is wrong it is very difficult to describe with words what that might be or even harder to write a program to detect the correct characteristic features of the disease. This is why we rely on having good amount of labeled data for this project to work. For increased accuracy we may have to look closer at a couple of diseases. Preferably two irregularities that both have different characteristics and lots of labeled training data.
 
 
