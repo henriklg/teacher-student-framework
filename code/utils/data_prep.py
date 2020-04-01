@@ -214,7 +214,6 @@ def prepare_for_training(ds, bs, cache, shuffle_buffer_size):
     # `prefetch` lets the dataset fetch batches in the background while the model
     # is training. TODO: potential memory leak when buffersize is 1. Check
     ds = ds.prefetch(buffer_size=AUTOTUNE)
-    print ("Prefetch buffer size:", AUTOTUNE)
     return ds
     
     
