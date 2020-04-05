@@ -60,7 +60,7 @@ def create_dataset(config):
         files_string = str(data_dir/'[!{}]*/*'.format(outcast))
     
     if verbosity > 0: print ("Dataset.list_files: ",files_string, "\n")
-    list_ds = tf.data.Dataset.list_files(files_string)
+    list_ds = tf.data.Dataset.list_files(files_string, shuffle=True, seed=tf.constant(123, tf.int64))
     
     # Functions for the data pipeline
     def get_label(file_path):
