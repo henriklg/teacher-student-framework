@@ -11,6 +11,7 @@
 % ----------------------------------------------------------
 \section{Background and Motivation} \label{sec:background_and_motivation}
 % ----------------------------------------------------------
+\textbf{** This entire section is going to be rewritten **} \bigbreak \noindent
 In this project we aim to design and develop a system for analyzing medical videos from a camera pill, as seen in Figure \ref{fig:pill-cam}. The pill is swallowed and records video of the entire digestive system The goal is to be able to detect different irregularities in the patients digestive system, like a colon polyp, Chron's disease, Colorectal cancer, etc. by using video object tracking, object detection, machine learning or other relevant tools.
 
 Neural networks models that we would like to explore further for this purpose are Convolutional neural networks (CNN), Recurrent neural networks (RNN), Capsule neural networks, Long Short-Term memory networks and more.
@@ -18,23 +19,55 @@ Neural networks models that we would like to explore further for this purpose ar
 The main idea is to go beyond image-based methods and also exploit the time factor of the data. 
 The videos we will be using for this is delivered by Bærum Hospital, and is carefully labeled by using tools such as described in the paper \citetitle*{ExpertDriven15}. In this paper \citeauthor*{ExpertDriven15} presents a semi-supervised method to gather the annotations in a easy and time saving way \cite{ExpertDriven15}.
 
+%TODO : remove image?
+%TODO : source in footnote
 \begin{figure}[H] % fig:pill-cam
   \begin{center}
     \includegraphics[width=0.9\linewidth]{pill-cam.jpg}
-    \caption[Illustration of how such a camera pill could look like]{Illustration of how such a camera pill could look like \cite{PillCamCamera}.}
+    \caption[Illustration of how such a camera pill could look like]{Illustration of how such a camera pill could look like\footnotemark.}
     \label{fig:pill-cam}
   \end{center}
 \end{figure}
+
+\footnotetext{\text{Image Credit: Medtronic}}
+
+
+\subsection{Nomenclature used in the field of capsule endoscopy}
+%Source: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4665909/
+%TODO : move to WCE section? 
+%TODO : correct all naming schemes in thesis this far
+%TODO : add venn diagram
+From a variety of literature searches we have found that there is five different terms in use:
+
+\begin{itemize}
+\item \textbf{VCE}: Video Capsule Endoscopy - capsule endoscopy including an imaging device such as a CCD (the capsule does not have to be wireless);
+\item \textbf{WVE}: Wireless Video Endoscopy (not necessarily a capsule);
+\item \textbf{CE}: Capsule Endoscopy - endoscopic capsule (not necessarily wireless);
+\item \textbf{WCE}: Wireless Capsule Endoscopy (not necessarily containing an image sensor);
+\item \textbf{WVC}: Wireless Video Capsule.
+\end{itemize}
+
+\begin{figure}[H] % fig:wce_nomenclature
+  \begin{center}
+    \includegraphics[width=0.9\linewidth]{wce_nomenclature.jpg}
+    \caption[]{}
+    \label{fig:wce_nomenclature}
+  \end{center}
+\end{figure}
+
+The terms are often confused and used interchangeably. Consequently in this thesis they will all be referred to as WCE.
 
 
 
 % ----------------------------------------------------------
 \section{Problem statement} \label{sec:problem_statment}
 % ----------------------------------------------------------
+%TODO : add soure
 Colorectal cancer (CRC) is the third most common cause of cancer mortality for both men and women \cite{CancerStatistics10}, and it is a condition where early detection is of clear value for the ultimate survival of the patient. As statistics show that 15\% of male and female above 50 years are at risk, the procedure is recommended on a regular basis (every 3-5 years) for the population over 50, and from an earlier age for high-risk groups. 
 
 Colonoscopy is a demanding procedure requiring an significant amount of time by specialized physicians, in addition to the discomfort and risks inherent in the procedure. Traditional methods based on colonoscopy are not cost-effective for population-based screening purposes, so only about 2-3\% of the target population is reached at present. 
 
+%TODO : add source for cost
 The cost of a population screening program is prohibitively expensive. Colonoscopy is the most expensive cancer screening process in the US, with annual costs of \$10 billion dollars (\$1100 per person). In Norway we have similar costs of around \$1000 per person, with a time consumption of about 1 doctor-hour and 2 nurse-hours per examination. 
 
 By researching an automatic system for a camera pill the aim is to greatly increase the number of patients that can be examined, i.e., making the public health care system more scalable and cost effective, while at the same time reducing the need for intrusive procedures like "bottom-up" examinations like colonoscopy.
@@ -51,23 +84,28 @@ By researching an automatic system for a camera pill the aim is to greatly incre
 %- time constraints
 %- small sample size (few medical videos)
 %- searching for a given set of diseases
-%- TODO: not knowing what the algorightm learns (unless implementing gradcam etc)
+%TODO : not knowing what the algorightm learns (unless implementing gradcam etc)
+%TODO : temporal constraints due to low (and variable) frame rate
 
 % scope: 
 %- looking at only some AI models
 %- compare atomatic classification systems against eachother
 % ----------------------------------------------------------
-Based on the described problem statement the scope of this thesis is to compare some prior selected automatic systems with focus on machine learning, for classification tasks in the medical domain. We will test the systems on video and still images taken from a wireless capsule endoscopy system, provided by Bærum Hospital. This data is generated with PillCam$^{TM}$ SB 3 System \footnote{\url{https://www.medtronic.com/covidien/en-us/products/capsule-endoscopy/pillcam-sb-3-system.html}} and gives us a wide view of the GI-tract. A limitation for our research will therefore be that our dataset lack a great deal of diversity. While we might have a wide range of patients all the data contributions stem from one provider in one location. This might not be much of an issue due to GI-tract being quite homegenous over large populations. But can presumably cause biasing issues in our deep learning models. % mention ethnicity and age
+Based on the described problem statement the scope of this thesis is to compare some prior selected automatic systems with focus on machine learning, for classification tasks in the medical domain. We will test the systems on video and still images taken from a wireless capsule endoscopy system, provided by Bærum Hospital. 
+%TODO : fix VCE system
+This data is collected with the Olympus Endocapsule 10 System\footnote{\url{https://www.olympus-europa.com/medical/en/Products-and-Solutions/Products/Product/ENDOCAPSULE-10-System.html}} and gives us a wide view of the GI-tract. A limitation for our research will therefore be that our dataset lack a great deal of diversity. While we might have a wide range of patients all the data contributions stem from one provider in one location. This might not be much of an issue due to GI-tract being quite homogeneous over large populations. But can presumably cause biasing issues in our deep learning models. % mention ethnicity and age
 
-By using a tool provided by Augere Medical, we have sequentially classified each frame in some 45 PillCam videos. Although being assisted by doctor Thomas de Lange, with many years of experience, the dataset might not be perfectly labeled due to time constraints. But to the best of our efforts we managed to divide the data into 10 classes which we later will train our networks on.
+%TODO : needs to be rewritten to accomondate the changes made to the thesis
+%TODO : write more aout augere medical
+By using a tool provided by Augere Medical, we have sequentially classified each frame in XXX WCE videos, assisted by doctor Thomas de Lange, with many years of experience. To the best of our efforts we managed to divide the data into XXX classes which we later will train our networks on.
 
-Considering the scope of this thesis, we will limit ourselves to use some of the more common deep convolutional neural networks and a more novel stacked hourglass network. There are many other more common network used in the field of object classification like NN, RNN, stastisctial methods, but these methods are widely tested and we wish to push the envelope of machine learning systems on medical videos and also have a wide variety of ways to score our model against previously tested algorithms.
+Considering the scope of this thesis, we will limit ourselves to use some of the more common deep convolutional neural networks and a more novel stacked hourglass network. There are many other more common network used in the field of object classification like NN, RNN, statistical methods, but these methods are widely tested and we wish to push the envelope of machine learning systems on medical videos and also have a wide variety of ways to score our model against previously tested algorithms.
 
 
 % ----------------------------------------------------------
 \section{Research methods} \label{sec:research_methods}
 % ----------------------------------------------------------
-% TODO: describe how our methodology fits into this
+%TODO : describe how our methodology fits into this
 
 We have based this paper on Association for Computing Machinerys (ACMs) research
 methodology. In the spring of 1986 ACM president Adele Goldberg and ACM Education Board Chairman Robert Aiken appointed a task force with the prime objective of describing the core fundamentals of computer science and computer engineering \cite{ComputingDiscipline89}. They introduced the phrase "discipline of computing" to embrace the two fields. The task force were given three objectives to complete.
@@ -121,6 +159,8 @@ An engineer is to iterate these steps until the results from the testing satisfy
 \section{Main Contributions} \label{sec:main_contributions}
 % ----------------------------------------------------------
 % what did your research contribute to the field?
+% ----------------------------------------------------------
+Write a section on how our work contributes to the field... TBW (to be written)
 
 
 % ----------------------------------------------------------
@@ -128,8 +168,9 @@ An engineer is to iterate these steps until the results from the testing satisfy
 % ----------------------------------------------------------
 % the layout of the thesis
 % ----------------------------------------------------------
-This thesis is split into five chapter. Chapter one and two are mostly to introduce the reader to the topic and to fill in the necessary knowledge to understand the rest of the thesis. In the last chapter we conclude on our findings and discuss our findings and propose further work. The papers that have been referenced in the thesis is added in the bibliography at the very end. The chapters in the thesis is summarized below:
+This thesis is split into five chapters. Chapter one and two are mostly to introduce the reader to the topic and to fill in the necessary knowledge to understand the rest of the thesis. In the last chapter we conclude on our findings and discuss our findings and propose further work. The papers that have been referenced in the thesis is added in the bibliography at the very end. The chapters in the thesis is summarized below:
 
+%TODO : finish the chapter outline
 \begin{itemize}
 \item In Chapter \ref{chap:background} we discuss the literature that focus on the topic of automated lesion detection in computer systems.
 
@@ -138,7 +179,6 @@ This thesis is split into five chapter. Chapter one and two are mostly to introd
 \item In Chapter \ref{chap:experiments} we present the experiments we have conducted and..
 
 \item In Chapter \ref{chap:conclusions} we provide a comprehensive overview of the results found and discus what that contributes to the field and propose some further work.
-
 \end{itemize}
 
 
