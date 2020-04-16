@@ -10,13 +10,30 @@
 
 
 % ----------------------------------------------------------
-\section{Data collection} \label{sec:data_collection}
+\section{Dataset} \label{sec:data_collection}
 % ----------------------------------------------------------
 % Present how you gathered the data and labels
 % ----------------------------------------------------------
 %TODO : add list of diseases from datasets (like stated in \ref{sec:colon_cancer})
 
 The datasets used in our experiments are Kvasir Pillcam, Kvasir and Hyper-Kvasir. This section will demonstrate the main differences between the three datasets and explain how they can be found and used for fact checking. All three datasets are collected using endoscopic equipment at Vestre Viken Health Trust in Norway. The VV consists of 4 hospitals and provides health care for 470.000 people. One of the hospitals is Bærum Hospital, which has a large gastroenterology department from where the data is collected. 
+
+
+
+\subsection{Open-source endoscopy datasets}
+% ----------------------------------------------------------
+% Present other datasets found online, and end with what they lack,
+% and why we need kvasirV2, hyper-kvasir, etc
+% ----------------------------------------------------------
+
+
+\subsection{Augere Medical}
+% ----------------------------------------------------------
+% Write about augere medical and the tagging tool and export script used
+% ----------------------------------------------------------
+Write about augere medical and the tagging tool and export script used
+
+
 
 \subsection{Kvasir PillCam} \label{sec:kvasir_pillcam}
 The dataset we used in our experiments consist of endoscopic videos collected from Bærum Hospital. Unlike Kvasir and Hyper-Kvasir datasets we have made the Kvasir PillCam dataset for the purpose of this thesis. In total we have 44 videos which have gone through some re encoding to reduce the file sizes, and also because the original encoding is proprietary Sony technology. After that the videos are uploaded to Augere Medical \footnote{\url{https://augere.md/}} tagging tool. The data export from Bærum also contains some findings for each video (if there is any) and are extracted, converted to frame number and that helped us a great deal with tagging the videos. We also have Thomas de Lange to thank, because he helped us a lot with the medical aspect of the classification process. When all 44 videos have been precisely labeled the dataset is exported from Augeres tagging tool and split into folders for each class. The folders/classes are given in table \ref{table:kvasir_pillcam}. In total we have 44 000 labeled images in 8 classes. The sample distribution across the eight classes is skewed depending on how many findings there are in the videos. Some findings occur often and some very rarely. The dataset also contain one class for 'normal' images, which there is quite a bit more of than findings. 
@@ -99,18 +116,20 @@ In figure \ref{fig:kvasir_seg_example} we can see an example of the segmented Kv
 % data normalization, splitting, augmentation etc
 
 \subsection{Data pipeline}
-% tensorflow.data.Dataset pipeline with prefecth, batching etc
+% tensorflow.data.Dataset pipeline with prefech, batching, shuffling, caching etc
 
 
 % ----------------------------------------------------------
 \section{System implementation} \label{sec:system_implementation}
 % ----------------------------------------------------------
-
+% Present the system architecture, some results perhaps
+% ----------------------------------------------------------
 
 % ----------------------------------------------------------
 \section{Summary} \label{sec:C3-summary}
 % ----------------------------------------------------------
-
+% Present a summary of the chapter
+% ----------------------------------------------------------
 
 
 \end{document}
