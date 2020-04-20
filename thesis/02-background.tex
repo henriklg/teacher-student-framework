@@ -16,6 +16,9 @@ We begin with the digestive system and how it operates to aid the human body wit
 In the next part will focus on deep learning and its various architectures and building blocks. To fully understand this we need to have a look at its inner workings and output. We begin with looking at a basic three layer neural network and build from there up to CNNs and some of the most advanced architectures most recently proposed. This will give a good understanding of how and why we use deep learning to classify medical images.
 
 
+
+
+
 % ----------------------------------------------------------
 \section{Medical scenario} \label{sec:medical_scenario}
 % ----------------------------------------------------------
@@ -251,6 +254,10 @@ Consequently, there is ongoing research related to the implementation of image a
 % possibility of cheap, autonomous diagnostic.
 % source: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4665909/
 % ----------------------------------------------------------
+%TODO : mention capsule with flash storage and benefits like being able to swallow pill at home and return the data.
+
+
+
 
 
 
@@ -261,20 +268,16 @@ Consequently, there is ongoing research related to the implementation of image a
 As apposed to using regular optic-fiber endoscopy, it can be difficult to know the location and orientation of the capsule when it is traveling through the digestive system. In a paper by \citeauthor*{ClassifyingDigestive15} it is shown that by using Deep Convolutional Networks (DCNN) it is possible to classify the digestive organs in wireless capsule endoscopy with about 95\% classification accuracy on average \cite{ClassifyingDigestive15}.
 The DCNN-based WCE digestive organ classification system is constructed of three stages of convolution, pooling and two fully-connected layers. This is illustrated in Figure 3 in the paper \cite{ClassifyingDigestive15}. The main steps of this convolutional neural network are described in detail in section \ref{convolutional_neural_network}.
 
-\subsection{Imbalanced data}
-
-\subsection{TensorFlow Framework} % ?? Perhaps add everything under framework/libraries?
-%\subsection{Keras}
-\subsection{Data pipeline} % ??
-
 
 \subsection{Machine learning types} \label{sec:machine_learning_types}
 % reinforcement learning, supervised, unsupervised and semi-supervised
 % ----------------------------------------------------------
 In deep learning it is common to differentiate between three types of machine learning models, supervised learning, unsupervised learning and reinforcement learning. In this section we will go through them and explain how they function and which use cases suites them best. In addition we will introduce a combination of supervised and unsupervised learning, called semi-supervised learning.
 
+
 \subsubsection{Supervised learning} \label{sec:supervised_learnign}
 %Source1: https://blogs.nvidia.com/blog/2018/08/02/supervised-unsupervised-learning/
+% ----------------------------------------------------------
 The first category of machine learning is supervised learning. If you imagine yourself work under supervision of a leader or boss, it would mean someone is present and judging whether you are doing the correct work. Similarly to this, when a learning algorithm is under supervision is has a fully labeled dataset to work on; continuously updating the algorithm whether the answer is correct or wrong after every test.
 
 Fully labeled dataset means that for every sample in the dataset, it is known what the true answer is to the problem at hand. As an example; if the dataset is images to classify you can think of it as having the correct answer written on the back of the image, but the algorithm will pick up the image front side up, and not look at the correct answer until after making a prediction.
@@ -294,6 +297,7 @@ This method is best suited for classification problems and regression problems, 
 \subsubsection{Unsupervised learning} \label{sec:unsupervised_learning}
 % https://blogs.nvidia.com/blog/2018/08/02/supervised-unsupervised-learning/
 % https://www.guru99.com/unsupervised-machine-learning.html
+% ----------------------------------------------------------
 Large, cleanly labeled datasets are not does not always easy to come by. And sometimes the answers we are looking for are not discrete, but discontinuous and hard to define. This is where unsupervised learning comes in.
 
 In unsupervised learning, the algorithm is handed non-labeled data without any instructions on what to do with it. It is the algorithms job to automatically find which features that best separates the data and find a structure within it.	An example of a problem well suited for unsupervised learning is; using anomaly detection to discover unusual data points in a dataset, like fraudulent bank transactions.
@@ -312,6 +316,7 @@ Since the training data has not been reviewed by a human beforehand it is diffic
 
 \subsubsection{Semi-supervised learning} \label{semi_supervised_learning}
 %Source: https://machinelearningmastery.com/supervised-and-unsupervised-machine-learning-algorithms/
+% ----------------------------------------------------------
 %TODO refer to our implementation
 This is not its own category, but a combination of the two categories just mentioned. It is good for dealing with problems where you have some labeled data and a lot of unlabeled data.
 
@@ -327,6 +332,7 @@ The goal of the semi-supervised machine learning technique is to make best predi
 %Source1: https://blogs.nvidia.com/blog/2018/08/02/supervised-unsupervised-learning/
 %Source2: https://intellipaat.com/blog/supervised-learning-vs-unsupervised-learning-vs-reinforcement-learning/
 %Source3: https://medium.com/@machadogj/ml-basics-supervised-unsupervised-and-reinforcement-learning-b18108487c5a
+% ----------------------------------------------------------
 In Reinforcement Learning (RL) algorithms learn how to react to the environment on their own and is neither supervised nor unsupervised. Instead the algorithm rely on being able to monitor response of its action and measure against a defined "reward".
 
 Reinforcement learning is a type of machine learning where AI agents are attempting to find the optimal way through an environment, to accomplish a set goal or to improve on a specific task. As the agent take an action in the environment it receives a reward, as seen in Figure \ref{fig:reinforcement_learning}. If the action improved on the last agent state it gets a positive reward and if the new state of the agent is worse than the previous it get a negative reward. The goal is to predict which next step to take to get the biggest final reward.
@@ -345,10 +351,6 @@ To make these predictions the agent need to rely on what it has previously learn
 
 To achieve good cumulative reward the algorithm must iterate over the problem many times. For each iteration, and each round of feedback, the agents strategy incrementally improves. This works really good for problems that can be simulated, where iterating the problem only cost computer power. A good example of a good RL problem is video games and autonomous driving.
 
-
-\subsection{How to evaluate a model}
-
-\subsection{Performance metrics}
 
 \subsection{Convolutional Neural Network} \label{convolutional_neural_network}
 % write some general stuff about CNN's
@@ -491,11 +493,126 @@ Having found the error, the gradient of the cost function with regards to the we
 
 
 
+\subsection{Hyper-parameter tuning}
+% 
+% ----------------------------------------------------------
+
+
+\subsection{How to evaluate a model}
+% ----------------------------------------------------------
+
+
+\subsection{Performance metrics}
+% ----------------------------------------------------------
+
+
+\subsection{Weight initializing}
+% mention pre-trained models etc
+% ----------------------------------------------------------
+
+
+
+
+
+
+
+% ----------------------------------------------------------
+\section{Available datasets} \label{sec:available_datasets}
+% ----------------------------------------------------------
+%
+% ----------------------------------------------------------
+%TODO : add list of diseases from datasets (like stated in \ref{sec:colon_cancer})
+
+The datasets used in our experiments are Kvasir Pillcam, Kvasir and Hyper-Kvasir. This section will demonstrate the main differences between the three datasets and explain how they can be found and used for fact checking. All three datasets are collected using endoscopic equipment at Vestre Viken Health Trust in Norway. The VV consists of 4 hospitals and provides health care for 470.000 people. One of the hospitals is Bærum Hospital, which has a large gastroenterology department from where the data is collected. 
+
+
+\subsection{Imbalanced data}
+% ----------------------------------------------------------
+
+
+\subsection{Open-source endoscopy datasets}
+% ----------------------------------------------------------
+% Present other datasets found online, and end with what they lack,
+% and why we need kvasirV2, hyper-kvasir, etc
+% ----------------------------------------------------------
+
+
+\subsection{Augere Medical}
+% ----------------------------------------------------------
+% Write about augere medical and the tagging tool and export script used
+% ----------------------------------------------------------
+Write about augere medical and the tagging tool and export script used
+
+
+\subsection{Kvasir-V2} \label{sec:kvasir-v2}
+The Kvasir dataset \cite{KVASIRMultiClass17} contains images from inside the gastrointestinal (GI) tract. The samples are classified into three important anatomical landmarks and three clinically significant findings. In addition it has two classes related to the removal procedure of polyps. The dataset is sorted and annotated is performed by medical doctors. The class names and findings for each class is given in table \ref{table:kvasir}. One of the most important aspects of the Kvasir dataset is that it makes it easy to reproduce and compare results in scientific computing.
+
+\begin{table}
+  \centering
+  \begin{tabular}{ |c|c|c| }
+  	\hline
+  	Class number & Class name & Number of samples \\
+    \hline
+    0 & normal & 8000 \\ 
+    1 & polyp & 8000 \\ 
+    2 & polyrus & 8000 \\ 
+    \hline
+  \end{tabular}
+  \caption{Kvasir class names and corresponding class numbers.}
+  \label{table:kvasir}
+\end{table}
+
+
+\subsection{Hyper Kvasir} \label{sec:hyper_kvasir}
+The Hyper-Kvasir dataset \cite{HyperKvasirComprehensive19} is one of the largest medical datasets containing 110.079 images and 373 videos where it captures anatomical landmarks and pathological and normal findings. Resulting in more than 1.1 million images and video frames all together. The dataset contain four parts, labeled images, unlabeled images, segmented images and lastly, videos. In total the dataset is 70 GB in size, but can be downloaded and stored in parts from \url{https://datasets.simula.no/hyper-kvasir/}.
+
+
+\subsubsection{Labeled images}
+Hyper-Kvasir contains 10.662 labeled images. The images are split into 23 different classes, and are stored in a folder with the same name as its corresponding class. All of the images are stored in JPEG format \cite{JPEGStill92}, which means it has some image quality loss but quite insignificant compared to the reduction in file size. Like in situations most often encountered the classes has a different number of samples, this is a challenge in the medical field because some findings occur more often than others.
+
+% ask Pål for the figure with class/sample distribution from original hyper-kvasir paper
+
+\subsubsection{Unlabeled images}
+This part of the dataset contains 99.417 images
+
+\subsubsection{segmented images}
+In figure \ref{fig:kvasir_seg_example} we can see an example of the segmented Kvasir images.
+
+\begin{figure}[H] % kvasir_seg_example
+  \begin{center}
+    \includegraphics[width=0.7\textwidth]{kvasir_seg_example.png}
+    \caption{Example of a segmented image from Hyper-Kvasir dataset.}
+    \label{fig:kvasir_seg_example}
+  \end{center}
+\end{figure}
+
+
+\subsubsection{Videos}
+
+
+
+\section{TensorFlow Framework} 
+% ?? Perhaps add everything under framework/libraries?
+%\subsection{Keras}
+% ----------------------------------------------------------
+
+
+\subsection{Data pipeline} % ??
+% ----------------------------------------------------------
+
+
+\subsection{How TF handles data}
+% tf.data.Dataset, generators
+% ----------------------------------------------------------
+
+
+
 
 % ----------------------------------------------------------
 \section{Related work} \label{relatedwork}
 % ----------------------------------------------------------
-
+%
+% ----------------------------------------------------------
 \citeauthor*{LesionDetection15} have made a computer-aided lesion\footnote{a region in an organ or tissue which has suffered damage through injury or disease, such as a wound, ulcer, abscess, or tumor.} detection system which uses a trainable feature extractor, also based on a CNN, and feed the generic features to a Support Vector Machine which enhance the generalization ability \cite{LesionDetection15}. This method greatly outperform the earlier methods based on color and texture features. However we believe that by using neural networks to do the decision making we can further improve this detection system. 
 
 \medbreak 
@@ -509,6 +626,7 @@ Our goal is to develop a method for using deep learning to find more generalized
 
 \medbreak
 We will go through some other methods not directly related to neural networks but which we think may come in handy for my thesis later on. 
+
 
 \subsection{Object tracking}
 % ----------------------------------------------------------
