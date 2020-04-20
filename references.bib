@@ -56,6 +56,22 @@
   language = {en}
 }
 
+@article{AutomatedPolyp16,
+  title = {Automated {{Polyp Detection}} in {{Colonoscopy Videos Using Shape}} and {{Context Information}}},
+  author = {Tajbakhsh, Nima and Gurudu, Suryakanth R. and Liang, Jianming},
+  year = {2016},
+  month = feb,
+  volume = {35},
+  pages = {630--644},
+  issn = {1558-254X},
+  doi = {10.1109/TMI.2015.2487997},
+  abstract = {This paper presents the culmination of our research in designing a system for computer-aided detection (CAD) of polyps in colonoscopy videos. Our system is based on a hybrid context-shape approach, which utilizes context information to remove non-polyp structures and shape information to reliably localize polyps. Specifically, given a colonoscopy image, we first obtain a crude edge map. Second, we remove non-polyp edges from the edge map using our unique feature extraction and edge classification scheme. Third, we localize polyp candidates with probabilistic confidence scores in the refined edge maps using our novel voting scheme. The suggested CAD system has been tested using two public polyp databases, CVC-ColonDB, containing 300 colonoscopy images with a total of 300 polyp instances from 15 unique polyps, and ASU-Mayo database, which is our collection of colonoscopy videos containing 19,400 frames and a total of 5,200 polyp instances from 10 unique polyps. We have evaluated our system using free-response receiver operating characteristic (FROC) analysis. At 0.1 false positives per frame, our system achieves a sensitivity of 88.0\% for CVC-ColonDB and a sensitivity of 48\% for the ASU-Mayo database. In addition, we have evaluated our system using a new detection latency analysis where latency is defined as the time from the first appearance of a polyp in the colonoscopy video to the time of its first detection by our system. At 0.05 false positives per frame, our system yields a polyp detection latency of 0.3 seconds.},
+  file = {/home/henriklg/Zotero/storage/DXKC2VUG/7294676.html},
+  journal = {IEEE Transactions on Medical Imaging},
+  keywords = {Algorithms,ASU-Mayo database,automated polyp detection,boundary classification,Cancer,Colonic Polyps,Colonoscopy,colonoscopy image,colonoscopy videos,computer-aided detection,context information,crude edge map,CVC-ColonDB,Dataset,detection latency,Discrete cosine transforms,edge classification scheme,edge detection,edge voting,endoscopes,feature extraction,Feature extraction,free-response receiver operating characteristic analysis,Humans,hybrid context-shape approach,image classification,Image color analysis,Image edge detection,Image Interpretation; Computer-Assisted,Machine Learning,medical image processing,nonpolyp edge removal,Optical colonoscopy,Pattern Recognition; Automated,polyp detection,probabilistic confidence scores,public polyp databases,refined edge maps,sensitivity analysis,Shape,shape information,Video Recording,video signal processing,voting scheme},
+  number = {2}
+}
+
 @phdthesis{AutomaticAnalysis17,
   title = {Automatic {{Analysis}} of {{Endoscopic Videos}}},
   author = {H{\o}iland, Torbj{\o}rn Nesb{\o}},
@@ -64,6 +80,24 @@
   file = {/home/henriklg/Zotero/storage/SUFDRZJD/Høiland - 2017 - Automatic Analysis of Endoscopic Videos.pdf;/home/henriklg/Zotero/storage/EKD2IYKW/56885.html},
   language = {eng},
   school = {University of Oslo}
+}
+
+@article{AutomaticPolyp12,
+  title = {Towards Automatic Polyp Detection with a Polyp Appearance Model},
+  author = {Bernal, J. and S{\'a}nchez, J. and Vilari{\~n}o, F.},
+  year = {2012},
+  month = sep,
+  volume = {45},
+  pages = {3166--3182},
+  issn = {0031-3203},
+  doi = {10.1016/j.patcog.2012.03.002},
+  abstract = {This work aims at automatic polyp detection by using a model of polyp appearance in the context of the analysis of colonoscopy videos. Our method consists of three stages: region segmentation, region description and region classification. The performance of our region segmentation method guarantees that if a polyp is present in the image, it will be exclusively and totally contained in a single region. The output of the algorithm also defines which regions can be considered as non-informative. We define as our region descriptor the novel Sector Accumulation-Depth of Valleys Accumulation (SA-DOVA), which provides a necessary but not sufficient condition for the polyp presence. Finally, we classify our segmented regions according to the maximal values of the SA-DOVA descriptor. Our preliminary classification results are promising, especially when classifying those parts of the image that do not contain a polyp inside.},
+  file = {/home/henriklg/Zotero/storage/7D24GAM2/Bernal et al. - 2012 - Towards automatic polyp detection with a polyp app.pdf;/home/henriklg/Zotero/storage/55572SY5/S0031320312001185.html},
+  journal = {Pattern Recognition},
+  keywords = {Colonoscopy,Dataset,Polyp detection,Region segmentation,SA-DOVA descriptor},
+  language = {en},
+  number = {9},
+  series = {Best {{Papers}} of {{Iberian Conference}} on {{Pattern Recognition}} and {{Image Analysis}} ({{IbPRIA}}'2011)}
 }
 
 @article{BleedingDetection19,
@@ -80,6 +114,30 @@
   journal = {Journal of Applied Clinical Medical Physics},
   keywords = {bleeding detection,color feature,machine learning,texture feature,wireless capsule endoscopy},
   number = {8}
+}
+
+@article{CADCAP2520,
+  title = {{{CAD}}-{{CAP}}: A 25,000-Image Database Serving the Development of Artificial Intelligence for Capsule Endoscopy},
+  shorttitle = {{{CAD}}-{{CAP}}},
+  author = {Leenhardt, Romain and Li, Cynthia and Mouel, Jean-Philippe Le and Rahmi, Gabriel and Saurin, Jean Christophe and Cholet, Franck and Boureille, Arnaud and Amiot, Xavier and Delvaux, Michel and Duburque, Clotilde and Leandri, Chlo{\'e} and G{\'e}rard, Romain and Lecleire, St{\'e}phane and Mesli, Farida and {Nion-Larmurier}, Isabelle and Romain, Olivier and {Sacher-Huvelin}, Sylvie and {Simon-Shane}, Camille and Vanbiervliet, Geoffroy and Marteau, Philippe and Histace, Aymeric and Dray, Xavier},
+  year = {2020},
+  month = mar,
+  volume = {08},
+  pages = {E415-E420},
+  publisher = {{\textcopyright{} Georg Thieme Verlag KG}},
+  issn = {2364-3722, 2196-9736},
+  doi = {10.1055/a-1035-9088},
+  abstract = {Background and study aims Capsule endoscopy (CE) is the preferred method for small bowel (SB) exploration. With a mean number of 50,000 SB frames per video, SBCE reading is time-consuming and tedious (30 to 60 minutes per video). We describe a large, multicenter database named CAD-CAP (Computer-Assisted Diagnosis for CAPsule Endoscopy, CAD-CAP). This database aims to serve the development of CAD tools for CE reading.
+
+  Materials and methods Twelve French endoscopy centers were involved. All available third-generation SB-CE videos (Pillcam, Medtronic) were retrospectively selected from these centers and deidentified. Any pathological frame was extracted and included in the database. Manual segmentation of findings within these frames was performed by two pre-med students trained and supervised by an expert reader. All frames were then classified by type and clinical relevance by a panel of three expert readers. An automated extraction process was also developed to create a dataset of normal, proofread, control images from normal, complete, SB-CE videos.
+
+  Results Four-thousand-one-hundred-and-seventy-four SB-CE were included. Of them, 1,480 videos (35 \%) containing at least one pathological finding were selected. Findings from 5,184 frames (with their short video sequences) were extracted and delimited: 718 frames with fresh blood, 3,097 frames with vascular lesions, and 1,369 frames with inflammatory and ulcerative lesions. Twenty-thousand normal frames were extracted from 206 SB-CE normal videos. CAD-CAP has already been used for development of automated tools for angiectasia detection and also for two international challenges on medical computerized analysis.},
+  copyright = {\textcopyright{} Georg Thieme Verlag KG Stuttgart {$\cdot$} New York},
+  file = {/home/henriklg/Zotero/storage/GQSH4SJ8/Leenhardt et al. - 2020 - CAD-CAP a 25,000-image database serving the devel.pdf;/home/henriklg/Zotero/storage/9DCND7WL/a-1035-9088.html},
+  journal = {Endoscopy International Open},
+  keywords = {Dataset,Original article},
+  language = {en},
+  number = {3}
 }
 
 @article{CancerStatistics10,
@@ -174,6 +232,22 @@
   keywords = {object tracking},
   language = {en},
   number = {1}
+}
+
+@article{ComputerAidedClassification16,
+  title = {Computer-{{Aided Classification}} of {{Gastrointestinal Lesions}} in {{Regular Colonoscopy}}},
+  author = {Mesejo, Pablo and Pizarro, Daniel and Abergel, Armand and Rouquette, Olivier and Beorchia, Sylvain and Poincloux, Laurent and Bartoli, Adrien},
+  year = {2016},
+  month = sep,
+  volume = {35},
+  pages = {2051--2063},
+  issn = {1558-254X},
+  doi = {10.1109/TMI.2016.2547947},
+  abstract = {We have developed a technique to study how good computers can be at diagnosing gastrointestinal lesions from regular (white light and narrow banded) colonoscopic videos compared to two levels of clinical knowledge (expert and beginner). Our technique includes a novel tissue classification approach which may save clinician's time by avoiding chromoendoscopy, a time-consuming staining procedure using indigo carmine. Our technique also discriminates the severity of individual lesions in patients with many polyps, so that the gastroenterologist can directly focus on those requiring polypectomy. Technically, we have designed and developed a framework combining machine learning and computer vision algorithms, which performs a virtual biopsy of hyperplastic lesions, serrated adenomas and adenomas. Serrated adenomas are very difficult to classify due to their mixed/hybrid nature and recent studies indicate that they can lead to colorectal cancer through the alternate serrated pathway. Our approach is the first step to avoid systematic biopsy for suspected hyperplastic tissues. We also propose a database of colonoscopic videos showing gastrointestinal lesions with ground truth collected from both expert image inspection and histology. We not only compare our system with the expert predictions, but we also study if the use of 3D shape features improves classification accuracy, and compare our technique's performance with three competitor methods.},
+  file = {/home/henriklg/Zotero/storage/AH75YMQS/Mesejo et al. - 2016 - Computer-Aided Classification of Gastrointestinal .pdf;/home/henriklg/Zotero/storage/MKPJQB99/7442848.html},
+  journal = {IEEE Transactions on Medical Imaging},
+  keywords = {Adenoma,Biopsy,cancer,Cancer,chromoendoscopy,Colonic Polyps,colonoscopic video,colonoscopy,Colonoscopy,colorectal cancer,Colorectal Neoplasms,computer vision algorithm,computer-aided decision support system,Dataset,endoscopes,ensemble classifiers,Feature extraction,gastrointestinal lesion computer-aided classification,histology,Humans,hyperplastic lesion virtual biopsy,image inspection,indigo carmine,learning (artificial intelligence),Lesions,machine learning,medical image processing,polypectomy,serrated adenoma,Shape,structure-from-motion,Three-dimensional displays,tissue classification,Videos,virtual biopsy},
+  number = {9}
 }
 
 @phdthesis{ComputerAidedScreening15,
@@ -445,6 +519,23 @@ Conclusion: The comprehensive results have demonstrated that the proposed SSAEIM
   number = {16}
 }
 
+@article{EmbeddedDetection14,
+  title = {Toward Embedded Detection of Polyps in {{WCE}} Images for Early Diagnosis of Colorectal Cancer},
+  author = {Silva, Juan and Histace, Aymeric and Romain, Olivier and Dray, Xavier and Granado, Bertrand},
+  year = {2014},
+  month = mar,
+  volume = {9},
+  pages = {283--293},
+  issn = {1861-6429},
+  doi = {10.1007/s11548-013-0926-3},
+  abstract = {Wireless capsule endoscopy (WCE) is commonly used for noninvasive gastrointestinal tract evaluation, including the detection of mucosal polyps. A new embeddable method for polyp detection in wireless capsule endoscopic images was developed and tested.},
+  file = {/home/henriklg/Zotero/storage/GB6JBXRT/Silva et al. - 2014 - Toward embedded detection of polyps in WCE images .pdf},
+  journal = {International Journal of Computer Assisted Radiology and Surgery},
+  keywords = {Dataset},
+  language = {en},
+  number = {2}
+}
+
 @article{EndoscopistCan07,
   title = {Endoscopist {{Can Be More Powerful}} than {{Age}} and {{Male Gender}} in {{Predicting Adenoma Detection}} at {{Colonoscopy}}},
   author = {Chen, Shawn and Rex, Douglas},
@@ -475,6 +566,29 @@ Conclusion: The comprehensive results have demonstrated that the proposed SSAEIM
   isbn = {978-1-4503-3351-1}
 }
 
+@article{ExploringClinical16,
+  title = {Exploring the Clinical Potential of an Automatic Colonic Polyp Detection Method Based on the Creation of Energy Maps},
+  author = {{Fern{\'a}ndez-Esparrach}, Gl{\`o}ria and Bernal, Jorge and {L{\'o}pez-Cer{\'o}n}, Maria and C{\'o}rdova, Henry and {S{\'a}nchez-Montes}, Cristina and de Miguel, Cristina Rodr{\'i}guez and S{\'a}nchez, Francisco Javier},
+  year = {2016},
+  month = sep,
+  volume = {48},
+  pages = {837--842},
+  publisher = {{\textcopyright{} Georg Thieme Verlag KG}},
+  issn = {0013-726X, 1438-8812},
+  doi = {10.1055/s-0042-108434},
+  abstract = {Background and aims: Polyp miss-rate is a drawback of colonoscopy that increases significantly for small polyps. We explored the efficacy of an automatic computer-vision method for polyp detection.
+
+  Methods: Our method relies on a model that defines polyp boundaries as valleys of image intensity. Valley information is integrated into energy maps that represent the likelihood of the presence of a polyp.
+
+  Results: In 24 videos containing polyps from routine colonoscopies, all polyps were detected in at least one frame. The mean of the maximum values on the energy map was higher for frames with polyps than without (P  Conclusion: Energy maps performed well for colonic polyp detection, indicating their potential applicability in clinical practice.},
+  copyright = {\textcopyright{} Georg Thieme Verlag KG Stuttgart {$\cdot$} New York},
+  file = {/home/henriklg/Zotero/storage/FB9RTKY5/login.html},
+  journal = {Endoscopy},
+  keywords = {Dataset,Innovations and brief communications},
+  language = {en},
+  number = {9}
+}
+
 @inproceedings{FullyConvolutional15,
   title = {Fully {{Convolutional Networks}} for {{Semantic Segmentation}}},
   booktitle = {Proceedings of the {{IEEE Conference}} on {{Computer Vision}} and {{Pattern Recognition}}},
@@ -482,6 +596,18 @@ Conclusion: The comprehensive results have demonstrated that the proposed SSAEIM
   year = {2015},
   pages = {3431--3440},
   file = {/home/henriklg/Zotero/storage/DEGCVEFG/Long et al. - 2015 - Fully Convolutional Networks for Semantic Segmenta.pdf;/home/henriklg/Zotero/storage/DIC8VB4W/Long_Fully_Convolutional_Networks_2015_CVPR_paper.html}
+}
+
+@misc{GastrointestinalImage17,
+  title = {Gastrointestinal {{Image ANAlysis}} ({{GIANA}}) {{Angiodysplasia D}}\textbackslash\&{{L}} Challenge},
+  author = {{Bernal, J {and} Aymeric, H}},
+  year = {2017},
+  abstract = {Gastrointestinal Image Analysis Subchallenge, part of MICCAI 2018 EndoVis Challenge},
+  file = {/home/henriklg/Zotero/storage/8GQMJAKV/home.html},
+  howpublished = {https://endovissub2017-giana.grand-challenge.org/home/},
+  journal = {grand-challenge.org},
+  keywords = {Dataset},
+  language = {en}
 }
 
 @article{GenerativeImage19,
@@ -613,6 +739,32 @@ Conclusion: The comprehensive results have demonstrated that the proposed SSAEIM
   number = {1}
 }
 
+@article{KIDProject17,
+  title = {{{KID Project}}: An Internet-Based Digital Video Atlas of Capsule Endoscopy for Research Purposes},
+  shorttitle = {{{KID Project}}},
+  author = {Koulaouzidis, Anastasios and Iakovidis, Dimitris K. and Yung, Diana E. and Rondonotti, Emanuele and Kopylov, Uri and Plevris, John N. and Toth, Ervin and Eliakim, Abraham and Johansson, Gabrielle Wurm and Marlicz, Wojciech and Mavrogenis, Georgios and Nemeth, Artur and Thorlacius, Henrik and Tontini, Gian Eugenio},
+  year = {2017},
+  month = jun,
+  volume = {05},
+  pages = {E477-E483},
+  publisher = {{\textcopyright{} Georg Thieme Verlag KG}},
+  issn = {2364-3722, 2196-9736},
+  doi = {10.1055/s-0043-105488},
+  abstract = {Background and aims Capsule endoscopy (CE) has revolutionized small-bowel (SB) investigation. Computational methods can enhance diagnostic yield (DY); however, incorporating machine learning algorithms (MLAs) into CE reading is difficult as large amounts of image annotations are required for training. Current databases lack graphic annotations of pathologies and cannot be used. A novel database, KID, aims to provide a reference for research and development of medical decision support systems (MDSS) for CE.
+
+  Methods Open-source software was used for the KID database. Clinicians contribute anonymized, annotated CE images and videos. Graphic annotations are supported by an open-access annotation tool (Ratsnake). We detail an experiment based on the KID database, examining differences in SB lesion measurement between human readers and a MLA. The Jaccard Index (JI) was used to evaluate similarity between annotations by the MLA and human readers.
+
+  Results The MLA performed best in measuring lymphangiectasias with a JI of 81 {$\pm$} 6 \%. The other lesion types were: angioectasias (JI 64 {$\pm$} 11 \%), aphthae (JI 64 {$\pm$} 8 \%), chylous cysts (JI 70 {$\pm$} 14 \%), polypoid lesions (JI 75 {$\pm$} 21 \%), and ulcers (JI 56 {$\pm$} 9 \%).
+
+  Conclusion MLA can perform as well as human readers in the measurement of SB angioectasias in white light (WL). Automated lesion measurement is therefore feasible. KID is currently the only open-source CE database developed specifically to aid development of MDSS. Our experiment demonstrates this potential.},
+  copyright = {\textcopyright{} Georg Thieme Verlag KG Stuttgart {$\cdot$} New York},
+  file = {/home/henriklg/Zotero/storage/35WBJB3F/Koulaouzidis et al. - 2017 - KID Project an internet-based digital video atlas.pdf;/home/henriklg/Zotero/storage/5QXNPB3I/s-0043-105488.html},
+  journal = {Endoscopy International Open},
+  keywords = {Dataset,Original article},
+  language = {en},
+  number = {6}
+}
+
 @inproceedings{KVASIRMultiClass17,
   title = {{{KVASIR}}: {{A Multi}}-{{Class Image Dataset}} for {{Computer Aided Gastrointestinal Disease Detection}}},
   shorttitle = {{{KVASIR}}},
@@ -689,6 +841,20 @@ Lucene, OpenCV.},
   howpublished = {http://www.genesis.net.au/\textasciitilde{}ajs/projects/medical\_physics/endoscopes/index.html}
 }
 
+@article{MedicoMultimedia18,
+  title = {Medico Multimedia Task at {{MediaEval}} 2018},
+  author = {Pogorelov, Konstantin and Riegler, Michael and Halvorsen, P{\aa}l and Hicks, Steven and Randel, Kristin Ranheim and Dang Nguyen, Duc Tien and Lux, Mathias and Ostroukhova, Olga and {de Lange}, Thomas},
+  year = {2018},
+  month = dec,
+  publisher = {{CEUR Workshop Proceedings}},
+  abstract = {The Medico: Multimedia for Medicine Task, running for the second time as part of MediaEval 2018, focuses on detecting abnormalities, diseases, anatomical landmarks and other findings in images captured by medical devices in the gastrointestinal tract. The task is described, including the use case and its challenges, the dataset with ground truth, the required participant runs and the evaluation metrics.},
+  copyright = {Copyright 2018 The Authors.},
+  file = {/home/henriklg/Zotero/storage/WIVTSDI6/Pogorelov et al. - 2018 - Medico multimedia task at MediaEval 2018.pdf;/home/henriklg/Zotero/storage/PR7D2QFY/20930.html},
+  keywords = {Dataset},
+  language = {eng},
+  note = {Accepted: 2019-10-15T14:06:36Z}
+}
+
 @phdthesis{MimirAutomatic18,
   title = {{Mimir: An Automatic Reporting and Reasoning System for Screening of the Gastrointestinal Tract Using Deep Neural Networks}},
   shorttitle = {{Mimir}},
@@ -725,6 +891,24 @@ how it may aid us in the development and understanding of deep neural
 networks.},
   file = {/home/henriklg/Zotero/storage/M6ILEV7V/Hicks - 2018 - Mimir An Automatic Reporting and Reasoning System.pdf;/home/henriklg/Zotero/storage/69JSKP4S/65179.html},
   language = {nob}
+}
+
+@inproceedings{NerthusBowel17,
+  title = {Nerthus: {{A Bowel Preparation Quality Video Dataset}}},
+  shorttitle = {Nerthus},
+  booktitle = {Proceedings of the 8th {{ACM}} on {{Multimedia Systems Conference}}},
+  author = {Pogorelov, Konstantin and Randel, Kristin Ranheim and {de Lange}, Thomas and Eskeland, Sigrun Losada and Griwodz, Carsten and Johansen, Dag and Spampinato, Concetto and Taschwer, Mario and Lux, Mathias and Schmidt, Peter Thelin and Riegler, Michael and Halvorsen, P{\aa}l},
+  year = {2017},
+  month = jun,
+  pages = {170--174},
+  publisher = {{Association for Computing Machinery}},
+  address = {{Taipei, Taiwan}},
+  doi = {10.1145/3083187.3083216},
+  abstract = {Bowel preparation (cleansing) is considered to be a key precondition for successful colonoscopy (endoscopic examination of the bowel). The degree of bowel cleansing directly affects the possibility to detect diseases and may influence decisions on screening and follow-up examination intervals. An accurate assessment of bowel preparation quality is therefore important. Despite the use of reliable and validated bowel preparation scales, the grading may vary from one doctor to another. An objective and automated assessment of bowel cleansing would contribute to reduce such inequalities and optimize use of medical resources. This would also be a valuable feature for automatic endoscopy reporting in the future. In this paper, we present Nerthus, a dataset containing videos from inside the gastrointestinal (GI) tract, showing different degrees of bowel cleansing. By providing this dataset, we invite multimedia researchers to contribute in the medical field by making systems automatically evaluate the quality of bowel cleansing for colonoscopy. Such innovations would probably contribute to improve the medical field of GI endoscopy.},
+  file = {/home/henriklg/Zotero/storage/WFME6HC9/Pogorelov et al. - 2017 - Nerthus A Bowel Preparation Quality Video Dataset.pdf},
+  isbn = {978-1-4503-5002-0},
+  keywords = {Dataset},
+  series = {{{MMSys}}'17}
 }
 
 @article{NewMethod54,
