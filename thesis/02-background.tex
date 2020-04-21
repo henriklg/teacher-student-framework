@@ -492,22 +492,25 @@ Having found the error, the gradient of the cost function with regards to the we
 \end{equation}
 
 
+\section{Popular network architectures} %NOTE : drop this and merge with deep learning?
 
-\subsection{Hyper-parameter tuning}
-% 
-% ----------------------------------------------------------
+\subsection{ResNet}
+\subsection{EfficientNet}
+\subsection{Student teacher model}
 
 
-\subsection{How to evaluate a model}
+
+\section{Model evaluation}
 % ----------------------------------------------------------
 
 
 \subsection{Performance metrics}
 % ----------------------------------------------------------
+% ROC, sensitivity, confustion matrix etc. Check out metrics scores for hyper-kvasir paper
 
 
 \subsection{Weight initializing}
-% mention pre-trained models etc
+% mention pre-trained models and 'set correct initial bias'
 % ----------------------------------------------------------
 
 
@@ -611,6 +614,8 @@ polyp mask (ground truth) \\
 % ----------------------------------------------------------
 The Kvasir dataset \cite{KVASIRMultiClass17} contains images from inside the gastrointestinal (GI) tract. The samples are classified into three important anatomical landmarks and three clinically significant findings. In addition it has two classes related to the removal procedure of polyps. The dataset is sorted and annotated is performed by medical doctors. The class names and findings for each class is given in table \ref{table:kvasir}. One of the most important aspects of the Kvasir dataset is that it makes it easy to reproduce and compare results in scientific computing.
 
+%TODO : add sample images and explain the findings etc
+
 \begin{table}
   \centering
   \begin{tabular}{ |c|c|c| }
@@ -631,17 +636,39 @@ The Kvasir dataset \cite{KVASIRMultiClass17} contains images from inside the gas
 % ----------------------------------------------------------
 The Hyper-Kvasir dataset \cite{HyperKvasirComprehensive19} is one of the largest medical datasets containing 110.079 images and 373 videos where it captures anatomical landmarks and pathological and normal findings. Resulting in more than 1.1 million images and video frames all together. The dataset contain four parts, labeled images, unlabeled images, segmented images and lastly, videos. In total the dataset is 70 GB in size, but can be downloaded and stored in parts from \url{https://datasets.simula.no/hyper-kvasir/}.
 
+\begin{table} % table:hyper_kvasir
+  \centering
+  \begin{tabular}{|l|l|l|l|}
+  	\hline
+  	\textbf{Class name}		& \textbf{Samples}	& \textbf{Class name}		& \textbf{Samples} \\
+    \hline
+    barrets			& 41		& normal-z-line		& 932 \\ %\hline
+    barretts-short-segment & 53	& polyps			& 1028 \\ %\hline
+    bbps-0-1		& 646		& pylorus			& 999 \\ %\hline
+    bbps-2-3		& 1148		& retroflex-rectum	& 391 \\ %\hline
+    cecum			& 1009		& retroflex-stomach	& 764 \\ %\hline
+    dyed-lifted-polyps & 1002	& ulcerative-colitis-0-1 & 35 \\ %\hline
+    dyed-resection-margins & 989& ulcerative-colitis-1-2 & 11 \\ %\hline
+    esophagitis-a	& 403		& ulcerative-colitis-2-3 & 28 \\ %\hline
+    esophagitis-b-d	& 260		& ulcerative-colitis-grade-1 & 201 \\ %\hline
+    hemorrhoids		& 6			& ulcerative-colitis-grade-2 & 443 \\ %\hline
+    ileum			& 9			& ulcerative-colitis-grade-3 & 133 \\ %\hline
+    impacted-stool	& 131		& & \\ \hline
+  \end{tabular}
+  \caption{Hyper-Kvasir class names and corresponding amount of samples.}
+  \label{table:hyper_kvasir}
+\end{table}
 
 \subsubsection{Labeled images}
-Hyper-Kvasir contains 10.662 labeled images. The images are split into 23 different classes, and are stored in a folder with the same name as its corresponding class. All of the images are stored in JPEG format \cite{JPEGStill92}, which means it has some image quality loss but quite insignificant compared to the reduction in file size. Like in situations most often encountered the classes has a different number of samples, this is a challenge in the medical field because some findings occur more often than others.
+Hyper-Kvasir contains 10,662 labeled images. The images are split into 23 different classes, and are stored in a folder with the same name as its corresponding class. All of the images are stored in JPEG format \cite{JPEGStill92}, which means it has some image quality loss but quite insignificant compared to the reduction in file size. Like in situations most often encountered the classes has a different number of samples, this is a challenge in the medical field because some findings occur more often than others. In Table \ref{table:hyper_kvasir} you can see the 23 classes and how many images there is for each class.
 
 % ask Pål for the figure with class/sample distribution from original hyper-kvasir paper
 
 \subsubsection{Unlabeled images}
-This part of the dataset contains 99.417 images
+This part of the dataset contains 99.417 unlabeled images. When extracted they can be found in a separate subfolder. The images are accompanied with extracted global features and clusters assignments in Hyper-Kvasir Github repository. 
 
-\subsubsection{segmented images}
-In figure \ref{fig:kvasir_seg_example} we can see an example of the segmented Kvasir images.
+\subsubsection{Segmented images}
+Hyper-Kvasir includes images with corresponding segmentation masks and bounding boxes for 1,000 images from the polyp class. The segmentation masks depicts the polyp tissue for the corresponding image pixel. The Region of Interest (ROI) are represented by the white mask while the black does not contain polyp pixels. In Figure \ref{fig:kvasir_seg_example} we can see an example of the segmented Kvasir images.
 
 \begin{figure}[H] % kvasir_seg_example
   \begin{center}
@@ -653,10 +680,12 @@ In figure \ref{fig:kvasir_seg_example} we can see an example of the segmented Kv
 
 
 \subsubsection{Videos}
+In total there are 373 videos provided in the dataset, corresponding to 11.62 hours of videos and about 1 million video frames that can be convertet to images. The file format for the videos are Audio Video Interleave (AVI). The video portion of the dataset is 38.6GB in file size. In addition to the video folder there is a CSV file provided containing the videos IDs and findings. The finding contains the description of the finding in the video, of which there is 171 of. Finding description is meant to describe the video as a whole. Some of the findings are related to the categories found in the image portion and some are unique for the videos.
 
 
 
-\subsection{Augere Medical} \label{sec:augere_medical}
+
+\subsection{Augere Medical AS} \label{sec:augere_medical}
 % ----------------------------------------------------------
 % Write about augere medical and the tagging tool and export script used
 % ----------------------------------------------------------
