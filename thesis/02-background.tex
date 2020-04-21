@@ -517,7 +517,7 @@ Having found the error, the gradient of the cost function with regards to the we
 
 
 % ----------------------------------------------------------
-\section{Available datasets} \label{sec:available_datasets}
+\section{Datasets} \label{sec:available_datasets}
 % ----------------------------------------------------------
 % - Ha alle kvasir dataset under én section?
 % ----------------------------------------------------------
@@ -537,11 +537,9 @@ We will also go through some other publicly and restrictively available datasets
 % and why we need kvasirV2, hyper-kvasir, etc
 % source1: https://www.duo.uio.no/bitstream/handle/10852/71038/PhD-Pogorelov-2019.pdf?sequence=1&isAllowed=y P25
 % ----------------------------------------------------------
-There is a great number of publicly available endoscopy datasets online, and some that are restricted. To further improve detection rates in automated gastrointestinal analyze tools there is a demand for large amounts of data for different use cases, and since medical data often is scarce, or restricted, we introduce Kvasir-Pillcam dataset, currently in development. This dataset is among the few available VCE datasets, see Table \ref{table:wce_dataset_overview} for an overview. 
+There is a great number of publicly available endoscopy datasets online, and some that are restricted. To further improve detection rates in automated gastrointestinal analyze tools there is a demand for large amounts of data for different use cases, and since medical data often is scarce, or restricted, we introduce Kvasir-PillCam dataset, currently in development. This dataset is among the few publicly available VCE datasets, see Table \ref{table:wce_dataset_overview} for an overview. 
 Traditional colonoscopy have been around for longer and have been under more research. Therefore colonoscopy datasets are easier to find publicly, see Table \ref{table:dataset_overview} for a list of these datasets. This can benefit the ongoing automated VCE analysis as deep learning models can be tested and pretrained on them.
 
-%TODO : add ref to kvasir sections
-%TODO : fill in kvasir XXX
 %Sizes: \tiny, \scriptsize, \footnotesize, \small, \normalsize
 \begin{table}[h!] % table:dataset_overview
   \scriptsize
@@ -567,11 +565,11 @@ polyp mask (ground truth) \\
 	\hline
 	WEO Clinical Endoscopy Atlas\footnotemark	&Endoscopy	&GI lesions	&152 images	&By explicit permission	&One image per lesion \\
 	\hline
-	GASTROLAB\footnotemark	&Endoscopy	&GI lesions	&Several hundreds of images and several tenths of videos	&Discontinued	&Partially damaged dataset \\
+	GASTROLAB\footnotemark	&Endoscopy	&GI lesions	&Several hundreds of images and several tenths of videos	&Discontinued	&Partially damaged and unavailable dataset \\
 	\hline
-	Kvasir-V2 \cite{KVASIRMultiClass17}	&Various	&GI lesions \& landmarks	&8,000 images, 8 classes, 1,000 images per class	&Available, public, free for research and educational purposes	&See section 3.1 for the description \\
+	Kvasir-V2 \cite{KVASIRMultiClass17}	&Various	&GI lesions \& landmarks	&8,000 images, 8 classes, 1,000 images per class	&Available, public, free for research and educational purposes	&See Section \ref{sec:kvasir-v2} for the description \\
 	\hline
-	Hyper-Kvasir  \cite{HyperKvasirComprehensive19} &Endoscopy	&GI lesions and landmarks	&XXX labeled images, XXX videos and XXX unlabeled images	&Available, public, free for research and educational purposes	&See section X \\
+	Hyper-Kvasir  \cite{HyperKvasirComprehensive19} &Endoscopy	&GI lesions and landmarks	&10,662 labeled images, 373 videos and 99,417 unlabeled images	&Available, public, free for research and educational purposes	&See Section \ref{sec:hyper_kvasir} \\
 	\hline
 	Nerthus \cite{NerthusBowel17}	&Colonoscopy	&GI findings	&5,525 frames extracted from the 21 videos, 4 classes, from 500 to 2,700 frames per class	&Available, public, free for research and educational purposes	&XXX \\
 	\hline
@@ -600,7 +598,7 @@ polyp mask (ground truth) \\
 	\hline
 	CAD-CAP \cite{CADCAP2520}	&VCE	&Normal, Vascular Lesions and Inflammatory Lesions	&25,000 images	&Discontinued	&By request \\
 	\hline
-	Kvasir-Pillcam	&VCE	&GI lesions, landmarks and findings	&XXX images with ROI, XX classes and XXX unlabeled images/videos	&Available, public, free for research and educational purposes	&Ours, See section \ref{sec:kvasir_pillcam}. \\
+	Kvasir-PillCam	&VCE	&GI lesions, landmarks and findings	&XXX images with ROI, XX classes and XXX unlabeled images/videos	&Available, public, free for research and educational purposes	&Ours, See Section \ref{sec:kvasir_pillcam}. \\
 	\hline
   \end{tabular}
   \caption[An overview of existing VCE datasets from the GI tract]{An overview of existing VCE datasets from the GI tract.}
@@ -658,7 +656,7 @@ In figure \ref{fig:kvasir_seg_example} we can see an example of the segmented Kv
 
 
 
-\subsection{Augere Medical}
+\subsection{Augere Medical} \label{sec:augere_medical}
 % ----------------------------------------------------------
 % Write about augere medical and the tagging tool and export script used
 % ----------------------------------------------------------
