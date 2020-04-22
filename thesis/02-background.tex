@@ -492,22 +492,25 @@ Having found the error, the gradient of the cost function with regards to the we
 \end{equation}
 
 
+\section{Popular network architectures} %NOTE : drop this and merge with deep learning?
 
-\subsection{Hyper-parameter tuning}
-% 
-% ----------------------------------------------------------
+\subsection{ResNet}
+\subsection{EfficientNet}
+\subsection{Student teacher model}
 
 
-\subsection{How to evaluate a model}
+
+\section{Model evaluation}
 % ----------------------------------------------------------
 
 
 \subsection{Performance metrics}
 % ----------------------------------------------------------
+% ROC, sensitivity, confustion matrix etc. Check out metrics scores for hyper-kvasir paper
 
 
 \subsection{Weight initializing}
-% mention pre-trained models etc
+% mention pre-trained models and 'set correct initial bias'
 % ----------------------------------------------------------
 
 
@@ -517,7 +520,7 @@ Having found the error, the gradient of the cost function with regards to the we
 
 
 % ----------------------------------------------------------
-\section{Available datasets} \label{sec:available_datasets}
+\section{Datasets} \label{sec:available_datasets}
 % ----------------------------------------------------------
 % - Ha alle kvasir dataset under én section?
 % ----------------------------------------------------------
@@ -537,11 +540,9 @@ We will also go through some other publicly and restrictively available datasets
 % and why we need kvasirV2, hyper-kvasir, etc
 % source1: https://www.duo.uio.no/bitstream/handle/10852/71038/PhD-Pogorelov-2019.pdf?sequence=1&isAllowed=y P25
 % ----------------------------------------------------------
-There is a great number of publicly available endoscopy datasets online, and some that are restricted. To further improve detection rates in automated gastrointestinal analyze tools there is a demand for large amounts of data for different use cases, and since medical data often is scarce, or restricted, we introduce Kvasir-Pillcam dataset, currently in development. This dataset is among the few available VCE datasets, see Table \ref{table:wce_dataset_overview} for an overview. 
+There is a great number of publicly available endoscopy datasets online, and some that are restricted. To further improve detection rates in automated gastrointestinal analyze tools there is a demand for large amounts of data for different use cases, and since medical data often is scarce, or restricted, we introduce Kvasir-PillCam dataset, currently in development. This dataset is among the few publicly available VCE datasets, see Table \ref{table:wce_dataset_overview} for an overview. 
 Traditional colonoscopy have been around for longer and have been under more research. Therefore colonoscopy datasets are easier to find publicly, see Table \ref{table:dataset_overview} for a list of these datasets. This can benefit the ongoing automated VCE analysis as deep learning models can be tested and pretrained on them.
 
-%TODO : add ref to kvasir sections
-%TODO : fill in kvasir XXX
 %Sizes: \tiny, \scriptsize, \footnotesize, \small, \normalsize
 \begin{table}[h!] % table:dataset_overview
   \scriptsize
@@ -567,11 +568,11 @@ polyp mask (ground truth) \\
 	\hline
 	WEO Clinical Endoscopy Atlas\footnotemark	&Endoscopy	&GI lesions	&152 images	&By explicit permission	&One image per lesion \\
 	\hline
-	GASTROLAB\footnotemark	&Endoscopy	&GI lesions	&Several hundreds of images and several tenths of videos	&Discontinued	&Partially damaged dataset \\
+	GASTROLAB\footnotemark	&Endoscopy	&GI lesions	&Several hundreds of images and several tenths of videos	&Discontinued	&Partially damaged and unavailable dataset \\
 	\hline
-	Kvasir-V2 \cite{KVASIRMultiClass17}	&Various	&GI lesions \& landmarks	&8,000 images, 8 classes, 1,000 images per class	&Available, public, free for research and educational purposes	&See section 3.1 for the description \\
+	Kvasir-V2 \cite{KVASIRMultiClass17}	&Various	&GI lesions \& landmarks	&8,000 images, 8 classes, 1,000 images per class	&Available, public, free for research and educational purposes	&See Section \ref{sec:kvasir-v2} for the description \\
 	\hline
-	Hyper-Kvasir  \cite{HyperKvasirComprehensive19} &Endoscopy	&GI lesions and landmarks	&XXX labeled images, XXX videos and XXX unlabeled images	&Available, public, free for research and educational purposes	&See section X \\
+	Hyper-Kvasir  \cite{HyperKvasirComprehensive19} &Endoscopy	&GI lesions and landmarks	&10,662 labeled images, 373 videos and 99,417 unlabeled images	&Available, public, free for research and educational purposes	&See Section \ref{sec:hyper_kvasir} \\
 	\hline
 	Nerthus \cite{NerthusBowel17}	&Colonoscopy	&GI findings	&5,525 frames extracted from the 21 videos, 4 classes, from 500 to 2,700 frames per class	&Available, public, free for research and educational purposes	&XXX \\
 	\hline
@@ -600,7 +601,7 @@ polyp mask (ground truth) \\
 	\hline
 	CAD-CAP \cite{CADCAP2520}	&VCE	&Normal, Vascular Lesions and Inflammatory Lesions	&25,000 images	&Discontinued	&By request \\
 	\hline
-	Kvasir-Pillcam	&VCE	&GI lesions, landmarks and findings	&XXX images with ROI, XX classes and XXX unlabeled images/videos	&Available, public, free for research and educational purposes	&Ours, See section \ref{sec:kvasir_pillcam}. \\
+	Kvasir-PillCam	&VCE	&GI lesions, landmarks and findings	&XXX images with ROI, XX classes and XXX unlabeled images/videos	&Available, public, free for research and educational purposes	&Ours, See Section \ref{sec:kvasir_pillcam}. \\
 	\hline
   \end{tabular}
   \caption[An overview of existing VCE datasets from the GI tract]{An overview of existing VCE datasets from the GI tract.}
@@ -611,7 +612,10 @@ polyp mask (ground truth) \\
 
 \subsection{Kvasir-V2} \label{sec:kvasir-v2}
 % ----------------------------------------------------------
+%TODO : need to fill in more below
 The Kvasir dataset \cite{KVASIRMultiClass17} contains images from inside the gastrointestinal (GI) tract. The samples are classified into three important anatomical landmarks and three clinically significant findings. In addition it has two classes related to the removal procedure of polyps. The dataset is sorted and annotated is performed by medical doctors. The class names and findings for each class is given in table \ref{table:kvasir}. One of the most important aspects of the Kvasir dataset is that it makes it easy to reproduce and compare results in scientific computing.
+
+%TODO : add sample images and explain the findings etc
 
 \begin{table}
   \centering
@@ -633,17 +637,45 @@ The Kvasir dataset \cite{KVASIRMultiClass17} contains images from inside the gas
 % ----------------------------------------------------------
 The Hyper-Kvasir dataset \cite{HyperKvasirComprehensive19} is one of the largest medical datasets containing 110.079 images and 373 videos where it captures anatomical landmarks and pathological and normal findings. Resulting in more than 1.1 million images and video frames all together. The dataset contain four parts, labeled images, unlabeled images, segmented images and lastly, videos. In total the dataset is 70 GB in size, but can be downloaded and stored in parts from \url{https://datasets.simula.no/hyper-kvasir/}.
 
+%Ethics
+All the data is fully anonymized and approved by Privacy Data Protection Authority, and all experiments were performed in accordance with the relevant guidelines and regulations of the Regional Committee for Medical and Health Research Ethics - South East Norway, and the GDPR.
+
+%License /Terms of use
+The Hyper-Kvasir dataset is licensed under a Creative Commons Attribution 4.0 International License, which permits use, sharing, adaption, distribution and reproduction in any medium or format, as long as you give appropriate credit to the original authors and the source. This is important to highlight because it benefits other researchers who is in need of similar data can access the dataset easily.
+
+\begin{table} % table:hyper_kvasir
+  \centering
+  \begin{tabular}{|l|l|l|l|}
+  	\hline
+  	\textbf{Class name}		& \textbf{Samples}	& \textbf{Class name}		& \textbf{Samples} \\
+    \hline
+    barrets			& 41		& normal-z-line		& 932 \\ %\hline
+    barretts-short-segment & 53	& polyps			& 1028 \\ %\hline
+    bbps-0-1		& 646		& pylorus			& 999 \\ %\hline
+    bbps-2-3		& 1148		& retroflex-rectum	& 391 \\ %\hline
+    cecum			& 1009		& retroflex-stomach	& 764 \\ %\hline
+    dyed-lifted-polyps & 1002	& ulcerative-colitis-0-1 & 35 \\ %\hline
+    dyed-resection-margins & 989& ulcerative-colitis-1-2 & 11 \\ %\hline
+    esophagitis-a	& 403		& ulcerative-colitis-2-3 & 28 \\ %\hline
+    esophagitis-b-d	& 260		& ulcerative-colitis-grade-1 & 201 \\ %\hline
+    hemorrhoids		& 6			& ulcerative-colitis-grade-2 & 443 \\ %\hline
+    ileum			& 9			& ulcerative-colitis-grade-3 & 133 \\ %\hline
+    impacted-stool	& 131		& & \\ \hline
+  \end{tabular}
+  \caption{Hyper-Kvasir class names and corresponding amount of samples.}
+  \label{table:hyper_kvasir}
+\end{table}
 
 \subsubsection{Labeled images}
-Hyper-Kvasir contains 10.662 labeled images. The images are split into 23 different classes, and are stored in a folder with the same name as its corresponding class. All of the images are stored in JPEG format \cite{JPEGStill92}, which means it has some image quality loss but quite insignificant compared to the reduction in file size. Like in situations most often encountered the classes has a different number of samples, this is a challenge in the medical field because some findings occur more often than others.
+Hyper-Kvasir contains 10,662 labeled images. The images are split into 23 different classes, and are stored in a folder with the same name as its corresponding class. All of the images are stored in JPEG format \cite{JPEGStill92}, which means it has some image quality loss but quite insignificant compared to the reduction in file size. Like in situations most often encountered the classes has a different number of samples, this is a challenge in the medical field because some findings occur more often than others. In Table \ref{table:hyper_kvasir} you can see the 23 classes and how many images there is for each class.
 
 % ask Pål for the figure with class/sample distribution from original hyper-kvasir paper
 
 \subsubsection{Unlabeled images}
-This part of the dataset contains 99.417 images
+This part of the dataset contains 99.417 unlabeled images. When extracted they can be found in a separate subfolder. The images are accompanied with extracted global features and clusters assignments in Hyper-Kvasir Github repository. 
 
-\subsubsection{segmented images}
-In figure \ref{fig:kvasir_seg_example} we can see an example of the segmented Kvasir images.
+\subsubsection{Segmented images}
+Hyper-Kvasir includes images with corresponding segmentation masks and bounding boxes for 1,000 images from the polyp class. The segmentation masks depicts the polyp tissue for the corresponding image pixel. The Region of Interest (ROI) are represented by the white mask while the black does not contain polyp pixels. In Figure \ref{fig:kvasir_seg_example} we can see an example of the segmented Kvasir images.
 
 \begin{figure}[H] % kvasir_seg_example
   \begin{center}
@@ -655,10 +687,12 @@ In figure \ref{fig:kvasir_seg_example} we can see an example of the segmented Kv
 
 
 \subsubsection{Videos}
+In total there are 373 videos provided in the dataset, corresponding to 11.62 hours of videos and about 1 million video frames that can be convertet to images. The file format for the videos are Audio Video Interleave (AVI). The video portion of the dataset is 38.6GB in file size. In addition to the video folder there is a CSV file provided containing the videos IDs and findings. The finding contains the description of the finding in the video, of which there is 171 of. Finding description is meant to describe the video as a whole. Some of the findings are related to the categories found in the image portion and some are unique for the videos.
 
 
 
-\subsection{Augere Medical}
+
+\subsection{Augere Medical AS} \label{sec:augere_medical}
 % ----------------------------------------------------------
 % Write about augere medical and the tagging tool and export script used
 % ----------------------------------------------------------

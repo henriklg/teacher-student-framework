@@ -68,8 +68,9 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# tf.cache
+# cache files
 *.tfcache*
+*.pkl
 
 
 # folders

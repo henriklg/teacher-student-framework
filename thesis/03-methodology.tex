@@ -7,7 +7,7 @@
 % ----------------------------------------------------------
 % Present the method and system. Basically write everything you've done.
 % ----------------------------------------------------------
-
+In this chapter we will discuss how we created the dataset used in our research, what the dataset contains and the purpose for which we created it. 
 
 
 
@@ -18,31 +18,53 @@
 % Present how you gathered the data and labels
 % ----------------------------------------------------------
 %TODO : add list of diseases from datasets (like stated in \ref{sec:colon_cancer})
+As discussed in Section \ref{sec:available_datasets} there is number of publicly available datasets online, and some which are restricted. Some of these datasets are difficult to access, and there is a need for more publicly available datasets which are collected for the purpose of deep learning. To assist the under-explored field of research within medical computer assisted analysis tools the datasets need to be large and well annotated. Some of the mentioned datasets lack adequately documented, annotated samples from a good source and is not well suited for our research. Thus, as a vital part of our research, we aim to produce a collection of well annotated and adequately big dataset that can be used not only in this study, but also contribute to the research community and have a impact on the research comparability in future. We achieve this by collecting medical data, sorting and annotating it and making the dataset publicly available and free for non-commercial, educational and research purposes.
+
+\subsection{Privacy, Legal and Ethics Issues}
+%Source: pogorelov thesis 3.1.1
+% ----------------------------------------------------------
+To obtain medical videos from a hospital in Norway is very difficult and not straight forward. All medical data is considered personal and is therefore strongly protected from unauthorized use and distribution by the \textbf{Pasientjournalloven??} legislation.
+A medical study conducted at 2 academic hospitals from May 2017 to September 2018 found that most patients are willing to share their data and biospecimens for research purposes \cite{PatientPerspectives19}. Regardless of the patient opting in to share their data and biospecimens it is difficult for researchers to get their hands on it. 
+%TODO : why is it difficult to access data?
+We solved this problem by collaborating with a number of Norwegian hospitals and research teams working there. One of the research teams we collaborated with is Augere Medical (See Section \ref{sec:augere_medical} for more info), and through them we got in contact with Vestre Viken Hospital Trust, allowing our research team to download anonymous data from hospital systems and transfer it using secure media to our facility. Upon downloading the data we further stripped the metadata files for potential information regarding patients like time stamps, dates and camera equipment used.
+%TODO : ethics?
 
 
 
 \subsection{Kvasir-PillCam} \label{sec:kvasir_pillcam}
-The dataset we used in our experiments consist of endoscopic videos collected from Bærum Hospital. Unlike Kvasir and Hyper-Kvasir datasets we have made the Kvasir PillCam dataset for the purpose of this thesis. In total we have 44 videos which have gone through some re encoding to reduce the file sizes, and also because the original encoding is proprietary Sony technology. After that the videos are uploaded to Augere Medical \footnote{\url{https://augere.md/}} tagging tool. The data export from Bærum also contains some findings for each video (if there is any) and are extracted, converted to frame number and that helped us a great deal with tagging the videos. We also have Thomas de Lange to thank, because he helped us a lot with the medical aspect of the classification process. When all 44 videos have been precisely labeled the dataset is exported from Augeres tagging tool and split into folders for each class. The folders/classes are given in table \ref{table:kvasir_pillcam}. In total we have 44 000 labeled images in 8 classes. The sample distribution across the eight classes is skewed depending on how many findings there are in the videos. Some findings occur often and some very rarely. The dataset also contain one class for 'normal' images, which there is quite a bit more of than findings. 
+% Where is the dataset collected from?
+The dataset we used in our experiments consist of endoscopic videos collected from Bærum Hospital, a hospital in Vestre Viken Hospital Trust. Unlike Kvasir and Hyper-Kvasir datasets we have made the Kvasir-PillCam dataset for the purpose of this thesis. In total we have 44 videos which have gone through some re encoding to reduce the file sizes, and also because the original encoding is proprietary Sony technology. After that the videos are uploaded to Augere Medical\footnote{\url{https://augere.md/}} tagging tool. The data export from Bærum contains a number of  findings for each video and they are annotated, extracted, converted to frame number and that helped us a great deal with tagging the videos. %TODO : rewrite 
+%We also have Thomas de Lange to thank, because he helped us a lot with the medical aspect of the classification process. ** bad sentence **
+When all 44 videos have been precisely labeled the dataset is exported from Augere Medical tagging tool and split into folders for each class. The number of images per class are given in Table \ref{table:kvasir_pillcam_samples}. In total we have 43,905 labeled images in 12 classes. The sample distribution across the classes is skewed depending on how many findings there are in the videos. Some findings occur often and some very rarely. The dataset also contain one class for 'normal' images, which there is quite a bit more of than findings.
 
 Imbalanced dataset pose a challenge for predictive algorithms as most learning algorithms are based on the assumption of an equal number of samples for each class. This results in models that have poor predictive performance, especially for minority class or classes. This is a great problem because in many medical datasets the minority class is the most important and therefore more sensitive for classification errors.
 
-In addition to labeling the images the dataset also contain a JSON format file which stores coordinates for where in the frame the finding is located. The Kvasir Pillcam dataset will be an open-source dataset available for others scientists, and will later be grown to include more PillCam videos, both labeled and unlabeled samples.
+In addition to labeling the images the dataset also contain a JSON format file which stores coordinates for where in the frame the finding is located. The Kvasir-PillCam dataset will be an open-source dataset available for others scientists, and will later be grown to include more PillCam videos, both labeled and unlabeled samples.
 
-\begin{table}
+%TODO : update this table with the final classes and numbers
+\begin{table} % table:kvasir_pillcam
   \centering
-  \begin{tabular}{ |c|c| }
+  \begin{tabular}{|l|l|}
   	\hline
-  	Class number & Class name \\
+  	Class name & Samples \\
     \hline
-    0 & normal \\ 
-    1 & polyp \\ 
-    2 & polyrus \\ 
+    Angiectasia		& 908 \\ 
+    Blood			& 658 \\ 
+    Erosion			& 525 \\ 
+    Erythematous	& 251 \\
+    Foreign Bodies	& 776 \\
+    Hematin			& 12 \\
+    Ileo-cecal valve& 4704 \\
+    Normal			& 33,129 \\
+    Polyp			& 583 \\
+    Pylorus			& 1410 \\
+    Ulcer			& 759 \\
+    Unknown			& 190 \\
     \hline
   \end{tabular}
-  \caption{PillCam class names and corresponding class numbers.}
-  \label{table:kvasir_pillcam}
+  \caption{Hyper-PillCam class names and corresponding amount of samples.}
+  \label{table:kvasir_pillcam_samples}
 \end{table}
-
 
 
 
@@ -71,7 +93,7 @@ In addition to labeling the images the dataset also contain a JSON format file w
 % Present the system architecture, some results perhaps
 % ----------------------------------------------------------
 
-
+\subsection{Hyper-parameter tuning}
 
 
 
