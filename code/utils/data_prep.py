@@ -142,20 +142,30 @@ def create_dataset(config):
         print ("{:32} {:>5}".format("Validation dataset sample size:", val_size))
     
     
-#     def augment(img, label):
-#         # Augment the image using tf.image
-#         # Standardize - skip this because it already is normalized
-#         #img = tf.image.per_image_standardization(img)
-#         # Pad with 8 pixels
-#         img = tf.image.resize_with_crop_or_pad(img, config["img_shape"][0] + 8, config["img_shape"][1] + 8)
-#         # Randomly crop the image back to original size
-#         img = tf.image.random_crop(img, config["img_shape"])
-#         # Randomly flip image
-#         img = tf.image.random_flip_left_right(img)
-#         return img, label
+    def augment(img, label):
+        # Augment the image using tf.image
+        # Standardize
+        #img = tf.image.per_image_standardization(img)
+        
+        # Pad image with 10 percent og image size, and randomly crop back to size
+        pad = int(config["img_shape"][0]*0.15)
+        img = tf.image.resize_with_crop_or_pad(img, config["img_shape"][0] + pad, config["img_shape"][1] + pad)
+        img = tf.image.random_crop(img, config["img_shape"], seed=seed)
+        
+        # Randomly flip image
+        img = tf.image.random_flip_left_right(img, seed=seed)
+        img = tf.image.random_flip_up_down(img, seed=seed)
+        
+        # Change brightness and saturation
+        img = tf.image.random_brightness(img, max_delta=0.15, seed=seed)
+        img = tf.image.random_saturation(img, lower = 0.5, upper =1.5, seed=seed)
+        
+        # Make sure imgae is still in [0, 1]
+        img = tf.clip_by_value(img, 0.0, 1.0)
+        return img, label
 
-#     # Augment the training data
-#     train_ds = train_ds.map(augment, num_parallel_calls=AUTOTUNE)
+    # Augment the training data
+    train_ds = train_ds.map(augment, num_parallel_calls=AUTOTUNE)
     
     
     # Create training, test and validation dataset
@@ -202,7 +212,7 @@ def create_dataset(config):
     
     
 
-def prepare_for_training(ds, bs, cache=None, shuffle_buffer_size, seed):
+def prepare_for_training(ds, bs, cache, shuffle_buffer_size, seed):
     
     AUTOTUNE = tf.data.experimental.AUTOTUNE
     # use `.cache(filename)` to cache preprocessing work for datasets that don't
