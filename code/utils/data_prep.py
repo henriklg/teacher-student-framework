@@ -24,6 +24,9 @@ def create_dataset(config):
     data_dir = config["data_dir"]
     outcast = config["outcast"]
     verbosity = config["verbosity"]
+    shuffle_buffer_size = config["shuffle_buffer_size"]
+    seed = config["seed"]
+    
     neg_count = pos_count = 0
     AUTOTUNE = tf.data.experimental.AUTOTUNE
     DS_SIZE = len(list(data_dir.glob('*/*.*g')))
@@ -60,7 +63,11 @@ def create_dataset(config):
         files_string = str(data_dir/'[!{}]*/*'.format(outcast))
     
     if verbosity > 0: print ("Dataset.list_files: ",files_string, "\n")
-    list_ds = tf.data.Dataset.list_files(files_string, shuffle=True, seed=tf.constant(123, tf.int64))
+    list_ds = tf.data.Dataset.list_files(
+            files_string, 
+            shuffle=shuffle_buffer_size>1, 
+            seed=tf.constant(seed, tf.int64)
+    )
     
     # Functions for the data pipeline
     def get_label(file_path):
@@ -160,17 +167,20 @@ def create_dataset(config):
     train_ds = prepare_for_training(
         train_ds, config["batch_size"], 
         cache="{}/{}_{}_train.tfcache".format(cache_dir, img_width, ds_info),
-        shuffle_buffer_size=config["shuffle_buffer_size"]
+        shuffle_buffer_size=shuffle_buffer_size,
+        seed=seed
     )
     test_ds = prepare_for_training(
         test_ds, config["batch_size"], 
         cache="{}/{}_{}_test.tfcache".format(cache_dir, img_width, ds_info),
-        shuffle_buffer_size=0
+        shuffle_buffer_size=shuffle_buffer_size,
+        seed=seed
     )
     val_ds = prepare_for_training(
         val_ds, config["batch_size"], 
         cache="{}/{}_{}_val.tfcache".format(cache_dir, img_width, ds_info),
-        shuffle_buffer_size=0
+        shuffle_buffer_size=shuffle_buffer_size,
+        seed=seed
     )
     
    
@@ -191,7 +201,7 @@ def create_dataset(config):
     
     
 
-def prepare_for_training(ds, bs, cache, shuffle_buffer_size):
+def prepare_for_training(ds, bs, cache, shuffle_buffer_size, seed):
     # This is a small dataset, only load it once, and keep it in memory.
     
     AUTOTUNE = tf.data.experimental.AUTOTUNE
@@ -203,8 +213,8 @@ def prepare_for_training(ds, bs, cache, shuffle_buffer_size):
         else:
             ds = ds.cache()
     
-    if shuffle_buffer_size > 0:
-        ds = ds.shuffle(buffer_size=shuffle_buffer_size)
+    if shuffle_buffer_size>1:
+        ds = ds.shuffle(buffer_size=shuffle_buffer_size, seed=tf.constant(seed, tf.int64))
 
     # Repeat forever
     ds = ds.repeat()
