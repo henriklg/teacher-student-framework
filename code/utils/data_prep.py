@@ -78,7 +78,6 @@ def create_dataset(config):
         # cast to tensor array with dtype=uint8
         return tf.dtypes.cast(label_int, tf.int32)
 
-        
     def get_label_bin(file_path):
         parts = tf.strings.split(file_path, os.path.sep)
         bc = parts[-2] == pos_class_names
@@ -86,7 +85,6 @@ def create_dataset(config):
         if (nz_cnt > 0):
             return tf.constant(1, tf.int32)
         return tf.constant(0, tf.int32)
-        
         
     def decode_img(img):
         # convert the compressed string to a 3D uint8 tensor
@@ -123,7 +121,7 @@ def create_dataset(config):
     
     # Resample the binary dataset
     if config["resample"]:
-        labeled_ds = resample(labeled_ds.batch(1024), NUM_CLASSES, verbosity=1)
+        labeled_ds = resample(labeled_ds, NUM_CLASSES, verbosity=1)
     
     # Split into train, test and validation data
     train_size = int(0.7 * DS_SIZE)
@@ -204,8 +202,7 @@ def create_dataset(config):
     
     
 
-def prepare_for_training(ds, bs, cache, shuffle_buffer_size, seed):
-    # This is a small dataset, only load it once, and keep it in memory.
+def prepare_for_training(ds, bs, cache=None, shuffle_buffer_size, seed):
     
     AUTOTUNE = tf.data.experimental.AUTOTUNE
     # use `.cache(filename)` to cache preprocessing work for datasets that don't
@@ -224,8 +221,7 @@ def prepare_for_training(ds, bs, cache, shuffle_buffer_size, seed):
 
     ds = ds.batch(bs, drop_remainder=False)
 
-    # `prefetch` lets the dataset fetch batches in the background while the model
-    # is training. TODO: potential memory leak when buffersize is 1. Check
+    # `prefetch` lets the dataset fetch batches in the background while the model is training. 
     ds = ds.prefetch(buffer_size=AUTOTUNE)
     return ds
     
@@ -301,10 +297,10 @@ def show_image(img, class_names=None, title=None):
 
 def resample(ds, num_classes, verbosity=0):
     """
-    Resample the dataset
+    Resample the dataset. Accepts both binary and multiclass datasets.
     
     Args:
-    - ds: dataset to balance/resample. Should be batched to ~1024 samples per batch
+    - ds: dataset to balance/resample. Should not be repeated or batched
     - number of classes
     - verbosity
     
@@ -312,6 +308,7 @@ def resample(ds, num_classes, verbosity=0):
     - Resampled, repeated, and unbatched dataset
     """
     certainty_bs = 15
+    ds = ds.resample(1024)
     
     if verbosity > 0: print ("\nBeginning resampling..")
     def count(counts, batch):
