@@ -71,23 +71,23 @@ def create_dataset(config):
     
     # Functions for the data pipeline
     def get_label(file_path):
-        # if binary ds
-        if config["ds_info"] == 'binary':
-            parts = tf.strings.split(file_path, os.path.sep)
-            bc = parts[-2] == pos_class_names
-            nz_cnt = tf.math.count_nonzero(bc)
-            if (nz_cnt > 0):
-                return tf.constant(1, tf.int32)
-            return tf.constant(0, tf.int32)
-        # if complete ds
-        else:
-            # convert the path to a list of path components
-            parts = tf.strings.split(file_path, os.path.sep)
-            # get class integer from class-list
-            label_int = tf.reduce_min(tf.where(tf.equal(parts[-2], class_names)))
-            # cast to tensor array with dtype=uint8
-            return tf.dtypes.cast(label_int, tf.int32)
+        # convert the path to a list of path components
+        parts = tf.strings.split(file_path, os.path.sep)
+        # get class integer from class-list
+        label_int = tf.reduce_min(tf.where(tf.equal(parts[-2], class_names)))
+        # cast to tensor array with dtype=uint8
+        return tf.dtypes.cast(label_int, tf.int32)
 
+        
+    def get_label_bin(file_path):
+        parts = tf.strings.split(file_path, os.path.sep)
+        bc = parts[-2] == pos_class_names
+        nz_cnt = tf.math.count_nonzero(bc)
+        if (nz_cnt > 0):
+            return tf.constant(1, tf.int32)
+        return tf.constant(0, tf.int32)
+        
+        
     def decode_img(img):
         # convert the compressed string to a 3D uint8 tensor
         img = tf.image.decode_jpeg(img, channels=3)
@@ -102,9 +102,19 @@ def create_dataset(config):
         img = tf.io.read_file(file_path)
         img = decode_img(img)
         return img, label
+    
+    def process_path_bin(file_path):
+        label = get_label_bin(file_path)
+        # load the raw data from the file as a string
+        img = tf.io.read_file(file_path)
+        img = decode_img(img)
+        return img, label
 
     # Create dataset of label, image pairs from the tf.dataset of image paths
-    labeled_ds = list_ds.map(process_path, num_parallel_calls=AUTOTUNE)
+    if config["ds_info"] == 'binary':
+        labeled_ds = list_ds.map(process_path_bin, num_parallel_calls=AUTOTUNE)
+    else:
+        labeled_ds = list_ds.map(process_path, num_parallel_calls=AUTOTUNE)
     
     # Print some labels (to check the class-distribution)
     if verbosity > 0:
@@ -125,16 +135,9 @@ def create_dataset(config):
     val_ds = test_ds.skip(val_size)
     test_ds = test_ds.take(test_size)
 
+    
     # Print info about the dataset split
-    if verbosity > 0 and not config["resample"]:
-        def get_size(ds):
-            return tf.data.experimental.cardinality(ds).numpy()
-
-        print ("\n{:32} {:>5}".format("Full dataset sample size:", get_size(labeled_ds)))
-        print ("{:32} {:>5}".format("Train dataset sample size:", get_size(train_ds)))
-        print ("{:32} {:>5}".format("Test dataset sample size:", get_size(test_ds)))
-        print ("{:32} {:>5}".format("Validation dataset sample size:", get_size(val_ds)))
-    elif verbosity > 0 and config["resample"]:
+    if verbosity > 0:
         print ("\n{:32} {:>5}".format("Full dataset sample size:", DS_SIZE))
         print ("{:32} {:>5}".format("Train dataset sample size:", train_size))
         print ("{:32} {:>5}".format("Test dataset sample size:", test_size))
@@ -143,12 +146,12 @@ def create_dataset(config):
     
 #     def augment(img, label):
 #         # Augment the image using tf.image
-#         # Standardize
-#         img = tf.image.per_image_standardization(img)
+#         # Standardize - skip this because it already is normalized
+#         #img = tf.image.per_image_standardization(img)
 #         # Pad with 8 pixels
-#         img = tf.image.resize_with_crop_or_pad(img, IMG_HEIGHT + 8, IMG_WIDTH + 8)
+#         img = tf.image.resize_with_crop_or_pad(img, config["img_shape"][0] + 8, config["img_shape"][1] + 8)
 #         # Randomly crop the image back to original size
-#         img = tf.image.random_crop(img, [IMG_HEIGHT, IMG_WIDTH, NUM_CHANNELS])
+#         img = tf.image.random_crop(img, config["img_shape"])
 #         # Randomly flip image
 #         img = tf.image.random_flip_left_right(img)
 #         return img, label
