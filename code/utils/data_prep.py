@@ -119,7 +119,7 @@ def create_dataset(config):
         for images, labels in labeled_ds.batch(10).take(10):
             print(labels.numpy())
     
-    # Resample the binary dataset
+    # Resample the dataset
     if config["resample"]:
         labeled_ds = resample(labeled_ds, NUM_CLASSES, verbosity=1)
     
@@ -146,7 +146,8 @@ def create_dataset(config):
         # Augment the image using tf.image
         # Pad image with 10 percent og image size, and randomly crop back to size
         pad = int(config["img_shape"][0]*0.15)
-        img = tf.image.resize_with_crop_or_pad(img, config["img_shape"][0] + pad, config["img_shape"][1] + pad)
+        img = tf.image.resize_with_crop_or_pad(
+                img, config["img_shape"][0] + pad, config["img_shape"][1] + pad)
         img = tf.image.random_crop(img, config["img_shape"], seed=seed)
         
         # Randomly flip image
@@ -162,8 +163,8 @@ def create_dataset(config):
         return img, label
 
     # Augment the training data
-    train_ds = train_ds.map(augment, num_parallel_calls=AUTOTUNE)
-    
+    if config["augment"]:
+        train_ds = train_ds.map(augment, num_parallel_calls=AUTOTUNE)
     
     # Create training, test and validation dataset
     cache_dir = config["cache_dir"]
@@ -314,8 +315,9 @@ def resample(ds, num_classes, verbosity=0):
     Returns:
     - Resampled, repeated, and unbatched dataset
     """
-    certainty_bs = 15
-    ds = ds.resample(1024)
+    # certainty threshold for counting
+    certainty_bs = 5
+    ds = ds.batch(512)
     
     if verbosity > 0: print ("\nBeginning resampling..")
     def count(counts, batch):
