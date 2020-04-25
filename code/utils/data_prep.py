@@ -144,9 +144,6 @@ def create_dataset(config):
     
     def augment(img, label):
         # Augment the image using tf.image
-        # Standardize
-        #img = tf.image.per_image_standardization(img)
-        
         # Pad image with 10 percent og image size, and randomly crop back to size
         pad = int(config["img_shape"][0]*0.15)
         img = tf.image.resize_with_crop_or_pad(img, config["img_shape"][0] + pad, config["img_shape"][1] + pad)
