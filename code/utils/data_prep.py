@@ -119,10 +119,6 @@ def create_dataset(config):
         for images, labels in labeled_ds.batch(10).take(10):
             print(labels.numpy())
     
-    # Resample the dataset
-    if config["resample"]:
-        labeled_ds = resample(labeled_ds, NUM_CLASSES, verbosity=1)
-    
     # Split into train, test and validation data
     train_size = int(0.7 * DS_SIZE)
     test_size = int(0.15 * DS_SIZE)
@@ -141,6 +137,10 @@ def create_dataset(config):
         print ("{:32} {:>5}".format("Test dataset sample size:", test_size))
         print ("{:32} {:>5}".format("Validation dataset sample size:", val_size))
     
+    
+    # Resample the dataset
+    if config["resample"]:
+        train_ds = resample(train_ds, NUM_CLASSES, config["img_shape"][0], verbosity=1)
     
     def augment(img, label):
         # Augment the image using tf.image
@@ -175,7 +175,8 @@ def create_dataset(config):
     
     train_ds = prepare_for_training(
         train_ds, config["batch_size"], 
-        cache="{}/{}_{}_train.tfcache".format(cache_dir, img_width, ds_info),
+        #cache="{}/{}_{}_train.tfcache".format(cache_dir, img_width, ds_info),
+        cache=None,
         shuffle_buffer_size=shuffle_buffer_size,
         seed=seed
     )
@@ -303,7 +304,7 @@ def show_image(img, class_names=None, title=None):
     
 
 
-def resample(ds, num_classes, verbosity=0):
+def resample(ds, num_classes, img_size, verbosity=0):
     """
     Resample the dataset. Accepts both binary and multiclass datasets.
     
@@ -316,63 +317,70 @@ def resample(ds, num_classes, verbosity=0):
     - Resampled, repeated, and unbatched dataset
     """
     # certainty threshold for counting
-    certainty_bs = 5
-    ds = ds.batch(512)
+#     certainty_bs = 5
+#     ds = ds.cache(1024)
+#     if verbosity > 0: print ("\nBeginning resampling..")
+#     def count(counts, batch):
+#         images, labels = batch
+
+#         for i in range(num_classes):
+#             counts['class_{}'.format(i)] += tf.reduce_sum(tf.cast(labels == i, tf.int32))
+
+#         return counts
     
-    if verbosity > 0: print ("\nBeginning resampling..")
-    def count(counts, batch):
-        images, labels = batch
+#     # Set the initial states
+#     initial_state = {}
+#     for i in range(num_classes):
+#         initial_state['class_{}'.format(i)] = 0
 
-        for i in range(num_classes):
-            counts['class_{}'.format(i)] += tf.reduce_sum(tf.cast(labels == i, tf.int32))
+#     # Count samples
+#     counts = ds.take(certainty_bs).reduce(
+#         initial_state = initial_state,
+#         reduce_func = count)
 
-        return counts
-    
-    # Set the initial states
-    initial_state = {}
-    for i in range(num_classes):
-        initial_state['class_{}'.format(i)] = 0
+#     final_counts = []
+#     for class_, value in counts.items():
+#         final_counts.append(value.numpy().astype(np.float32))
 
-    # Count samples
-    counts = ds.take(certainty_bs).reduce(
-        initial_state = initial_state,
-        reduce_func = count)
+#     final_counts = np.asarray(final_counts)
 
-    final_counts = []
-    for class_, value in counts.items():
-        final_counts.append(value.numpy().astype(np.float32))
-
-    final_counts = np.asarray(final_counts)
-
-    fractions = final_counts/final_counts.sum()
-    if verbosity > 0:
-        print ("---- Fractions ---- ")
-        print (fractions)
+#     fractions = final_counts/final_counts.sum()
+#     if verbosity > 0:
+#         print ("---- Fractions ---- ")
+#         print (fractions)
         
+    if verbosity > 0:
+        print ("\nResampling the dataset")
+    
+    cache_dir = './cache/{}_train_cache/'.format(img_size)
+    # create directory if not already exist
+    pathlib.Path(cache_dir).mkdir(parents=True, exist_ok=True)
     
     # Beginning resampling
     datasets = []
     for i in range(num_classes):
-        data = ds.unbatch().filter(lambda image, label: label==i).repeat()
+        data = ds.filter(lambda image, label: label==i)
+        data = data.cache(cache_dir+'{}_ds'.format(i))
+        data = data.repeat() # temp removed unbatch and added cache
         datasets.append(data)
     
     target_dist = [1.0/num_classes] * num_classes
     
     balanced_ds = tf.data.experimental.sample_from_datasets(datasets, target_dist)
     
-    if verbosity > 0:
-        print ("\n---- Fractions after resampling ---.")
-        counts = balanced_ds.batch(10).take(certainty_bs).reduce(
-            initial_state = initial_state,
-            reduce_func = count)
+#     if verbosity > 0:
+#         print ("\n---- Fractions after resampling ---.")
+#         counts = balanced_ds.batch(10).take(certainty_bs).reduce(
+#             initial_state = initial_state,
+#             reduce_func = count)
 
-        final_counts = []
-        for class_, value in counts.items():
-            final_counts.append(value.numpy().astype(np.float32))
+#         final_counts = []
+#         for class_, value in counts.items():
+#             final_counts.append(value.numpy().astype(np.float32))
 
-        final_counts = np.asarray(final_counts)
+#         final_counts = np.asarray(final_counts)
 
-        fractions = final_counts/final_counts.sum()
-        print (fractions)
+#         fractions = final_counts/final_counts.sum()
+#         print (fractions)
     
     return balanced_ds
