@@ -311,10 +311,8 @@ def resample(ds, num_classes, conf):
     """
     # How many batches to use when counting the dataset
     certainty_bs = 10
-    ds = ds.batch(1024)
-    if conf["verbosity"] > 0: print ("\nBeginning resampling..")
     
-    ### Counting function
+    ### Counting functions
     def count(counts, batch):
         images, labels = batch
 
@@ -323,31 +321,31 @@ def resample(ds, num_classes, conf):
 
         return counts
     
-    # Set the initial states
-    initial_state = {}
-    for i in range(num_classes):
-        initial_state['class_{}'.format(i)] = 0
-
-    # Count samples
-    
-    if conf["verbosity"] > 0:
-        print ("---- Ratios before resampling ---- ")
-        counts = ds.take(certainty_bs).reduce(
-            initial_state = initial_state,
-            reduce_func = count)
+    def count_samples(count_ds):
+        # Set the initial states to zero
+        initial_state = {}
+        for i in range(num_classes):
+            initial_state['class_{}'.format(i)] = 0
+        
+        counts = count_ds.take(certainty_bs).reduce(
+                    initial_state = initial_state,
+                    reduce_func = count)
 
         final_counts = []
         for class_, value in counts.items():
-            final_counts.append(value.numpy().astype(np.float32))
+                    final_counts.append(value.numpy().astype(np.float32))
 
         final_counts = np.asarray(final_counts)
-
         fractions = final_counts/final_counts.sum()
         print (fractions)
+    
+    ## Count
+    if conf["verbosity"] > 0:
+        print ("---- Ratios before resampling ---- ")
+        count_samples(ds.batch(1024))
 
     ####################################
-    ## Resampling
-    ds = ds.unbatch()
+    ## Resample
     
     cache_dir = './cache/{}_train_cache/'.format(conf["img_shape"][0])
     # create directory if not already exist
@@ -369,20 +367,9 @@ def resample(ds, num_classes, conf):
     
     ####################################
     
-    ## Coutning
+    ## Count
     if conf["verbosity"] > 0:
         print ("\n---- Ratios after resampling ----")
-        counts = balanced_ds.batch(1024).take(certainty_bs).reduce(
-            initial_state = initial_state,
-            reduce_func = count)
-
-        final_counts = []
-        for class_, value in counts.items():
-            final_counts.append(value.numpy().astype(np.float32))
-
-        final_counts = np.asarray(final_counts)
-
-        fractions = final_counts/final_counts.sum()
-        print (fractions)
+        count_samples(balanced_ds.batch(1024))
     
     return balanced_ds
