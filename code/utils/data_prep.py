@@ -7,7 +7,7 @@ import os
 import pathlib
 import matplotlib.pyplot as plt
 
-def create_dataset(config):
+def create_dataset(conf):
     """
     Create a tf.data dataset
     
@@ -21,15 +21,16 @@ def create_dataset(config):
     tf.data.Dataset   
     """
     # Some parameters
-    data_dir = config["data_dir"]
-    outcast = config["outcast"]
-    verbosity = config["verbosity"]
-    shuffle_buffer_size = config["shuffle_buffer_size"]
-    seed = config["seed"]
+    data_dir = conf["data_dir"]
+    outcast = conf["outcast"]
+    verbosity = conf["verbosity"]
+    shuffle_buffer_size = conf["shuffle_buffer_size"]
+    seed = conf["seed"]
+
     
     neg_count = pos_count = 0
     AUTOTUNE = tf.data.experimental.AUTOTUNE
-    DS_SIZE = len(list(data_dir.glob('*/*.*g')))
+    ds_size = len(list(data_dir.glob('*/*.*g')))
     directories = np.array([item.name for item in data_dir.glob('*') if item.name != 'metadata.json'])
     
     # Remove the outcast folder
@@ -39,22 +40,22 @@ def create_dataset(config):
 
     ## Print info about the dataset
     # Binary dataset
-    if config["ds_info"] == 'binary':
+    if conf["ds_info"] == 'binary':
         class_names = np.array(['Negative','Positive'])
-        NUM_CLASSES = len(class_names)
-        neg_class_name = config['neg_class'] # 'normal'-class
+        num_classes = len(class_names)
+        neg_class_name = conf['neg_class'] # 'normal'-class
         pos_class_names = np.delete(directories, np.where(neg_class_name == directories))
         # Print info about neg/pos split
         if verbosity > 0: 
-            DS_SIZE, neg_count, pos_count = print_bin_class_info(directories, data_dir, 
-                                            DS_SIZE, outcast, class_names, neg_class_name, pos_class_names)
+            ds_size, neg_count, pos_count = print_bin_class_info(directories, data_dir, 
+                                            ds_size, outcast, class_names, neg_class_name, pos_class_names)
     # Full dataset
     else:     
         class_names = directories
-        NUM_CLASSES = len(class_names)
+        num_classes = len(class_names)
         # Print info about classes
         if verbosity > 0: 
-            DS_SIZE = print_class_info(directories, data_dir, DS_SIZE, outcast, NUM_CLASSES)
+            ds_size = print_class_info(directories, data_dir, ds_size, outcast, num_classes)
     
     # Create a tf.dataset of the file paths
     if outcast == None:
@@ -92,7 +93,7 @@ def create_dataset(config):
         # Use `convert_image_dtype` to convert to floats in the [0,1] range.
         img = tf.image.convert_image_dtype(img, tf.float32)
         # resize the image to the desired size.
-        return tf.image.resize(img, [config["img_shape"][0], config["img_shape"][1]])
+        return tf.image.resize(img, [conf["img_shape"][0], conf["img_shape"][1]])
 
     def process_path(file_path):
         label = get_label(file_path)
@@ -109,7 +110,7 @@ def create_dataset(config):
         return img, label
 
     # Create dataset of label, image pairs from the tf.dataset of image paths
-    if config["ds_info"] == 'binary':
+    if conf["ds_info"] == 'binary':
         labeled_ds = list_ds.map(process_path_bin, num_parallel_calls=AUTOTUNE)
     else:
         labeled_ds = list_ds.map(process_path, num_parallel_calls=AUTOTUNE)
@@ -120,9 +121,9 @@ def create_dataset(config):
             print(labels.numpy())
     
     # Split into train, test and validation data
-    train_size = int(0.7 * DS_SIZE)
-    test_size = int(0.15 * DS_SIZE)
-    val_size = int(0.15 * DS_SIZE)
+    train_size = int(0.7 * ds_size)
+    test_size = int(0.15 * ds_size)
+    val_size = int(0.15 * ds_size)
     
     train_ds = labeled_ds.take(train_size)
     test_ds = labeled_ds.skip(train_size)
@@ -132,23 +133,23 @@ def create_dataset(config):
     
     # Print info about the dataset split
     if verbosity > 0:
-        print ("\n{:32} {:>5}".format("Full dataset sample size:", DS_SIZE))
+        print ("\n{:32} {:>5}".format("Full dataset sample size:", ds_size))
         print ("{:32} {:>5}".format("Train dataset sample size:", train_size))
         print ("{:32} {:>5}".format("Test dataset sample size:", test_size))
         print ("{:32} {:>5}".format("Validation dataset sample size:", val_size))
     
     
     # Resample the dataset
-    if config["resample"]:
-        train_ds = resample(train_ds, NUM_CLASSES, config["img_shape"][0], verbosity=1)
+    if conf["resample"]:
+        train_ds = resample(train_ds, num_classes, conf)
     
     def augment(img, label):
         # Augment the image using tf.image
         # Pad image with 10 percent og image size, and randomly crop back to size
-        pad = int(config["img_shape"][0]*0.15)
+        pad = int(conf["img_shape"][0]*0.15)
         img = tf.image.resize_with_crop_or_pad(
-                img, config["img_shape"][0] + pad, config["img_shape"][1] + pad)
-        img = tf.image.random_crop(img, config["img_shape"], seed=seed)
+                img, conf["img_shape"][0] + pad, conf["img_shape"][1] + pad)
+        img = tf.image.random_crop(img, conf["img_shape"], seed=seed)
         
         # Randomly flip image
         img = tf.image.random_flip_left_right(img, seed=seed)
@@ -162,42 +163,30 @@ def create_dataset(config):
         img = tf.clip_by_value(img, 0.0, 1.0)
         return img, label
 
-    # Augment the training data
-    if config["augment"]:
-        train_ds = train_ds.map(augment, num_parallel_calls=AUTOTUNE)
+    
     
     # Create training, test and validation dataset
-    cache_dir = config["cache_dir"]
-    img_width = config["img_shape"][0]
-    ds_info = config["ds_info"]
     # Create cache-dir if not already exists
-    pathlib.Path(cache_dir).mkdir(parents=True, exist_ok=True)
+    pathlib.Path(conf["cache_dir"]).mkdir(parents=True, exist_ok=True)
     
-    train_ds = prepare_for_training(
-        train_ds, config["batch_size"], 
-        #cache="{}/{}_{}_train.tfcache".format(cache_dir, img_width, ds_info),
-        cache=None,
-        shuffle_buffer_size=shuffle_buffer_size,
-        seed=seed
-    )
-    test_ds = prepare_for_training(
-        test_ds, config["batch_size"], 
-        cache="{}/{}_{}_test.tfcache".format(cache_dir, img_width, ds_info),
-        shuffle_buffer_size=shuffle_buffer_size,
-        seed=seed
-    )
-    val_ds = prepare_for_training(
-        val_ds, config["batch_size"], 
-        cache="{}/{}_{}_val.tfcache".format(cache_dir, img_width, ds_info),
-        shuffle_buffer_size=shuffle_buffer_size,
-        seed=seed
-    )
-    
-   
-    # Return some of the data
+    # Augment the training data
+    if conf["augment"]:
+        train_ds = train_ds.map(augment, num_parallel_calls=AUTOTUNE)
+
+    train_ds = prepare_for_training(train_ds, None, conf)
+    test_ds = prepare_for_training(test_ds, 'test', conf)
+    val_ds = prepare_for_training(val_ds, 'val', conf)
+
+    # Print some labels (to check the class-distribution)
+    print ()
+    if conf["verbosity"] > 0:
+        for images, labels in train_ds.unbatch().batch(10).take(10):
+            print(labels.numpy())
+            
+    # Return some parameters
     return_params = {
-        "num_classes": NUM_CLASSES,
-        "ds_size": DS_SIZE,
+        "num_classes": num_classes,
+        "ds_size": ds_size,
         "train_size": train_size,
         "test_size": test_size,
         "val_size": val_size,
@@ -211,24 +200,28 @@ def create_dataset(config):
     
     
 
-def prepare_for_training(ds, bs, cache, shuffle_buffer_size, seed):
+def prepare_for_training(ds, cache, conf):
     
     AUTOTUNE = tf.data.experimental.AUTOTUNE
     # use `.cache(filename)` to cache preprocessing work for datasets that don't
     # fit in memory.
     if cache:
         if isinstance(cache, str):
+            cache_string = "{}/{}_{}_{}.tfcache".format(
+                conf["cache_dir"], conf["img_shape"][0], conf["ds_info"], cache
+            )
             ds = ds.cache(cache)
         else:
             ds = ds.cache()
     
-    if shuffle_buffer_size>1:
-        ds = ds.shuffle(buffer_size=shuffle_buffer_size, seed=tf.constant(seed, tf.int64))
+    if conf["shuffle_buffer_size"]>1:
+        ds = ds.shuffle(buffer_size=conf["shuffle_buffer_size"], 
+                        seed=tf.constant(conf["seed"], tf.int64))
 
     # Repeat forever
     ds = ds.repeat()
 
-    ds = ds.batch(bs, drop_remainder=False)
+    ds = ds.batch(conf["batch_size"], drop_remainder=False)
 
     # `prefetch` lets the dataset fetch batches in the background while the model is training. 
     ds = ds.prefetch(buffer_size=AUTOTUNE)
@@ -236,7 +229,7 @@ def prepare_for_training(ds, bs, cache, shuffle_buffer_size, seed):
     
     
     
-def print_bin_class_info(directories, data_dir, DS_SIZE, outcast, class_names, neg, pos):
+def print_bin_class_info(directories, data_dir, ds_size, outcast, class_names, neg, pos):
     """
     Extract and print info about the class split of binary dataset
     """
@@ -268,7 +261,7 @@ def print_bin_class_info(directories, data_dir, DS_SIZE, outcast, class_names, n
 
     
     
-def print_class_info(directories, data_dir, DS_SIZE, outcast, NUM_CLASSES):
+def print_class_info(directories, data_dir, ds_size, outcast, num_classes):
     # print ("Directories: ", directories, end='\n\n')
     
     # Count number of samples for each folder
@@ -282,7 +275,7 @@ def print_class_info(directories, data_dir, DS_SIZE, outcast, NUM_CLASSES):
     for folder, count in count_dir.items():
         print ("{:28}: {:4d} | {:2.2f}%".format(folder, count, count/tot*100))
         
-    print ('\nTotal number of images: {}, in {} classes.\n'.format(DS_SIZE, NUM_CLASSES))
+    print ('\nTotal number of images: {}, in {} classes.\n'.format(ds_size, num_classes))
 
     return tot
 
@@ -304,7 +297,7 @@ def show_image(img, class_names=None, title=None):
     
 
 
-def resample(ds, num_classes, img_size, verbosity=0):
+def resample(ds, num_classes, conf):
     """
     Resample the dataset. Accepts both binary and multiclass datasets.
     
@@ -316,71 +309,80 @@ def resample(ds, num_classes, img_size, verbosity=0):
     Returns:
     - Resampled, repeated, and unbatched dataset
     """
-    # certainty threshold for counting
-#     certainty_bs = 5
-#     ds = ds.cache(1024)
-#     if verbosity > 0: print ("\nBeginning resampling..")
-#     def count(counts, batch):
-#         images, labels = batch
-
-#         for i in range(num_classes):
-#             counts['class_{}'.format(i)] += tf.reduce_sum(tf.cast(labels == i, tf.int32))
-
-#         return counts
+    # How many batches to use when counting the dataset
+    certainty_bs = 10
+    ds = ds.batch(1024)
+    if conf["verbosity"] > 0: print ("\nBeginning resampling..")
     
-#     # Set the initial states
-#     initial_state = {}
-#     for i in range(num_classes):
-#         initial_state['class_{}'.format(i)] = 0
+    ### Counting function
+    def count(counts, batch):
+        images, labels = batch
 
-#     # Count samples
-#     counts = ds.take(certainty_bs).reduce(
-#         initial_state = initial_state,
-#         reduce_func = count)
+        for i in range(num_classes):
+            counts['class_{}'.format(i)] += tf.reduce_sum(tf.cast(labels == i, tf.int32))
 
-#     final_counts = []
-#     for class_, value in counts.items():
-#         final_counts.append(value.numpy().astype(np.float32))
-
-#     final_counts = np.asarray(final_counts)
-
-#     fractions = final_counts/final_counts.sum()
-#     if verbosity > 0:
-#         print ("---- Fractions ---- ")
-#         print (fractions)
-        
-    if verbosity > 0:
-        print ("\nResampling the dataset")
+        return counts
     
-    cache_dir = './cache/{}_train_cache/'.format(img_size)
+    # Set the initial states
+    initial_state = {}
+    for i in range(num_classes):
+        initial_state['class_{}'.format(i)] = 0
+
+    # Count samples
+    
+    if conf["verbosity"] > 0:
+        print ("---- Ratios before resampling ---- ")
+        counts = ds.take(certainty_bs).reduce(
+            initial_state = initial_state,
+            reduce_func = count)
+
+        final_counts = []
+        for class_, value in counts.items():
+            final_counts.append(value.numpy().astype(np.float32))
+
+        final_counts = np.asarray(final_counts)
+
+        fractions = final_counts/final_counts.sum()
+        print (fractions)
+
+    ####################################
+    ## Resampling
+    ds = ds.unbatch()
+    
+    cache_dir = './cache/{}_train_cache/'.format(conf["img_shape"][0])
     # create directory if not already exist
     pathlib.Path(cache_dir).mkdir(parents=True, exist_ok=True)
     
     # Beginning resampling
     datasets = []
     for i in range(num_classes):
+        # Get all samples from class i [0 -> num_classes], repeat the dataset
+        # indefinitely and store in datasets list
         data = ds.filter(lambda image, label: label==i)
         data = data.cache(cache_dir+'{}_ds'.format(i))
         data = data.repeat() # temp removed unbatch and added cache
         datasets.append(data)
     
-    target_dist = [1.0/num_classes] * num_classes
+    target_dist = [ 1.0/num_classes ] * num_classes
     
     balanced_ds = tf.data.experimental.sample_from_datasets(datasets, target_dist)
     
-#     if verbosity > 0:
-#         print ("\n---- Fractions after resampling ---.")
-#         counts = balanced_ds.batch(10).take(certainty_bs).reduce(
-#             initial_state = initial_state,
-#             reduce_func = count)
+    ####################################
+    
+    ## Coutning
+    if conf["verbosity"] > 0:
+        print ("\n---- Ratios after resampling ----")
+        counts = balanced_ds.batch(1024).take(certainty_bs).reduce(
+            initial_state = initial_state,
+            reduce_func = count)
 
-#         final_counts = []
-#         for class_, value in counts.items():
-#             final_counts.append(value.numpy().astype(np.float32))
+        final_counts = []
+        for class_, value in counts.items():
+            final_counts.append(value.numpy().astype(np.float32))
 
-#         final_counts = np.asarray(final_counts)
+        final_counts = np.asarray(final_counts)
 
-#         fractions = final_counts/final_counts.sum()
-#         print (fractions)
+        fractions = final_counts/final_counts.sum()
+        print (fractions)
     
     return balanced_ds
