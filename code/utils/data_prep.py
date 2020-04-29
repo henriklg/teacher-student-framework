@@ -6,6 +6,7 @@ import numpy as np
 import os
 import pathlib
 import matplotlib.pyplot as plt
+import scipy.ndimage as ndimage
 
 def create_dataset(conf):
     """
@@ -27,7 +28,7 @@ def create_dataset(conf):
     shuffle_buffer_size = conf["shuffle_buffer_size"]
     seed = conf["seed"]
 
-    
+    train_cache = 'train'
     neg_count = pos_count = 0
     AUTOTUNE = tf.data.experimental.AUTOTUNE
     ds_size = len(list(data_dir.glob('*/*.*g')))
@@ -139,11 +140,15 @@ def create_dataset(conf):
         print ("{:32} {:>5}".format("Validation dataset sample size:", val_size))
     
     
+
     # Resample the dataset
     if conf["resample"]:
-        train_ds = resample(train_ds, num_classes, conf)
+#         train_ds = resample(train_ds, num_classes, conf)
+        train_ds = reject_resample(train_ds, conf)
+        train_cache = None
     
     def augment(img, label):
+        
         # Augment the image using tf.image
         # Pad image with 10 percent og image size, and randomly crop back to size
         pad = int(conf["img_shape"][0]*0.15)
@@ -163,7 +168,20 @@ def create_dataset(conf):
         img = tf.clip_by_value(img, 0.0, 1.0)
         return img, label
 
+    #####################
+    def random_rotate_image(image):
+        image = ndimage.rotate(image, np.random.uniform(-30, 30), reshape=False)
+        return image
+
+    def tf_random_rotate_image(image, label):
+        im_shape = image.shape
+        [image,] = tf.py_function(random_rotate_image, [image], [tf.float32])
+        image.set_shape(im_shape)
+        image = tf.clip_by_value(image, 0.0, 1.0)
+        return image, label
     
+
+    #####################
     
     # Create training, test and validation dataset
     # Create cache-dir if not already exists
@@ -171,9 +189,12 @@ def create_dataset(conf):
     
     # Augment the training data
     if conf["augment"]:
+        train_ds = train_ds.map(tf_random_rotate_image, num_parallel_calls=AUTOTUNE)
         train_ds = train_ds.map(augment, num_parallel_calls=AUTOTUNE)
-
-    train_ds = prepare_for_training(train_ds, None, conf)
+    
+    
+    # Cache, shuffle, repeat, batch, prefetch
+    train_ds = prepare_for_training(train_ds, train_cache, conf)
     test_ds = prepare_for_training(test_ds, 'test', conf)
     val_ds = prepare_for_training(val_ds, 'val', conf)
 
@@ -373,3 +394,11 @@ def resample(ds, num_classes, conf):
         count_samples(balanced_ds.batch(1024))
     
     return balanced_ds
+
+
+
+def reject_resample(ds, conf):
+    if conf["verbosity"]: 
+        print ('\nResample the dataset with rejection_resample')
+    
+    return ds
