@@ -28,6 +28,7 @@ def create_dataset(conf):
     shuffle_buffer_size = conf["shuffle_buffer_size"]
     seed = conf["seed"]
 
+    np.random.seed(seed=seed)
     train_cache = 'train'
     neg_count = pos_count = 0
     AUTOTUNE = tf.data.experimental.AUTOTUNE
@@ -141,10 +142,10 @@ def create_dataset(conf):
     
     
 
-    # Resample the dataset
+    # Resample the dataset. NB: dataset is cached in resamler
     if conf["resample"]:
-        train_ds = resample(train_ds, num_classes, conf)
-#         train_ds = reject_resample(train_ds, conf)
+#         train_ds = resample(train_ds, num_classes, conf)
+        train_ds = reject_resample(train_ds, num_classes, conf)
         train_cache = None
 
     def random_rotate_image(img):
@@ -181,12 +182,10 @@ def create_dataset(conf):
     if conf["augment"]:
         train_ds = train_ds.map(augment, num_parallel_calls=AUTOTUNE)
         
-        
-    # Create training, test and validation dataset
     # Create cache-dir if not already exists
     pathlib.Path(conf["cache_dir"]).mkdir(parents=True, exist_ok=True)
     
-    # Cache, shuffle, repeat, batch, prefetch
+    # Cache, shuffle, repeat, batch, prefetch pipeline
     train_ds = prepare_for_training(train_ds, train_cache, conf)
     test_ds = prepare_for_training(test_ds, 'test', conf)
     val_ds = prepare_for_training(val_ds, 'val', conf)
@@ -224,7 +223,7 @@ def prepare_for_training(ds, cache, conf):
             cache_string = "{}/{}_{}_{}.tfcache".format(
                 conf["cache_dir"], conf["img_shape"][0], conf["ds_info"], cache
             )
-            ds = ds.cache(cache)
+            ds = ds.cache(cache_string)
         else:
             ds = ds.cache()
     
@@ -390,8 +389,64 @@ def resample(ds, num_classes, conf):
 
 
 
-def reject_resample(ds, conf):
+def reject_resample(ds, num_classes, conf):
+    # How many batches to use when counting the dataset
+    certainty_bs = 10
+    
     if conf["verbosity"]: 
         print ('\nResample the dataset with rejection_resample')
+    ####################################
+    ### Counting functions
+    def count(counts, batch):
+        images, labels = batch
+
+        for i in range(num_classes):
+            counts['class_{}'.format(i)] += tf.reduce_sum(tf.cast(labels == i, tf.int32))
+
+        return counts
     
-    return ds
+    def count_samples(count_ds):
+        # Set the initial states to zero
+        initial_state = {}
+        for i in range(num_classes):
+            initial_state['class_{}'.format(i)] = 0
+        
+        counts = count_ds.take(certainty_bs).reduce(
+                    initial_state = initial_state,
+                    reduce_func = count)
+
+        final_counts = []
+        for class_, value in counts.items():
+                    final_counts.append(value.numpy().astype(np.float32))
+
+        final_counts = np.asarray(final_counts)
+        fractions = final_counts/final_counts.sum()
+        return fractions
+    ####################################
+    ## Count before resample
+    print ("\n---- Ratios before resampling ---- ")
+    initial_dist = count_samples(ds.batch(1024))
+    print (initial_dist)
+    ####################################
+    ## Resample
+    
+    def class_func(img, lab):
+        return lab
+    
+    target_dist = [ 1.0/num_classes ] * num_classes
+    
+    resampler = tf.data.experimental.rejection_resample(
+        class_func, target_dist=target_dist, initial_dist=initial_dist
+    )
+    
+    resample_ds = ds.apply(resampler)
+    
+    balanced_ds = resample_ds.map(lambda extra_label, img_and_label: img_and_label)
+    
+    ####################################
+    ## Count after resample
+    if conf["verbosity"] > 0:
+        print ("\n---- Ratios after resampling ----")
+        print(count_samples(balanced_ds.batch(1024)))
+    ####################################
+    return balanced_ds
