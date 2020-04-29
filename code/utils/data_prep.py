@@ -144,8 +144,7 @@ def create_dataset(conf):
 
     # Resample the dataset. NB: dataset is cached in resamler
     if conf["resample"]:
-#         train_ds = resample(train_ds, num_classes, conf)
-        train_ds = reject_resample(train_ds, num_classes, conf)
+        train_ds = resample(train_ds, num_classes, conf)
         train_cache = None
 
     def random_rotate_image(img):
@@ -173,6 +172,8 @@ def create_dataset(conf):
             img = tf.image.random_brightness(img, max_delta=0.15, seed=seed)
         if "saturation" in conf["augment"]:
             img = tf.image.random_saturation(img, lower = 0.5, upper =1.5, seed=seed)
+        if "contrast" in conf["augment"]:
+            img = tf.image.random_contrast(img, lower=0.6, upper=1.6, seed=seed)
         
         # Make sure imgae is still in [0, 1]
         img = tf.clip_by_value(img, 0.0, 1.0)
@@ -385,68 +386,4 @@ def resample(ds, num_classes, conf):
         print ("\n---- Ratios after resampling ----")
         count_samples(balanced_ds.batch(1024))
     
-    return balanced_ds
-
-
-
-def reject_resample(ds, num_classes, conf):
-    # How many batches to use when counting the dataset
-    certainty_bs = 10
-    
-    if conf["verbosity"]: 
-        print ('\nResample the dataset with rejection_resample')
-    ####################################
-    ### Counting functions
-    def count(counts, batch):
-        images, labels = batch
-
-        for i in range(num_classes):
-            counts['class_{}'.format(i)] += tf.reduce_sum(tf.cast(labels == i, tf.int32))
-
-        return counts
-    
-    def count_samples(count_ds):
-        # Set the initial states to zero
-        initial_state = {}
-        for i in range(num_classes):
-            initial_state['class_{}'.format(i)] = 0
-        
-        counts = count_ds.take(certainty_bs).reduce(
-                    initial_state = initial_state,
-                    reduce_func = count)
-
-        final_counts = []
-        for class_, value in counts.items():
-                    final_counts.append(value.numpy().astype(np.float32))
-
-        final_counts = np.asarray(final_counts)
-        fractions = final_counts/final_counts.sum()
-        return fractions
-    ####################################
-    ## Count before resample
-    print ("\n---- Ratios before resampling ---- ")
-    initial_dist = count_samples(ds.batch(1024))
-    print (initial_dist)
-    ####################################
-    ## Resample
-    
-    def class_func(img, lab):
-        return lab
-    
-    target_dist = [ 1.0/num_classes ] * num_classes
-    
-    resampler = tf.data.experimental.rejection_resample(
-        class_func, target_dist=target_dist, initial_dist=initial_dist
-    )
-    
-    resample_ds = ds.apply(resampler)
-    
-    balanced_ds = resample_ds.map(lambda extra_label, img_and_label: img_and_label)
-    
-    ####################################
-    ## Count after resample
-    if conf["verbosity"] > 0:
-        print ("\n---- Ratios after resampling ----")
-        print(count_samples(balanced_ds.batch(1024)))
-    ####################################
     return balanced_ds
