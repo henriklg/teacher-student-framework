@@ -179,10 +179,13 @@ def create_dataset(conf):
         img = tf.clip_by_value(img, 0.0, 1.0)
         return img, label
 
-     # Augment the training data
-    if conf["augment"]:
-        train_ds = train_ds.map(augment, num_parallel_calls=AUTOTUNE)
-        
+    # Augment the training data
+    try:
+        if conf["augment"]:
+            train_ds = train_ds.map(augment, num_parallel_calls=AUTOTUNE)
+    except KeyError:
+        pass
+    
     # Create cache-dir if not already exists
     pathlib.Path(conf["cache_dir"]).mkdir(parents=True, exist_ok=True)
     
@@ -283,17 +286,21 @@ def print_class_info(directories, data_dir, ds_size, outcast, num_classes):
     for dir_name in directories:
         count_dir[dir_name] = len(list(data_dir.glob(dir_name+'/*.*g')))
 
-    tot = sum(count_dir.values())
-    assert tot != 0, "Can't divide by zero."
+    total = sum(count_dir.values())
+    assert total != 0, "Can't divide by zero."
     
     for folder, count in count_dir.items():
-        print ("{:28}: {:4d} | {:2.2f}%".format(folder, count, count/tot*100))
+        print ("{:28}: {:4d} | {:2.2f}%".format(folder, count, count/total*100))
         
     print ('\nTotal number of images: {}, in {} classes.\n'.format(ds_size, num_classes))
 
-    return tot
+    return total
 
-    
+
+
+
+
+
 def show_image(img, class_names=None, title=None):
     if (isinstance(img, tf.data.Dataset)):
         for image, label in img:
@@ -308,7 +315,75 @@ def show_image(img, class_names=None, title=None):
             plt.title(title, fontdict={'color':'white','size':20})
         plt.imshow(img)
         plt.axis('off')
+
+        
+
+
+def calculate_weights(count_ds, num_classes):
+    """
+    Find distribution of dataset by counting a subset.
+    Args: count_ds - dataset to be counted.
+    Return: a list of class distributions
+    """
+    def count(counts, batch):
+        images, labels = batch
+        for i in range(num_classes):
+            counts['class_{}'.format(i)] += tf.reduce_sum(tf.cast(labels == i, tf.int32))
+        return counts
     
+    # Set the initial states to zero
+    initial_state = {}
+    for i in range(num_classes):
+        initial_state['class_{}'.format(i)] = 0
+        
+    counts = count_ds.reduce(
+                initial_state = initial_state,
+                reduce_func = count)
+
+    final_counts = []
+    for class_, value in counts.items():
+                final_counts.append(value.numpy().astype(np.float32))
+    
+    final_counts = np.asarray(final_counts)
+    total = final_counts.sum()
+    
+    score = total / (final_counts*num_classes)
+#     score[score<1.0] = 1.0
+    return score
+
+
+
+
+def class_distribution(count_ds, num_classes, count_batches=10, bs=1024):
+    """
+    Find distribution of dataset by counting a subset.
+    Args: count_ds - dataset to be counted.
+    Return: a list of class distributions
+    """
+    def count(counts, batch):
+        _, labels = batch
+        for i in range(num_classes):
+            counts['class_{}'.format(i)] += tf.reduce_sum(tf.cast(labels == i, tf.int32))
+        return counts
+    
+    # Batch dataset
+    count_ds = count_ds.batch(bs)
+    # Set the initial states to zero
+    initial_state = {}
+    for i in range(num_classes):
+        initial_state['class_{}'.format(i)] = 0
+        
+    counts = count_ds.take(count_batches).reduce(
+                initial_state = initial_state,
+                reduce_func = count)
+
+    final_counts = []
+    for class_, value in counts.items():
+                final_counts.append(value.numpy().astype(np.float32))
+
+    final_counts = np.asarray(final_counts)
+    distribution = final_counts/final_counts.sum()
+    return distribution
 
 
 def resample(ds, num_classes, conf):
@@ -324,44 +399,21 @@ def resample(ds, num_classes, conf):
     - Resampled, repeated, and unbatched dataset
     """
     # How many batches to use when counting the dataset
-    certainty_bs = 10
-    
-    ### Counting functions
-    def count(counts, batch):
-        images, labels = batch
-
-        for i in range(num_classes):
-            counts['class_{}'.format(i)] += tf.reduce_sum(tf.cast(labels == i, tf.int32))
-
-        return counts
-    
-    def count_samples(count_ds):
-        # Set the initial states to zero
-        initial_state = {}
-        for i in range(num_classes):
-            initial_state['class_{}'.format(i)] = 0
-        
-        counts = count_ds.take(certainty_bs).reduce(
-                    initial_state = initial_state,
-                    reduce_func = count)
-
-        final_counts = []
-        for class_, value in counts.items():
-                    final_counts.append(value.numpy().astype(np.float32))
-
-        final_counts = np.asarray(final_counts)
-        fractions = final_counts/final_counts.sum()
-        print (fractions)
+    count_batches = 10
     
     ## Count
     if conf["verbosity"] > 0:
         print ("\n---- Ratios before resampling ---- ")
-        count_samples(ds.batch(1024))
+        initial_dist = class_distribution(ds, num_classes, count_batches)
+        print (initial_dist)
 
     ####################################
     ## Resample
     
-    cache_dir = './cache/{}_train_cache/'.format(conf["img_shape"][0])
+    cache_dir = './cache/{}_{}_train_cache/'.format(
+        conf["img_shape"][0], 
+        conf["ds_info"]
+    )
     # create directory if not already exist
     pathlib.Path(cache_dir).mkdir(parents=True, exist_ok=True)
     
@@ -372,7 +424,8 @@ def resample(ds, num_classes, conf):
         # indefinitely and store in datasets list
         data = ds.filter(lambda image, label: label==i)
         data = data.cache(cache_dir+'{}_ds'.format(i))
-        data = data.repeat() # temp removed unbatch and added cache
+        # prefetch?
+        data = data.repeat()
         datasets.append(data)
     
     target_dist = [ 1.0/num_classes ] * num_classes
@@ -384,6 +437,6 @@ def resample(ds, num_classes, conf):
     ## Count
     if conf["verbosity"] > 0:
         print ("\n---- Ratios after resampling ----")
-        count_samples(balanced_ds.batch(1024))
+        print (class_distribution(balanced_ds, num_classes, count_batches))
     
     return balanced_ds
