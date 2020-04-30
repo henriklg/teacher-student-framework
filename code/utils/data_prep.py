@@ -21,6 +21,7 @@ def create_dataset(conf):
     Return:
     tf.data.Dataset   
     """
+    
     # Some parameters
     data_dir = conf["data_dir"]
     outcast = conf["outcast"]
@@ -66,10 +67,12 @@ def create_dataset(conf):
         files_string = str(data_dir/'[!{}]*/*'.format(outcast))
     
     if verbosity > 0: print ("Dataset.list_files: ",files_string, "\n")
+    
+    
     list_ds = tf.data.Dataset.list_files(
             files_string, 
             shuffle=shuffle_buffer_size>1, 
-            seed=tf.constant(seed, tf.int64)
+            seed=tf.constant(seed, tf.int64) if seed else None
     )
     
     # Functions for the data pipeline
@@ -116,11 +119,7 @@ def create_dataset(conf):
         labeled_ds = list_ds.map(process_path_bin, num_parallel_calls=AUTOTUNE)
     else:
         labeled_ds = list_ds.map(process_path, num_parallel_calls=AUTOTUNE)
-    
-    # Print some labels (to check the class-distribution)
-#     if verbosity > 0:
-#         for images, labels in labeled_ds.batch(10).take(10):
-#             print(labels.numpy())
+        
     
     # Split into train, test and validation data
     train_size = int(0.7 * ds_size)
@@ -146,59 +145,14 @@ def create_dataset(conf):
     if conf["resample"]:
         train_ds = resample(train_ds, num_classes, conf)
         train_cache = None
-
-    def random_rotate_image(img):
-        img = ndimage.rotate(img, np.random.uniform(-30, 30), reshape=False)
-        return img
-    
-    def augment(img, label):
-        # Augment the image using tf.image
-        if "rotate" in conf["augment"]:
-            im_shape = img.shape
-            [img,] = tf.py_function(random_rotate_image, [img], [tf.float32])
-            img.set_shape(im_shape)
-        if "crop" in conf["augment"]:
-            # Pad image with 10 percent og image size, and randomly crop back to size
-            pad = int(conf["img_shape"][0]*0.15)
-            img = tf.image.resize_with_crop_or_pad(
-                    img, conf["img_shape"][0] + pad, conf["img_shape"][1] + pad)
-            img = tf.image.random_crop(img, conf["img_shape"], seed=seed)
-        if "flip" in conf["augment"]:
-            # Randomly flip image
-            img = tf.image.random_flip_left_right(img, seed=seed)
-            img = tf.image.random_flip_up_down(img, seed=seed)
-        if "brightness" in conf["augment"]:
-            # Change brightness and saturation
-            img = tf.image.random_brightness(img, max_delta=0.15, seed=seed)
-        if "saturation" in conf["augment"]:
-            img = tf.image.random_saturation(img, lower = 0.5, upper =1.5, seed=seed)
-        if "contrast" in conf["augment"]:
-            img = tf.image.random_contrast(img, lower=0.6, upper=1.6, seed=seed)
-        
-        # Make sure imgae is still in [0, 1]
-        img = tf.clip_by_value(img, 0.0, 1.0)
-        return img, label
-
-    # Augment the training data
-    try:
-        if conf["augment"]:
-            train_ds = train_ds.map(augment, num_parallel_calls=AUTOTUNE)
-    except KeyError:
-        pass
     
     # Create cache-dir if not already exists
     pathlib.Path(conf["cache_dir"]).mkdir(parents=True, exist_ok=True)
     
     # Cache, shuffle, repeat, batch, prefetch pipeline
-    train_ds = prepare_for_training(train_ds, train_cache, conf)
-    test_ds = prepare_for_training(test_ds, 'test', conf)
-    val_ds = prepare_for_training(val_ds, 'val', conf)
-
-    # Print some labels (to check the class-distribution)
-#     print ()
-#     if conf["verbosity"] > 0:
-#         for images, labels in train_ds.unbatch().batch(10).take(10):
-#             print(labels.numpy())
+    train_ds = prepare_for_training(train_ds, 'train', conf, cache=train_cache)
+    test_ds = prepare_for_training(test_ds, 'test', conf, cache=True)
+    val_ds = prepare_for_training(val_ds, 'val', conf, cache=True)
             
     # Return some parameters
     return_params = {
@@ -214,29 +168,65 @@ def create_dataset(conf):
     
     return train_ds, test_ds, val_ds, return_params
     
-    
+
     
 
-def prepare_for_training(ds, cache, conf):
+def prepare_for_training(ds, ds_name, conf, cache):
+    
+    def random_rotate_image(img):
+        img = ndimage.rotate(img, np.random.uniform(-30, 30), reshape=False)
+        return img
+    def augment(img, label):
+        # Augment the image using tf.image
+        if "rotate" in conf["augment"]:
+            im_shape = img.shape
+            [img,] = tf.py_function(random_rotate_image, [img], [tf.float32])
+            img.set_shape(im_shape)
+        if "crop" in conf["augment"]:
+            # Pad image with 10 percent og image size, and randomly crop back to size
+            pad = int(conf["img_shape"][0]*0.15)
+            img = tf.image.resize_with_crop_or_pad(
+                    img, conf["img_shape"][0] + pad, conf["img_shape"][1] + pad)
+            img = tf.image.random_crop(img, conf["img_shape"], seed=conf["seed"])
+        if "flip" in conf["augment"]:
+              # Randomly flip image
+            img = tf.image.random_flip_left_right(img, seed=conf["seed"])
+            img = tf.image.random_flip_up_down(img, seed=conf["seed"])
+        if "brightness" in conf["augment"]:
+            # Change brightness and saturation
+            img = tf.image.random_brightness(img, max_delta=0.15, seed=conf["seed"])
+        if "saturation" in conf["augment"]:
+            img = tf.image.random_saturation(img, lower = 0.5, upper =1.5, seed=conf["seed"])
+        if "contrast" in conf["augment"]:
+              img = tf.image.random_contrast(img, lower=0.6, upper=1.6, seed=conf["seed"])
+        # Make sure imgae is still in [0, 1]
+        img = tf.clip_by_value(img, 0.0, 1.0)
+        return img, label
     
     AUTOTUNE = tf.data.experimental.AUTOTUNE
     # use `.cache(filename)` to cache preprocessing work for datasets that don't
     # fit in memory.
     if cache:
-        if isinstance(cache, str):
-            cache_string = "{}/{}_{}_{}.tfcache".format(
-                conf["cache_dir"], conf["img_shape"][0], conf["ds_info"], cache
-            )
-            ds = ds.cache(cache_string)
-        else:
-            ds = ds.cache()
+        cache_string = "{}/{}_{}_{}".format(
+            conf["cache_dir"], conf["img_shape"][0], conf["ds_info"], ds_name
+        )
+        ds = ds.cache(cache_string)
     
     if conf["shuffle_buffer_size"]>1:
-        ds = ds.shuffle(buffer_size=conf["shuffle_buffer_size"], 
-                        seed=tf.constant(conf["seed"], tf.int64))
+        ds = ds.shuffle(
+            buffer_size=conf["shuffle_buffer_size"], 
+            seed=tf.constant(conf["seed"], tf.int64) if conf["seed"] else None
+        )
 
     # Repeat forever
     ds = ds.repeat()
+    
+    #Augment the training data
+    try:
+        if conf["augment"] and ds_name=='train':
+            ds = ds.map(augment, num_parallel_calls=AUTOTUNE)
+    except KeyError:
+        pass
 
     ds = ds.batch(conf["batch_size"], drop_remainder=False)
 
@@ -410,7 +400,7 @@ def resample(ds, num_classes, conf):
     ####################################
     ## Resample
     
-    cache_dir = './cache/{}_{}_train_cache/'.format(
+    cache_dir = './cache/{}_{}_train/'.format(
         conf["img_shape"][0], 
         conf["ds_info"]
     )
