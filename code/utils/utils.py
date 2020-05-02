@@ -1,9 +1,14 @@
 import tensorflow as tf
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def print_class_info(directories, data_dir, ds_size, outcast, num_classes):
     """
+    Extract and print info about the class split of multiclass dataset
+    
+    return:
+    total numbeer of samples
     """
     # Count number of samples for each folder
     count_dir = {}
@@ -89,6 +94,7 @@ def class_distribution(count_ds, num_classes, count_batches=10, bs=1024):
 def calculate_weights(count_ds, num_classes):
     """
     Find distribution of dataset by counting a subset.
+    
     Args: count_ds - dataset to be counted.
     Return: a list of class distributions
     """

@@ -11,13 +11,12 @@ from utils import class_distribution, print_class_info, print_bin_class_info
 
 def create_dataset(conf):
     """
-    Create a tf.data dataset
+    Create a tf.data dataset based on a config file.
+    pipeline: list_files -> get_label -> read_file -> decode_image -> split -> resample
+                -> prepare_for_training
     
     Args:
-    data_dir: path to directory containing folders with class names
-    outcast: list of classes to exclude
-    binary: binary dataset or not
-    verbose: print info or not
+    conf - a dictionary with configuration settings
     
     Return:
     tf.data.Dataset   
@@ -170,6 +169,10 @@ def create_dataset(conf):
     
 
 def prepare_for_training(ds, ds_name, conf, cache):
+    """
+    Cache -> shuffle -> repeat -> augment -> batch -> prefetch
+    """
+    AUTOTUNE = tf.data.experimental.AUTOTUNE
     
     def random_rotate_image(img):
         img = ndimage.rotate(img, np.random.uniform(-30, 30), reshape=False)
@@ -201,9 +204,6 @@ def prepare_for_training(ds, ds_name, conf, cache):
         img = tf.clip_by_value(img, 0.0, 1.0)
         return img, label
     
-    AUTOTUNE = tf.data.experimental.AUTOTUNE
-    # use `.cache(filename)` to cache preprocessing work for datasets that don't
-    # fit in memory.
     if cache:
         cache_string = "{}/{}_{}_{}".format(
             conf["cache_dir"], conf["img_shape"][0], conf["ds_info"], ds_name
