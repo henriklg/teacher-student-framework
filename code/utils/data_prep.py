@@ -7,7 +7,7 @@ import pathlib
 import matplotlib.pyplot as plt
 import scipy.ndimage as ndimage
 
-from utils import class_distribution
+from utils import class_distribution, print_class_info, print_bin_class_info
 
 def create_dataset(conf):
     """
@@ -22,7 +22,6 @@ def create_dataset(conf):
     Return:
     tf.data.Dataset   
     """
-    
     # Some parameters
     data_dir = conf["data_dir"]
     outcast = conf["outcast"]
@@ -51,8 +50,11 @@ def create_dataset(conf):
         pos_class_names = np.delete(directories, np.where(neg_class_name == directories))
         # Print info about neg/pos split
         if verbosity > 0: 
-            ds_size, neg_count, pos_count = print_bin_class_info(directories, data_dir, 
-                                            ds_size, outcast, class_names, neg_class_name, pos_class_names)
+            ds_size, neg_count, pos_count = print_bin_class_info(
+                                                directories, data_dir, 
+                                                ds_size, outcast, class_names, 
+                                                neg_class_name, pos_class_names
+            )
     # Full dataset
     else:     
         class_names = directories
@@ -121,7 +123,6 @@ def create_dataset(conf):
     else:
         labeled_ds = list_ds.map(process_path, num_parallel_calls=AUTOTUNE)
         
-    
     # Split into train, test and validation data
     train_size = int(0.7 * ds_size)
     test_size = int(0.15 * ds_size)
@@ -132,7 +133,6 @@ def create_dataset(conf):
     val_ds = test_ds.skip(val_size)
     test_ds = test_ds.take(test_size)
 
-    
     # Print info about the dataset split
     if verbosity > 0:
         print ("\n{:32} {:>5}".format("Full dataset sample size:", ds_size))
@@ -140,8 +140,6 @@ def create_dataset(conf):
         print ("{:32} {:>5}".format("Test dataset sample size:", test_size))
         print ("{:32} {:>5}".format("Validation dataset sample size:", val_size))
     
-    
-
     # Resample the dataset. NB: dataset is cached in resamler
     if conf["resample"]:
         train_ds = resample(train_ds, num_classes, conf)
@@ -166,9 +164,8 @@ def create_dataset(conf):
         "neg_count": neg_count,
         "pos_count": pos_count
     }
-    
     return train_ds, test_ds, val_ds, return_params
-    
+
 
     
 
@@ -218,7 +215,6 @@ def prepare_for_training(ds, ds_name, conf, cache):
             buffer_size=conf["shuffle_buffer_size"], 
             seed=tf.constant(conf["seed"], tf.int64) if conf["seed"] else None
         )
-
     # Repeat forever
     ds = ds.repeat()
     
@@ -234,114 +230,6 @@ def prepare_for_training(ds, ds_name, conf, cache):
     # `prefetch` lets the dataset fetch batches in the background while the model is training. 
     ds = ds.prefetch(buffer_size=AUTOTUNE)
     return ds
-    
-    
-    
-def print_bin_class_info(directories, data_dir, ds_size, outcast, class_names, neg, pos):
-    """
-    Extract and print info about the class split of binary dataset
-    """
-    # Count the samples in each folder
-    count_dir = {}
-    negpos = [0, 0]
-    for dir_name in directories:
-        # Number of samples in 'class_name' folder
-        count = len(list(data_dir.glob(dir_name+'/*.*g')))
-        count_dir[dir_name] = count
-        
-        if (dir_name == neg[0]):
-            negpos[0] += count
-        else:
-            negpos[1] += count
-    
-    tot = np.sum(negpos)
-    assert tot != 0, "Can't divide by zero."
-    
-    # Print folder name and amount of samples
-    for i, class_ in enumerate([neg, pos]):
-        print ("\n{:27} : {:5} | {:2.2f}%".format(class_names[i], negpos[i], negpos[i]/tot*100))
-        print ("-"*45)
-        for cl in class_:
-            print ("{:5}- {:20} : {:5} | {:>2.2f}%".format(" "*5, cl, count_dir[cl], count_dir[cl]/tot*100))
-    print ('\nTotal number of image {} : {}\n'.format(" "*5, tot))
-    
-    return tot, negpos[0], negpos[1]
-
-    
-    
-def print_class_info(directories, data_dir, ds_size, outcast, num_classes):
-    # print ("Directories: ", directories, end='\n\n')
-    
-    # Count number of samples for each folder
-    count_dir = {}
-    for dir_name in directories:
-        count_dir[dir_name] = len(list(data_dir.glob(dir_name+'/*.*g')))
-
-    total = sum(count_dir.values())
-    assert total != 0, "Can't divide by zero."
-    
-    for folder, count in count_dir.items():
-        print ("{:28}: {:4d} | {:2.2f}%".format(folder, count, count/total*100))
-        
-    print ('\nTotal number of images: {}, in {} classes.\n'.format(ds_size, num_classes))
-
-    return total
-
-
-
-
-
-
-def show_image(img, class_names=None, title=None):
-    if (isinstance(img, tf.data.Dataset)):
-        for image, label in img:
-            plt.figure(frameon=False, facecolor='white')
-            class_name = class_names[label.numpy()]+" ["+str(label.numpy())+"]"
-            plt.title(class_name, fontdict={'color':'white','size':20})
-            plt.imshow(image.numpy())
-            plt.axis('off')
-    else:
-        plt.figure(frameon=False, facecolor='white')
-        if type(title) == str:
-            plt.title(title, fontdict={'color':'white','size':20})
-        plt.imshow(img)
-        plt.axis('off')
-
-        
-
-
-def calculate_weights(count_ds, num_classes):
-    """
-    Find distribution of dataset by counting a subset.
-    Args: count_ds - dataset to be counted.
-    Return: a list of class distributions
-    """
-    def count(counts, batch):
-        images, labels = batch
-        for i in range(num_classes):
-            counts['class_{}'.format(i)] += tf.reduce_sum(tf.cast(labels == i, tf.int32))
-        return counts
-    
-    # Set the initial states to zero
-    initial_state = {}
-    for i in range(num_classes):
-        initial_state['class_{}'.format(i)] = 0
-        
-    counts = count_ds.reduce(
-                initial_state = initial_state,
-                reduce_func = count)
-
-    final_counts = []
-    for class_, value in counts.items():
-                final_counts.append(value.numpy().astype(np.float32))
-    
-    final_counts = np.asarray(final_counts)
-    total = final_counts.sum()
-    
-    score = total / (final_counts*num_classes)
-#     score[score<1.0] = 1.0
-    return score
-
 
 
 
@@ -360,7 +248,7 @@ def resample(ds, num_classes, conf):
     # How many batches to use when counting the dataset
     count_batches = 10
     
-    ## Count
+    ## Check the original sample distribution
     if conf["verbosity"] > 0:
         print ("\n---- Ratios before resampling ---- ")
         initial_dist = class_distribution(ds, num_classes, count_batches)
@@ -368,7 +256,6 @@ def resample(ds, num_classes, conf):
 
     ####################################
     ## Resample
-    
     cache_dir = './cache/{}_{}_train/'.format(
         conf["img_shape"][0], 
         conf["ds_info"]
@@ -383,7 +270,6 @@ def resample(ds, num_classes, conf):
         # indefinitely and store in datasets list
         data = ds.filter(lambda image, label: label==i)
         data = data.cache(cache_dir+'{}_ds'.format(i))
-        # prefetch?
         data = data.repeat()
         datasets.append(data)
     
@@ -392,8 +278,7 @@ def resample(ds, num_classes, conf):
     balanced_ds = tf.data.experimental.sample_from_datasets(datasets, target_dist)
     
     ####################################
-    
-    ## Count
+    ## Check the sample distribution after oversampling the dataset
     if conf["verbosity"] > 0:
         print ("\n---- Ratios after resampling ----")
         print (class_distribution(balanced_ds, num_classes, count_batches))
