@@ -78,6 +78,13 @@ In addition to labeling the images the dataset also contain a JSON format file w
 
 \subsection{Data preprocessing}
 % data normalization, splitting, augmentation etc
+\begin{itemize}
+\item When splitting the dataset it is important to ensure minority classes are represented in both training, validation and test dataset.
+\item What is the necessity of rotating the samples. Will they not always be 'square'?
+\item Normalization; any benefit of using L2 normalization in last dense layer when using a pre-defined model?
+\end{itemize}
+
+
 
 \subsection{Data pipeline}
 % tensorflow.data.Dataset pipeline with prefech, batching, shuffling, caching etc
