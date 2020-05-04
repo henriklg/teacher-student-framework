@@ -87,7 +87,7 @@ def class_distribution(count_ds, num_classes, count_batches=10, bs=1024):
 
     final_counts = np.asarray(final_counts)
     distribution = final_counts/final_counts.sum()
-    return distribution
+    return distribution, final_counts
 
 
 
