@@ -251,8 +251,9 @@ def resample(ds, num_classes, conf):
     ## Check the original sample distribution
     if conf["verbosity"] > 0:
         print ("\n---- Ratios before resampling ---- ")
-        initial_dist = class_distribution(ds, num_classes, count_batches)
+        initial_dist, count = class_distribution(ds, num_classes, count_batches)
         print (initial_dist)
+        print (count)
 
     ####################################
     ## Resample
@@ -281,6 +282,7 @@ def resample(ds, num_classes, conf):
     ## Check the sample distribution after oversampling the dataset
     if conf["verbosity"] > 0:
         print ("\n---- Ratios after resampling ----")
-        print (class_distribution(balanced_ds, num_classes, count_batches))
+        final_distribution, _ = class_distribution(balanced_ds, num_classes, count_batches)
+        print (final_distribution)
     
     return balanced_ds
