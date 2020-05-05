@@ -4,6 +4,27 @@ import os
 import matplotlib.pyplot as plt
 
 
+
+def print_split_info(ds, conf, params):
+    """
+    """
+    # Count samples in each dataset by calling class_distribution
+    line = "{:28}: ".format('Category')
+    for split in ds:
+        _, ds[split] = class_distribution(ds[split], params["num_classes"])
+        line += "{:5} | ".format(split)
+    print (line, '\n-------------')
+    
+    for i in range(params["num_classes"]):
+        line = "{:28}: ".format(params["class_names"][i])
+        for split in ds:
+#             path = str(conf["data_dir"])+'/'+split+'/'+params["class_names"][i]
+#             num_files = len([name for name in os.listdir(path)])
+            line += "{:5d} | ".format(int(ds[split][i]))
+        print (line)
+
+
+
 def print_class_info(directories, data_dir, ds_size, outcast, num_classes):
     """
     Extract and print info about the class split of multiclass dataset
@@ -90,53 +111,16 @@ def class_distribution(count_ds, num_classes):
 
 
 
-def print_dataset_info(ds, conf, params):
-    """
-    """
-    # Count samples in each dataset by calling class_distribution
-    line = "{:28}: ".format('Category')
-    for split in ds:
-        _, ds[split] = class_distribution(ds[split], params["num_classes"])
-        line += "{:5} | ".format(split)
-    print (line, '\n-------------')
-    
-    for i in range(params["num_classes"]):
-        line = "{:28}: ".format(params["class_names"][i])
-        for split in ds:
-            path = str(conf["data_dir"])+'/'+split+'/'+params["class_names"][i]
-            num_files = len([name for name in os.listdir(path)])
-            line += "{:5d} | ".format(int(ds[split][i]))
-        print (line)
-
-
 
 def calculate_weights(count_ds, num_classes):
     """
-    Find distribution of dataset by counting a subset.
+    Find distribution of dataset by counting .
     
     Args: count_ds - dataset to be counted.
     Return: a list of class distributions
     """
-    def count(counts, batch):
-        images, labels = batch
-        for i in range(num_classes):
-            counts['class_{}'.format(i)] += tf.reduce_sum(tf.cast(labels == i, tf.int32))
-        return counts
+    _, final_counts = class_distribution(count_ds, num_classes)
     
-    # Set the initial states to zero
-    initial_state = {}
-    for i in range(num_classes):
-        initial_state['class_{}'.format(i)] = 0
-        
-    counts = count_ds.reduce(
-                initial_state = initial_state,
-                reduce_func = count)
-
-    final_counts = []
-    for class_, value in counts.items():
-                final_counts.append(value.numpy().astype(np.float32))
-    
-    final_counts = np.asarray(final_counts)
     total = final_counts.sum()
     
     score = total / (final_counts*num_classes)
