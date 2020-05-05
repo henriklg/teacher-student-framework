@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+import os
 import matplotlib.pyplot as plt
 
 
@@ -57,7 +58,7 @@ def print_bin_class_info(directories, data_dir, ds_size, outcast, class_names, n
 
 
 
-def class_distribution(count_ds, num_classes, count_batches=10, bs=1024):
+def class_distribution(count_ds, num_classes):
     """
     Find distribution of dataset by counting a subset.
     
@@ -69,15 +70,13 @@ def class_distribution(count_ds, num_classes, count_batches=10, bs=1024):
         for i in range(num_classes):
             counts['class_{}'.format(i)] += tf.reduce_sum(tf.cast(labels == i, tf.int32))
         return counts
-    
-    # Batch dataset
-    count_ds = count_ds.batch(bs)
+
     # Set the initial states to zero
     initial_state = {}
     for i in range(num_classes):
         initial_state['class_{}'.format(i)] = 0
         
-    counts = count_ds.take(count_batches).reduce(
+    counts = count_ds.reduce(
                 initial_state = initial_state,
                 reduce_func = count)
 
@@ -88,6 +87,26 @@ def class_distribution(count_ds, num_classes, count_batches=10, bs=1024):
     final_counts = np.asarray(final_counts)
     distribution = final_counts/final_counts.sum()
     return distribution, final_counts
+
+
+
+def print_dataset_info(ds, conf, params):
+    """
+    """
+    # Count samples in each dataset by calling class_distribution
+    line = "{:28}: ".format('Category')
+    for split in ds:
+        _, ds[split] = class_distribution(ds[split], params["num_classes"])
+        line += "{:5} | ".format(split)
+    print (line, '\n-------------')
+    
+    for i in range(params["num_classes"]):
+        line = "{:28}: ".format(params["class_names"][i])
+        for split in ds:
+            path = str(conf["data_dir"])+'/'+split+'/'+params["class_names"][i]
+            num_files = len([name for name in os.listdir(path)])
+            line += "{:5d} | ".format(int(ds[split][i]))
+        print (line)
 
 
 
