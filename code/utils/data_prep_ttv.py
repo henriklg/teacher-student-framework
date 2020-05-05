@@ -8,7 +8,7 @@ import pathlib
 import matplotlib.pyplot as plt
 import scipy.ndimage as ndimage
 
-from utils import class_distribution, print_class_info
+from utils import class_distribution
 
 def create_dataset(conf):
     """
@@ -62,7 +62,6 @@ def create_dataset(conf):
                                     seed=tf.constant(seed, tf.int64) if seed else None
                                     )
     
-    
     # Functions for the data pipeline
     def get_label(file_path):
         # convert the path to a list of path components
@@ -71,14 +70,6 @@ def create_dataset(conf):
         label_int = tf.reduce_min(tf.where(tf.equal(parts[-2], class_names)))
         # cast to tensor array with dtype=uint8
         return tf.dtypes.cast(label_int, tf.int32)
-
-    def get_label_bin(file_path):
-        parts = tf.strings.split(file_path, os.path.sep)
-        bc = parts[-2] == pos_class_names
-        nz_cnt = tf.math.count_nonzero(bc)
-        if (nz_cnt > 0):
-            return tf.constant(1, tf.int32)
-        return tf.constant(0, tf.int32)
         
     def decode_img(img):
         # convert the compressed string to a 3D uint8 tensor
@@ -106,10 +97,9 @@ def create_dataset(conf):
     for split in ds:
         ds[split] = ds[split].map(process_path, num_parallel_calls=AUTOTUNE)
         
-    
     # Resample the dataset. NB: dataset is cached in resamler
     if conf["resample"]:
-        train_ds = resample(ds["train"], num_classes, conf)
+        train_ds = resample(ds["train"], split_size[0], num_classes, conf)
         train_cache = None
     
     # Create cache-dir if not already exists
@@ -131,36 +121,94 @@ def create_dataset(conf):
     }
     return train_ds, test_ds, val_ds, return_params
 
-
-def print_class_info(directories, data_dir, ds_size, outcast):
-    """
-    Extract and print info about the class split of multiclass dataset
     
-    return:
-    total numbeer of samples
-    """
-    # Count number of samples for each folder
-    num_classes = len(directories)
-    count_dir = {}
-    for dir_name in directories:
-        count_dir[dir_name] = len(list(data_dir.glob('*/'+dir_name+'/*.*g')))
     
-    total = sum(count_dir.values())
-    assert total != 0, "Dataset is empty."
     
-    for folder, count in count_dir.items():
-        print ("{:28}: {:4d} | {:2.2f}%".format(folder, count, count/total*100))
-        
-    print ('\nTotal number of images: {}, in {} classes.\n'.format(ds_size, num_classes))
-    return total
-    
-
 def prepare_for_training(ds, ds_name, conf, cache):
     """
     Cache -> shuffle -> repeat -> augment -> batch -> prefetch
     """
     AUTOTUNE = tf.data.experimental.AUTOTUNE
     
+    if cache:
+        cache_string = "{}/{}_{}_{}".format(
+            conf["cache_dir"], conf["img_shape"][0], conf["ds_info"], ds_name
+        )
+        ds = ds.cache(cache_string)
+    
+    if conf["shuffle_buffer_size"]>1:
+        ds = ds.shuffle(
+            buffer_size=conf["shuffle_buffer_size"], 
+            seed=tf.constant(conf["seed"], tf.int64) if conf["seed"] else None
+        )
+    # Repeat forever
+    ds = ds.repeat()
+    
+    #Augment the training data
+    if conf["augment"] and ds_name=='train':
+        ds = augment_ds(ds, conf, AUTOTUNE)
+
+    ds = ds.batch(conf["batch_size"], drop_remainder=False)
+
+    # `prefetch` lets the dataset fetch batches in the background while the model is training. 
+    ds = ds.prefetch(buffer_size=AUTOTUNE)
+    return ds
+
+
+
+def resample(ds, train_size, num_classes, conf):
+    """
+    Resample the dataset. Accepts both binary and multiclass datasets.
+    
+    Args:
+    - ds: dataset to balance/resample. Should not be repeated or batched
+    - number of classes
+    - verbosity
+    
+    Returns:
+    - Resampled, repeated, and unbatched dataset
+    """
+    ## Check the original sample distribution
+    if conf["verbosity"] > 0:
+        print ("\n---- Ratios before resampling ---- ")
+        initial_dist, count = class_distribution(ds, num_classes)
+        print (initial_dist)
+
+    ####################################
+    ## Resample
+    cache_dir = './cache/{}_{}_train/'.format(
+        conf["img_shape"][0], 
+        conf["ds_info"]
+    )
+    # create directory if not already exist
+    pathlib.Path(cache_dir).mkdir(parents=True, exist_ok=True)
+    
+    # Beginning resampling
+    datasets = []
+    for i in range(num_classes):
+        # Get all samples from class i [0 -> num_classes], repeat the dataset
+        # indefinitely and store in datasets list
+        data = ds.filter(lambda image, label: label==i)
+        data = data.cache(cache_dir+'{}_ds'.format(i))
+        data = data.repeat()
+        datasets.append(data)
+    
+    target_dist = [ 1.0/num_classes ] * num_classes
+    
+    balanced_ds = tf.data.experimental.sample_from_datasets(datasets, target_dist)
+    
+    ####################################
+    ## Check the sample distribution after oversampling the dataset
+    if conf["verbosity"] > 0:
+        print ("\n---- Ratios after resampling ----")
+        final_distribution, _ = class_distribution(balanced_ds.take(train_size), num_classes)
+        print (final_distribution)
+    
+    return balanced_ds
+
+
+
+def augment_ds(ds, conf, AUTOTUNE):
     def random_rotate_image(img):
         img = ndimage.rotate(img, np.random.uniform(-30, 30), reshape=False)
         return img
@@ -191,85 +239,29 @@ def prepare_for_training(ds, ds_name, conf, cache):
         img = tf.clip_by_value(img, 0.0, 1.0)
         return img, label
     
-    if cache:
-        cache_string = "{}/{}_{}_{}".format(
-            conf["cache_dir"], conf["img_shape"][0], conf["ds_info"], ds_name
-        )
-        ds = ds.cache(cache_string)
-    
-    if conf["shuffle_buffer_size"]>1:
-        ds = ds.shuffle(
-            buffer_size=conf["shuffle_buffer_size"], 
-            seed=tf.constant(conf["seed"], tf.int64) if conf["seed"] else None
-        )
-    # Repeat forever
-    ds = ds.repeat()
-    
-    #Augment the training data
-    try:
-        if conf["augment"] and ds_name=='train':
-            ds = ds.map(augment, num_parallel_calls=AUTOTUNE)
-    except KeyError:
-        pass
-
-    ds = ds.batch(conf["batch_size"], drop_remainder=False)
-
-    # `prefetch` lets the dataset fetch batches in the background while the model is training. 
-    ds = ds.prefetch(buffer_size=AUTOTUNE)
-    return ds
+    return ds.map(augment, num_parallel_calls=AUTOTUNE)
 
 
 
-def resample(ds, num_classes, conf):
+# Override the print_class_info from utils
+def print_class_info(directories, data_dir, ds_size, outcast):
     """
-    Resample the dataset. Accepts both binary and multiclass datasets.
+    Extract and print info about the class split of multiclass dataset
     
-    Args:
-    - ds: dataset to balance/resample. Should not be repeated or batched
-    - number of classes
-    - verbosity
-    
-    Returns:
-    - Resampled, repeated, and unbatched dataset
+    return:
+    total numbeer of samples
     """
-    # How many batches to use when counting the dataset
-    count_batches = 10
+    # Count number of samples for each folder
+    num_classes = len(directories)
+    count_dir = {}
+    for dir_name in directories:
+        count_dir[dir_name] = len(list(data_dir.glob('*/'+dir_name+'/*.*g')))
     
-    ## Check the original sample distribution
-    if conf["verbosity"] > 0:
-        print ("\n---- Ratios before resampling ---- ")
-        initial_dist, count = class_distribution(ds, num_classes, count_batches)
-        print (initial_dist)
-        print (count)
-
-    ####################################
-    ## Resample
-    cache_dir = './cache/{}_{}_train/'.format(
-        conf["img_shape"][0], 
-        conf["ds_info"]
-    )
-    # create directory if not already exist
-    pathlib.Path(cache_dir).mkdir(parents=True, exist_ok=True)
+    total = sum(count_dir.values())
+    assert total != 0, "Dataset is empty."
     
-    # Beginning resampling
-    datasets = []
-    for i in range(num_classes):
-        # Get all samples from class i [0 -> num_classes], repeat the dataset
-        # indefinitely and store in datasets list
-        data = ds.filter(lambda image, label: label==i)
-        data = data.cache(cache_dir+'{}_ds'.format(i))
-        data = data.repeat()
-        datasets.append(data)
-    
-    target_dist = [ 1.0/num_classes ] * num_classes
-    
-    balanced_ds = tf.data.experimental.sample_from_datasets(datasets, target_dist)
-    
-    ####################################
-    ## Check the sample distribution after oversampling the dataset
-    if conf["verbosity"] > 0:
-        print ("\n---- Ratios after resampling ----")
-        final_distribution, _ = class_distribution(balanced_ds, num_classes, count_batches)
-        print (final_distribution)
-    
-    return balanced_ds
+    for folder, count in count_dir.items():
+        print ("{:28}: {:4d} | {:2.2f}%".format(folder, count, count/total*100))
+        
+    print ('\nTotal number of images: {}, in {} classes.\n'.format(ds_size, num_classes))
+    return total
