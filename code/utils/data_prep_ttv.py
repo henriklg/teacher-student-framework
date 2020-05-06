@@ -8,7 +8,7 @@ import pathlib
 import matplotlib.pyplot as plt
 import scipy.ndimage as ndimage
 
-from utils import class_distribution
+# from utils import class_distribution
 
 def create_dataset(conf):
     """
@@ -20,7 +20,7 @@ def create_dataset(conf):
     conf - a dictionary with configuration settings
     
     Return:
-    tf.data.Dataset   
+    tf.data.Dataset
     """
     # Some parameters
     data_dir = conf["data_dir"]
@@ -28,12 +28,14 @@ def create_dataset(conf):
     verbosity = conf["verbosity"]
     shuffle_buffer_size = conf["shuffle_buffer_size"]
     seed = conf["seed"]
-
+    
     np.random.seed(seed=seed)
     train_cache = 'train'
     AUTOTUNE = tf.data.experimental.AUTOTUNE
     ds_size = len(list(data_dir.glob('*/*/*.*g')))
-    class_names = np.array([item.name for item in data_dir.glob('train/*') if item.name != 'metadata.json'])
+    class_names = np.array(
+        [item.name for item in data_dir.glob('train/*') if item.name != 'metadata.json']
+    )
     
     # Remove the outcast folder
     if outcast != None:
@@ -100,7 +102,7 @@ def create_dataset(conf):
     # Resample the dataset. NB: dataset is cached in resamler
     if conf["resample"]:
         train_ds = resample(ds["train"], split_size[0], num_classes, conf)
-        train_cache = None
+        train_cache = False
     
     # Create cache-dir if not already exists
     pathlib.Path(conf["cache_dir"]).mkdir(parents=True, exist_ok=True)
@@ -121,9 +123,8 @@ def create_dataset(conf):
     }
     return train_ds, test_ds, val_ds, return_params
 
-    
-    
-    
+
+
 def prepare_for_training(ds, ds_name, conf, cache):
     """
     Cache -> shuffle -> repeat -> augment -> batch -> prefetch
@@ -188,10 +189,10 @@ def resample(ds, train_size, num_classes, conf):
     for i in range(num_classes):
         # Get all samples from class i [0 -> num_classes], repeat the dataset
         # indefinitely and store in datasets list
-        data = ds.filter(lambda image, label: label==i)
-        data = data.cache(cache_dir+'{}_ds'.format(i))
-        data = data.repeat()
-        datasets.append(data)
+        ds = ds.filter(lambda image, label: label==i)
+        ds = ds.cache(cache_dir+'{}_ds'.format(i))
+        ds = ds.repeat()
+        datasets.append(ds)
     
     target_dist = [ 1.0/num_classes ] * num_classes
     
