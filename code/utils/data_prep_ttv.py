@@ -8,7 +8,7 @@ import pathlib
 import matplotlib.pyplot as plt
 import scipy.ndimage as ndimage
 
-# from utils import class_distribution
+from utils import class_distribution
 
 def create_dataset(conf):
     """
@@ -157,7 +157,7 @@ def prepare_for_training(ds, ds_name, conf, cache):
 
 
 
-def resample(ds, train_size, num_classes, conf):
+def resample(ds, num_classes, conf):
     """
     Resample the dataset. Accepts both binary and multiclass datasets.
     
@@ -202,7 +202,7 @@ def resample(ds, train_size, num_classes, conf):
     ## Check the sample distribution after oversampling the dataset
     if conf["verbosity"] > 0:
         print ("\n---- Ratios after resampling ----")
-        final_distribution, _ = class_distribution(balanced_ds.take(train_size), num_classes)
+        final_distribution, _ = class_distribution(balanced_ds, num_classes)
         print (final_distribution)
     
     return balanced_ds
