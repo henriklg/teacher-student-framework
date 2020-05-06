@@ -25,13 +25,14 @@ def print_split_info(ds, conf, params):
 
 
 
-def print_class_info(directories, data_dir, ds_size, outcast, num_classes):
+def print_class_info(directories, data_dir, ds_size, outcast):
     """
     Extract and print info about the class split of multiclass dataset
     
     return:
     total numbeer of samples
     """
+    num_classes = len(directories)
     # Count number of samples for each folder
     count_dir = {}
     for dir_name in directories:
@@ -147,3 +148,49 @@ def show_image(img, class_names=None, title=None):
             plt.title(title, fontdict={'color':'white','size':20})
         plt.imshow(img)
         plt.axis('off')
+
+
+
+def print_bar_chart(lab_list, new_findings, count, params, log_dir=None, figsize=(15,6)):
+    lab_array = np.asarray(lab_list, dtype=np.int64)
+    findings = np.bincount(lab_array, minlength=int(params["num_classes"]))
+    assert len(params["class_names"]) == len(findings), "Must be same length."
+
+    # x = findings[:,0]
+    x = np.arange(params["num_classes"])
+    width = 0.5
+
+    fig, ax = plt.subplots(figsize=figsize)
+    # rects1 = ax.bar(x, findings[:,1], width, label='Findings')
+    rects1 = ax.bar(x, findings, width, label='Findings')
+    #rects2 = ax.bar(x + width/2, women_means, width, label='Women')
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    ax.set_ylabel('Number of samples')
+    ax.set_title("Found {} new samples in unlabeled_ds after looking at {} images.".format(new_findings, count))
+    ax.set_xticks(x)
+    ax.set_xticklabels(params["class_names"])
+    ax.set_axisbelow(True)
+    ax.legend()
+
+    # Rotate the tick labels and set their alignment.
+    plt.setp(ax.get_xticklabels(), rotation=25, ha="right",
+             rotation_mode="anchor")
+    plt.grid(axis='y')
+
+    def autolabel(rects):
+        """Attach a text label above each bar in *rects*, displaying its height."""
+        for rect in rects:
+            height = rect.get_height()
+            ax.annotate('{}'.format(height),
+                        xy=(rect.get_x() + rect.get_width() / 2, height),
+                        xytext=(0, 3),  # 3 points vertical offset
+                        textcoords="offset points",
+                        ha='center', va='bottom')
+
+    autolabel(rects1)
+
+    fig.tight_layout()
+    if log_dir:
+        plt.savefig(log_dir+'/unlab_data_prediction.pdf', format='pdf')
+    plt.show()
