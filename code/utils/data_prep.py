@@ -166,43 +166,12 @@ def create_dataset(conf):
     return train_ds, test_ds, val_ds, return_params
 
 
-    
 
 def prepare_for_training(ds, ds_name, conf, cache):
     """
     Cache -> shuffle -> repeat -> augment -> batch -> prefetch
     """
     AUTOTUNE = tf.data.experimental.AUTOTUNE
-    
-    def random_rotate_image(img):
-        img = ndimage.rotate(img, np.random.uniform(-30, 30), reshape=False)
-        return img
-    def augment(img, label):
-        # Augment the image using tf.image
-        if "rotate" in conf["augment"]:
-            im_shape = img.shape
-            [img,] = tf.py_function(random_rotate_image, [img], [tf.float32])
-            img.set_shape(im_shape)
-        if "crop" in conf["augment"]:
-            # Pad image with 10 percent og image size, and randomly crop back to size
-            pad = int(conf["img_shape"][0]*0.15)
-            img = tf.image.resize_with_crop_or_pad(
-                    img, conf["img_shape"][0] + pad, conf["img_shape"][1] + pad)
-            img = tf.image.random_crop(img, conf["img_shape"], seed=conf["seed"])
-        if "flip" in conf["augment"]:
-              # Randomly flip image
-            img = tf.image.random_flip_left_right(img, seed=conf["seed"])
-            img = tf.image.random_flip_up_down(img, seed=conf["seed"])
-        if "brightness" in conf["augment"]:
-            # Change brightness and saturation
-            img = tf.image.random_brightness(img, max_delta=0.15, seed=conf["seed"])
-        if "saturation" in conf["augment"]:
-            img = tf.image.random_saturation(img, lower = 0.5, upper =1.5, seed=conf["seed"])
-        if "contrast" in conf["augment"]:
-              img = tf.image.random_contrast(img, lower=0.6, upper=1.6, seed=conf["seed"])
-        # Make sure imgae is still in [0, 1]
-        img = tf.clip_by_value(img, 0.0, 1.0)
-        return img, label
     
     if cache:
         cache_string = "{}/{}_{}_{}".format(
@@ -219,11 +188,8 @@ def prepare_for_training(ds, ds_name, conf, cache):
     ds = ds.repeat()
     
     #Augment the training data
-    try:
-        if conf["augment"] and ds_name=='train':
-            ds = ds.map(augment, num_parallel_calls=AUTOTUNE)
-    except KeyError:
-        pass
+    if conf["augment"] and ds_name=='train':
+        ds = augment_ds(ds, conf, AUTOTUNE)
 
     ds = ds.batch(conf["batch_size"], drop_remainder=False)
 
@@ -285,3 +251,38 @@ def resample(ds, num_classes, conf):
         print (final_distribution)
     
     return balanced_ds
+
+
+
+def augment_ds(ds, conf, AUTOTUNE):
+    def random_rotate_image(img):
+        img = ndimage.rotate(img, np.random.uniform(-30, 30), reshape=False)
+        return img
+    def augment(img, label):
+        # Augment the image using tf.image
+        if "rotate" in conf["augment"]:
+            im_shape = img.shape
+            [img,] = tf.py_function(random_rotate_image, [img], [tf.float32])
+            img.set_shape(im_shape)
+        if "crop" in conf["augment"]:
+            # Pad image with 10 percent og image size, and randomly crop back to size
+            pad = int(conf["img_shape"][0]*0.15)
+            img = tf.image.resize_with_crop_or_pad(
+                    img, conf["img_shape"][0] + pad, conf["img_shape"][1] + pad)
+            img = tf.image.random_crop(img, conf["img_shape"], seed=conf["seed"])
+        if "flip" in conf["augment"]:
+              # Randomly flip image
+            img = tf.image.random_flip_left_right(img, seed=conf["seed"])
+            img = tf.image.random_flip_up_down(img, seed=conf["seed"])
+        if "brightness" in conf["augment"]:
+            # Change brightness and saturation
+            img = tf.image.random_brightness(img, max_delta=0.15, seed=conf["seed"])
+        if "saturation" in conf["augment"]:
+            img = tf.image.random_saturation(img, lower = 0.5, upper =1.5, seed=conf["seed"])
+        if "contrast" in conf["augment"]:
+              img = tf.image.random_contrast(img, lower=0.6, upper=1.6, seed=conf["seed"])
+        # Make sure imgae is still in [0, 1]
+        img = tf.clip_by_value(img, 0.0, 1.0)
+        return img, label
+    
+    return ds.map(augment, num_parallel_calls=AUTOTUNE)
