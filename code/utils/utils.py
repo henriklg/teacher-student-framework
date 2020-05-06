@@ -126,7 +126,7 @@ def calculate_weights(count_ds, num_classes):
     total = final_counts.sum()
     
     score = total / (final_counts*num_classes)
-#     score[score<1.0] = 1.0
+    score[score<1.0] = 1.0
     return score
 
 
@@ -167,7 +167,8 @@ def print_bar_chart(lab_list, new_findings, count, params, log_dir=None, figsize
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
     ax.set_ylabel('Number of samples')
-    ax.set_title("Found {} new samples in unlabeled_ds after looking at {} images.".format(new_findings, count))
+    title_string = "Found {} new samples in unlabeled_ds after looking at {} images."
+    ax.set_title(title_string.format(new_findings, count))
     ax.set_xticks(x)
     ax.set_xticklabels(params["class_names"])
     ax.set_axisbelow(True)
