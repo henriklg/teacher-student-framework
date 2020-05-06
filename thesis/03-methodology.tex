@@ -84,11 +84,23 @@ In addition to labeling the images the dataset also contain a JSON format file w
 \item Normalization; any benefit of using L2 normalization in last dense layer when using a pre-defined model?
 \end{itemize}
 
+\subsubsection{Splitting dataset}
+Discovered non-optimal implementation of dataset splitting, which left some of the most vulnerable minority classes with no samples in the test data. To mitigate this issue I created a new script for pre-splitting dataset into sub folders for each, training, testing and validation dataset. The outline of this script is seen in Figure XX.
+
+%TODO : add code outline
+
+We split the data into XX. To make it as reproducible as can be I have first sorted the data then used seeded random to shuffle before splitting. % Mention seed etc
+In this step we also reduce the image dimensions to make the data easier to use during the next preprocessing steps and to reduce file size.
+
 
 
 \subsection{Data pipeline}
 % tensorflow.data.Dataset pipeline with prefech, batching, shuffling, caching etc
+The preprocessing pipeline is implemented by using tensorflows data.Dataset library. This was chosen over datagenerator due to the easy of use, but later became an issue due to the complexity. The main benefits by using data.Dataset is that all data is handled in tensors and computed by the GPU which enhance the load distribution of processing power. 
 
+The pipeline outline can be seen in Figure XX.
+
+%TODO add figure of data pipeline and describe each step and why its done
 
 
 
