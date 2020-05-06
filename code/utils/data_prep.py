@@ -253,7 +253,6 @@ def resample(ds, num_classes, conf):
         print ("\n---- Ratios before resampling ---- ")
         initial_dist, count = class_distribution(ds, num_classes, count_batches)
         print (initial_dist)
-        print (count)
 
     ####################################
     ## Resample
