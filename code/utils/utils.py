@@ -79,7 +79,7 @@ def print_bin_class_info(directories, data_dir, ds_size, outcast, class_names, n
 
 
 
-def class_distribution(count_ds, num_classes):
+def class_distribution(count_ds, num_classes, count_batches=10, bs=1024):
     """
     Find distribution of dataset by counting a subset.
     
@@ -91,13 +91,14 @@ def class_distribution(count_ds, num_classes):
         for i in range(num_classes):
             counts['class_{}'.format(i)] += tf.reduce_sum(tf.cast(labels == i, tf.int32))
         return counts
-
+    
+    count_ds = count_ds.batch(bs)
     # Set the initial states to zero
     initial_state = {}
     for i in range(num_classes):
         initial_state['class_{}'.format(i)] = 0
         
-    counts = count_ds.reduce(
+    counts = count_ds.take(count_batches).reduce(
                 initial_state = initial_state,
                 reduce_func = count)
 
