@@ -60,7 +60,7 @@ def create_dataset(conf):
         num_classes = len(class_names)
         # Print info about classes
         if verbosity > 0: 
-            ds_size = print_class_info(directories, data_dir, ds_size, outcast, num_classes)
+            ds_size = print_class_info(directories, data_dir, ds_size, outcast)
     
     # Create a tf.dataset of the file paths
     if outcast == None:
