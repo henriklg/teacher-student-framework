@@ -42,7 +42,7 @@ thesis
 ```
 
 ## Compile
-1. First compile each subfile with pdflatex to generate aux files
+1. First compile each subfile with pdflatex to generate aux files in build/
 2. Compile the thesis.tex with quick build from setup step 4.
 
 
