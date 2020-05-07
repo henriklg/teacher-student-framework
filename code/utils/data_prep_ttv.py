@@ -101,7 +101,7 @@ def create_dataset(conf):
         
     # Resample the dataset. NB: dataset is cached in resamler
     if conf["resample"]:
-        train_ds = resample(ds["train"], split_size[0], num_classes, conf)
+        ds["train"] = resample(ds["train"], num_classes, conf)
         train_cache = False
     
     # Create cache-dir if not already exists
@@ -156,7 +156,6 @@ def prepare_for_training(ds, ds_name, conf, cache):
     return ds
 
 
-
 def resample(ds, num_classes, conf):
     """
     Resample the dataset. Accepts both binary and multiclass datasets.
@@ -177,7 +176,7 @@ def resample(ds, num_classes, conf):
 
     ####################################
     ## Resample
-    cache_dir = './cache/{}_{}_train/'.format(
+    cache_dir = './cache/TTV/{}_{}_train/'.format(
         conf["img_shape"][0], 
         conf["ds_info"]
     )
@@ -189,10 +188,10 @@ def resample(ds, num_classes, conf):
     for i in range(num_classes):
         # Get all samples from class i [0 -> num_classes], repeat the dataset
         # indefinitely and store in datasets list
-        ds = ds.filter(lambda image, label: label==i)
-        ds = ds.cache(cache_dir+'{}_ds'.format(i))
-        ds = ds.repeat()
-        datasets.append(ds)
+        data = ds.filter(lambda img, lab: lab==i)
+        data = data.cache(cache_dir+'{}_ds'.format(i))
+        data = data.repeat()
+        datasets.append(data)
     
     target_dist = [ 1.0/num_classes ] * num_classes
     
