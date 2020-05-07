@@ -126,6 +126,7 @@ def calculate_weights(count_ds, num_classes):
     total = final_counts.sum()
     
     score = total / (final_counts*num_classes)
+    # Set scores lower than 1.0 to 1
     score[score<1.0] = 1.0
     return score
 
