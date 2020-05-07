@@ -112,9 +112,20 @@ The pipeline outline can be seen in Figure XX.
 % Present the system architecture, some results perhaps
 % ----------------------------------------------------------
 
+
+\subsection{Learning rate}
+% see https://www.tensorflow.org/tutorials/keras/overfit_and_underfit
+Many models train better if you gradually reduce the learning rate during training. We are using learning rate which follows a inverse time decay which means that the learning rate is decreased to 1/2 of the base rate at 10 epochs, 1/3 at 20 epochs and so on.
+
+%TODO add plot of impact of decay rate and explain
+
+
 \subsection{Hyper-parameter tuning}
 
+\subsubsection{Class weighting}
+Found that when weighting the classes the model learns slower. Which means decay rate of learning rate must be lowered for it not to drop too soon. Also increase the buffer for early stopping of training.
 
+%TODO add formula for calculating class weights
 
 
 
