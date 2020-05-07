@@ -99,9 +99,10 @@ In this step we also reduce the image dimensions to make the data easier to use 
 The preprocessing pipeline is implemented by using tensorflows data.Dataset library. This was chosen over datagenerator due to the easy of use, but later became an issue due to the complexity. The main benefits by using data.Dataset is that all data is handled in tensors and computed by the GPU which enhance the load distribution of processing power. 
 
 The pipeline outline can be seen in Figure XX.
-
 %TODO add figure of data pipeline and describe each step and why its done
 
+\subsubsection{Caching}
+We call this consumer / producer overlap, where the consumer is the GPU and the producer is the CPU. %or is this prefetching?
 
 
 
