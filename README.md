@@ -3,6 +3,7 @@ By Henrik Gjestang
 
 ## Outline
 This repository is split into three parts; code, essay and thesis. In addition to run the experiments it is assumed to exist a folder containing the datasets. The code is split into one directory for each dataset, and additional testing and utils folder for packages etc.
+Draft of thesis is found in thesis/build/thesis.pdf
 
 ```bash
 $ tree -dL 2
