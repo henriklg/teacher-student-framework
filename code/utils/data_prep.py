@@ -211,13 +211,10 @@ def resample(ds, num_classes, conf):
     Returns:
     - Resampled, repeated, and unbatched dataset
     """
-    # How many batches to use when counting the dataset
-    count_batches = 10
-    
     ## Check the original sample distribution
     if conf["verbosity"] > 0:
         print ("\n---- Ratios before resampling ---- ")
-        initial_dist, count = class_distribution(ds, num_classes, count_batches)
+        initial_dist, count = class_distribution(ds, num_classes)
         print (initial_dist)
 
     ####################################
@@ -234,7 +231,7 @@ def resample(ds, num_classes, conf):
     for i in range(num_classes):
         # Get all samples from class i [0 -> num_classes], repeat the dataset
         # indefinitely and store in datasets list
-        data = ds.filter(lambda image, label: label==i)
+        data = ds.filter(lambda img, lab: lab==i)
         data = data.cache(cache_dir+'{}_ds'.format(i))
         data = data.repeat()
         datasets.append(data)
@@ -247,7 +244,7 @@ def resample(ds, num_classes, conf):
     ## Check the sample distribution after oversampling the dataset
     if conf["verbosity"] > 0:
         print ("\n---- Ratios after resampling ----")
-        final_distribution, _ = class_distribution(balanced_ds, num_classes, count_batches)
+        final_distribution, _ = class_distribution(balanced_ds, num_classes)
         print (final_distribution)
     
     return balanced_ds
