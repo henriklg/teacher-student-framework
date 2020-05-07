@@ -31,5 +31,5 @@ cache/
 
 
 # Latex files
-build/*
-!*.pdf
+thesis/build/*
+!thesis/build/*.pdf
