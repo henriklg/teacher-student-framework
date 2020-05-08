@@ -114,6 +114,18 @@ We call this consumer / producer overlap, where the consumer is the GPU and the 
 % ----------------------------------------------------------
 
 
+\subsection{Generating new pseudo labels}
+When we use the trained teacher model to generate new pseudo labels from the dataset we set a threshold for which the predicted image is saved if it is above the set value. Here we have two options, either to set the threshold low and extract a large dataset with high uncertainty, but get the most of our minority classes. Or we can set the threshold high, and gather a dataset with lower uncertainty, but might miss more samples for the minority classes.
+
+After subtracting samples from the unlabeled dataset through predicting and saving images with a probability score higher than the threshold, we sort the images based on the probability scores. This is done so for majority classes with a large amount of samples can be squeezed to fit the minority classes and we can select the samples with the highest probability scores.
+
+\subsubsection{Inspecting the pseudo labels}
+Since the unlabeled dataset don't contain labels, it is difficult to fully comprehend the results of the extracted data.
+%TODO mention that the result are checked with a specialist
+%TODO add figure of unlab_ds_checkout-all.pdf
+
+
+
 \subsection{Learning rate}
 % see https://www.tensorflow.org/tutorials/keras/overfit_and_underfit
 Many models train better if you gradually reduce the learning rate during training. We are using learning rate which follows a inverse time decay which means that the learning rate is decreased to 1/2 of the base rate at 10 epochs, 1/3 at 20 epochs and so on.
