@@ -2,12 +2,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-# from sklearn.preprocessing import LabelEncoder
-# from sklearn.base import clone
-# from sklearn.preprocessing import label_binarize
 from sklearn import metrics as m
-# from sklearn.metrics import roc_curve, auc 
-# from scipy import interp
 
 
 def get_metrics(true_labels, predicted_labels):
