@@ -8,7 +8,7 @@ import pathlib
 import matplotlib.pyplot as plt
 import scipy.ndimage as ndimage
 
-from utils import class_distribution
+from utils import class_distribution, print_class_info_ttv, print_class_info
 
 def create_dataset(conf):
     """
@@ -30,7 +30,6 @@ def create_dataset(conf):
     seed = conf["seed"]
     
     np.random.seed(seed=seed)
-    train_cache = 'train'
     AUTOTUNE = tf.data.experimental.AUTOTUNE
     ds_size = len(list(data_dir.glob('*/*/*.*g')))
     class_names = np.array(
@@ -45,7 +44,7 @@ def create_dataset(conf):
     
     # Print info about classes
     if verbosity > 0: 
-        ds_size = print_class_info(class_names, data_dir, ds_size, outcast)
+        ds_size = print_class_info_ttv(class_names, data_dir, ds_size, outcast)
     
     # Create a tf.dataset of the file paths
     ds = {split: str(data_dir/split/'*/*.*g') for split in ["train","test","val"]}
@@ -100,6 +99,7 @@ def create_dataset(conf):
         ds[split] = ds[split].map(process_path, num_parallel_calls=AUTOTUNE)
         
     # Resample the dataset. NB: dataset is cached in resamler
+    train_cache = True
     if conf["resample"]:
         ds["train"] = resample(ds["train"], num_classes, conf)
         train_cache = False
@@ -131,12 +131,14 @@ def prepare_for_training(ds, ds_name, conf, cache):
     """
     AUTOTUNE = tf.data.experimental.AUTOTUNE
     
+    # Cache to SSD
     if cache:
         cache_string = "{}/{}_{}_{}".format(
             conf["cache_dir"], conf["img_shape"][0], conf["ds_info"], ds_name
         )
         ds = ds.cache(cache_string)
     
+    # Shuffle
     if conf["shuffle_buffer_size"]>1:
         ds = ds.shuffle(
             buffer_size=conf["shuffle_buffer_size"], 
@@ -145,15 +147,17 @@ def prepare_for_training(ds, ds_name, conf, cache):
     # Repeat forever
     ds = ds.repeat()
     
-    #Augment the training data
+    #Augment
     if conf["augment"] and ds_name=='train':
         ds = augment_ds(ds, conf, AUTOTUNE)
-
+    
+    # Batch
     ds = ds.batch(conf["batch_size"], drop_remainder=False)
 
-    # `prefetch` lets the dataset fetch batches in the background while the model is training. 
+    # Prefetch - lets the dataset fetch batches in the background while the model is training. 
     ds = ds.prefetch(buffer_size=AUTOTUNE)
     return ds
+
 
 
 def resample(ds, num_classes, conf):
@@ -176,7 +180,7 @@ def resample(ds, num_classes, conf):
 
     ####################################
     ## Resample
-    cache_dir = './cache/TTV/{}_{}_train/'.format(
+    cache_dir = './cache/TTV/{}_{}_train_resampled/'.format(
         conf["img_shape"][0], 
         conf["ds_info"]
     )
@@ -243,25 +247,159 @@ def augment_ds(ds, conf, AUTOTUNE):
 
 
 
-# Override the print_class_info from utils
-def print_class_info(directories, data_dir, ds_size, outcast):
+
+def split_and_create_dataset(conf):
     """
-    Extract and print info about the class split of multiclass dataset
+    Create a tf.data dataset based on a config file.
+    pipeline: list_files -> get_label -> read_file -> decode_image -> split -> resample
+                -> prepare_for_training
     
-    return:
-    total numbeer of samples
+    Args:
+    conf - a dictionary with configuration settings
+    
+    Return:
+    tf.data.Dataset   
     """
-    # Count number of samples for each folder
-    num_classes = len(directories)
-    count_dir = {}
-    for dir_name in directories:
-        count_dir[dir_name] = len(list(data_dir.glob('*/'+dir_name+'/*.*g')))
+    # Some parameters
+    data_dir = conf["data_dir"]
+    outcast = conf["outcast"]
+    verbosity = conf["verbosity"]
+    shuffle_buffer_size = conf["shuffle_buffer_size"]
+    seed = conf["seed"]
+
+    np.random.seed(seed=seed)
+    train_cache = 'train'
+    neg_count = pos_count = 0
+    AUTOTUNE = tf.data.experimental.AUTOTUNE
+    ds_size = len(list(data_dir.glob('*/*.*g')))
+    directories = np.array([item.name for item in data_dir.glob('*') if item.name != 'metadata.json'])
     
-    total = sum(count_dir.values())
-    assert total != 0, "Dataset is empty."
+    # Remove the outcast folder
+    if outcast != None:
+        directories = np.delete(directories, np.where(outcast == directories))
+        if verbosity > 0: print ("Removed outcast:", outcast, end="\n\n")
+
+    ## Print info about the dataset
+    # Binary dataset
+    if conf["ds_info"] == 'binary':
+        class_names = np.array(['Negative','Positive'])
+        num_classes = len(class_names)
+        neg_class_name = conf['neg_class'] # 'normal'-class
+        pos_class_names = np.delete(directories, np.where(neg_class_name == directories))
+        # Print info about neg/pos split
+        if verbosity > 0: 
+            ds_size, neg_count, pos_count = print_bin_class_info(
+                                                directories, data_dir, 
+                                                ds_size, outcast, class_names, 
+                                                neg_class_name, pos_class_names
+            )
+    # Full dataset
+    else:     
+        class_names = directories
+        num_classes = len(class_names)
+        # Print info about classes
+        if verbosity > 0: 
+            ds_size = print_class_info(directories, data_dir, ds_size, outcast)
     
-    for folder, count in count_dir.items():
-        print ("{:28}: {:4d} | {:2.2f}%".format(folder, count, count/total*100))
+    # Create a tf.dataset of the file paths
+    if outcast == None:
+        files_string = str(data_dir/'*/*.*g')
+    else:
+        files_string = str(data_dir/'[!{}]*/*'.format(outcast))
+    
+    if verbosity > 0: print ("Dataset.list_files: ",files_string, "\n")
+    
+    
+    list_ds = tf.data.Dataset.list_files(
+            files_string, 
+            shuffle=shuffle_buffer_size>1, 
+            seed=tf.constant(seed, tf.int64) if seed else None
+    )
+    
+    # Functions for the data pipeline
+    def get_label(file_path):
+        # convert the path to a list of path components
+        parts = tf.strings.split(file_path, os.path.sep)
+        # get class integer from class-list
+        label_int = tf.reduce_min(tf.where(tf.equal(parts[-2], class_names)))
+        # cast to tensor array with dtype=uint8
+        return tf.dtypes.cast(label_int, tf.int32)
+
+    def get_label_bin(file_path):
+        parts = tf.strings.split(file_path, os.path.sep)
+        bc = parts[-2] == pos_class_names
+        nz_cnt = tf.math.count_nonzero(bc)
+        if (nz_cnt > 0):
+            return tf.constant(1, tf.int32)
+        return tf.constant(0, tf.int32)
         
-    print ('\nTotal number of images: {}, in {} classes.\n'.format(ds_size, num_classes))
-    return total
+    def decode_img(img):
+        # convert the compressed string to a 3D uint8 tensor
+        img = tf.image.decode_jpeg(img, channels=3)
+        # Use `convert_image_dtype` to convert to floats in the [0,1] range.
+        img = tf.image.convert_image_dtype(img, tf.float32)
+        # resize the image to the desired size.
+        return tf.image.resize(img, [conf["img_shape"][0], conf["img_shape"][1]])
+
+    def process_path(file_path):
+        label = get_label(file_path)
+        # load the raw data from the file as a string
+        img = tf.io.read_file(file_path)
+        img = decode_img(img)
+        return img, label
+    
+    def process_path_bin(file_path):
+        label = get_label_bin(file_path)
+        # load the raw data from the file as a string
+        img = tf.io.read_file(file_path)
+        img = decode_img(img)
+        return img, label
+
+    # Create dataset of label, image pairs from the tf.dataset of image paths
+    if conf["ds_info"] == 'binary':
+        labeled_ds = list_ds.map(process_path_bin, num_parallel_calls=AUTOTUNE)
+    else:
+        labeled_ds = list_ds.map(process_path, num_parallel_calls=AUTOTUNE)
+        
+    # Split into train, test and validation data
+    train_size = int(0.7 * ds_size)
+    test_size = int(0.15 * ds_size)
+    val_size = int(0.15 * ds_size)
+    
+    train_ds = labeled_ds.take(train_size)
+    test_ds = labeled_ds.skip(train_size)
+    val_ds = test_ds.skip(val_size)
+    test_ds = test_ds.take(test_size)
+
+    # Print info about the dataset split
+    if verbosity > 0:
+        print ("\n{:32} {:>5}".format("Full dataset sample size:", ds_size))
+        print ("{:32} {:>5}".format("Train dataset sample size:", train_size))
+        print ("{:32} {:>5}".format("Test dataset sample size:", test_size))
+        print ("{:32} {:>5}".format("Validation dataset sample size:", val_size))
+    
+    # Resample the dataset. NB: dataset is cached in resamler
+    if conf["resample"]:
+        train_ds = resample(train_ds, num_classes, conf)
+        train_cache = None
+    
+    # Create cache-dir if not already exists
+    pathlib.Path(conf["cache_dir"]).mkdir(parents=True, exist_ok=True)
+    
+    # Cache, shuffle, repeat, batch, prefetch pipeline
+    train_ds = prepare_for_training(train_ds, 'train', conf, cache=train_cache)
+    test_ds = prepare_for_training(test_ds, 'test', conf, cache=True)
+    val_ds = prepare_for_training(val_ds, 'val', conf, cache=True)
+            
+    # Return some parameters
+    return_params = {
+        "num_classes": num_classes,
+        "ds_size": ds_size,
+        "train_size": train_size,
+        "test_size": test_size,
+        "val_size": val_size,
+        "class_names": class_names,
+        "neg_count": neg_count,
+        "pos_count": pos_count
+    }
+    return train_ds, test_ds, val_ds, return_params
