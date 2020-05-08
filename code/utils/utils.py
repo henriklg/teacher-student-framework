@@ -221,3 +221,8 @@ def print_bar_chart(lab_list, new_findings, count, params, log_dir=None, figsize
     if log_dir:
         plt.savefig(log_dir+'/unlab_data_prediction.pdf', format='pdf')
     plt.show()
+
+
+
+def unpipe(ds, size):
+    return ds.unbatch().take(size)
