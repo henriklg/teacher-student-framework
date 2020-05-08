@@ -48,6 +48,31 @@ def print_class_info(directories, data_dir, ds_size, outcast):
     return total
 
 
+
+def print_class_info_ttv(directories, data_dir, ds_size, outcast):
+    """
+    Extract and print info about the class split of multiclass dataset
+    
+    return:
+    total numbeer of samples
+    """
+    # Count number of samples for each folder
+    num_classes = len(directories)
+    count_dir = {}
+    for dir_name in directories:
+        count_dir[dir_name] = len(list(data_dir.glob('*/'+dir_name+'/*.*g')))
+    
+    total = sum(count_dir.values())
+    assert total != 0, "Dataset is empty."
+    
+    for folder, count in count_dir.items():
+        print ("{:28}: {:4d} | {:2.2f}%".format(folder, count, count/total*100))
+        
+    print ('\nTotal number of images: {}, in {} classes.\n'.format(ds_size, num_classes))
+    return total
+
+
+
 def print_bin_class_info(directories, data_dir, ds_size, outcast, class_names, neg, pos):
     """
     Extract and print info about the class split of binary dataset
