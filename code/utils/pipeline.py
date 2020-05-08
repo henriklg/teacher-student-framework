@@ -12,15 +12,19 @@ from utils import class_distribution, print_class_info_ttv, print_class_info
 
 def create_dataset(conf):
     """
-    Create a tf.data dataset based on a config file.
-    pipeline: list_files -> get_label -> read_file -> decode_image -> [-split-] -> resample
+    Create a tf.data Dataset based on a config file.
+    Expects dataset to be stored in data_dir/split/categories. 
+    Don't currently accept binary ds.
+    
+    Pipeline: list_files -> get_label -> read_file -> decode_image -> resample
                 -> prepare_for_training
     
     Args:
     conf - a dictionary with configuration settings
     
     Return:
-    tf.data.Dataset
+    3x tf.data.Dataset for each train, test and val
+    Dictionary with some settings like ds_size, class-names etc.
     """
     # Some parameters
     data_dir = conf["data_dir"]
@@ -101,7 +105,7 @@ def create_dataset(conf):
     # Resample the dataset. NB: dataset is cached in resamler
     train_cache = True
     if conf["resample"]:
-        ds["train"] = resample(ds["train"], num_classes, conf)
+        ds["train"] = oversample(ds["train"], num_classes, conf)
         train_cache = False
     
     # Create cache-dir if not already exists
@@ -160,7 +164,7 @@ def prepare_for_training(ds, ds_name, conf, cache):
 
 
 
-def resample(ds, num_classes, conf):
+def oversample(ds, num_classes, conf):
     """
     Resample the dataset. Accepts both binary and multiclass datasets.
     
@@ -180,7 +184,7 @@ def resample(ds, num_classes, conf):
 
     ####################################
     ## Resample
-    cache_dir = './cache/TTV/{}_{}_train_resampled/'.format(
+    cache_dir = './cache/{}_{}_train_resampled/'.format(
         conf["img_shape"][0], 
         conf["ds_info"]
     )
@@ -250,7 +254,8 @@ def augment_ds(ds, conf, AUTOTUNE):
 
 def split_and_create_dataset(conf):
     """
-    Create a tf.data dataset based on a config file.
+    Create a tf.data Dataset based on a config file.
+    Expects dataset to be stored in data_dir/categories. This also accepts binary datasets.
     pipeline: list_files -> get_label -> read_file -> decode_image -> split -> resample
                 -> prepare_for_training
     
@@ -258,7 +263,8 @@ def split_and_create_dataset(conf):
     conf - a dictionary with configuration settings
     
     Return:
-    tf.data.Dataset   
+    3x tf.data.Dataset for each train, test and val
+    Dictionary with some settings like ds_size, class-names etc.
     """
     # Some parameters
     data_dir = conf["data_dir"]
@@ -380,7 +386,7 @@ def split_and_create_dataset(conf):
     
     # Resample the dataset. NB: dataset is cached in resamler
     if conf["resample"]:
-        train_ds = resample(train_ds, num_classes, conf)
+        train_ds = oversample(train_ds, num_classes, conf)
         train_cache = None
     
     # Create cache-dir if not already exists
