@@ -78,11 +78,31 @@ In addition to labeling the images the dataset also contain a JSON format file w
 
 \subsection{Data preprocessing}
 % data normalization, splitting, augmentation etc
+\begin{itemize}
+\item When splitting the dataset it is important to ensure minority classes are represented in both training, validation and test dataset. Found that opencv resizes images a bit faster (1.2s vs 1.6 for pillow)
+\item What is the necessity of rotating the samples. Will they not always be 'square'?
+\item Normalization; any benefit of using L2 normalization in last dense layer when using a pre-defined model?
+\end{itemize}
+
+\subsubsection{Splitting dataset}
+Discovered non-optimal implementation of dataset splitting, which left some of the most vulnerable minority classes with no samples in the test data. To mitigate this issue I created a new script for pre-splitting dataset into sub folders for each, training, testing and validation dataset. The outline of this script is seen in Figure XX.
+
+%TODO : add code outline
+
+We split the data into XX. To make it as reproducible as can be I have first sorted the data then used seeded random to shuffle before splitting. % Mention seed etc
+In this step we also reduce the image dimensions to make the data easier to use during the next preprocessing steps and to reduce file size.
+
+
 
 \subsection{Data pipeline}
 % tensorflow.data.Dataset pipeline with prefech, batching, shuffling, caching etc
+The preprocessing pipeline is implemented by using tensorflows data.Dataset library. This was chosen over datagenerator due to the easy of use, but later became an issue due to the complexity. The main benefits by using data.Dataset is that all data is handled in tensors and computed by the GPU which enhance the load distribution of processing power. 
 
+The pipeline outline can be seen in Figure XX.
+%TODO add figure of data pipeline and describe each step and why its done
 
+\subsubsection{Caching}
+We call this consumer / producer overlap, where the consumer is the GPU and the producer is the CPU. %or is this prefetching?
 
 
 
@@ -93,9 +113,32 @@ In addition to labeling the images the dataset also contain a JSON format file w
 % Present the system architecture, some results perhaps
 % ----------------------------------------------------------
 
+
+\subsection{Generating new pseudo labels}
+When we use the trained teacher model to generate new pseudo labels from the dataset we set a threshold for which the predicted image is saved if it is above the set value. Here we have two options, either to set the threshold low and extract a large dataset with high uncertainty, but get the most of our minority classes. Or we can set the threshold high, and gather a dataset with lower uncertainty, but might miss more samples for the minority classes.
+
+After subtracting samples from the unlabeled dataset through predicting and saving images with a probability score higher than the threshold, we sort the images based on the probability scores. This is done so for majority classes with a large amount of samples can be squeezed to fit the minority classes and we can select the samples with the highest probability scores.
+
+\subsubsection{Inspecting the pseudo labels}
+Since the unlabeled dataset don't contain labels, it is difficult to fully comprehend the results of the extracted data.
+%TODO mention that the result are checked with a specialist
+%TODO add figure of unlab_ds_checkout-all.pdf
+
+
+
+\subsection{Learning rate}
+% see https://www.tensorflow.org/tutorials/keras/overfit_and_underfit
+Many models train better if you gradually reduce the learning rate during training. We are using learning rate which follows a inverse time decay which means that the learning rate is decreased to 1/2 of the base rate at 10 epochs, 1/3 at 20 epochs and so on.
+
+%TODO add plot of impact of decay rate and explain
+
+
 \subsection{Hyper-parameter tuning}
 
+\subsubsection{Class weighting}
+Found that when weighting the classes the model learns slower. Which means decay rate of learning rate must be lowered for it not to drop too soon. Also increase the buffer for early stopping of training.
 
+%TODO add formula for calculating class weights
 
 
 
