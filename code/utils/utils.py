@@ -226,3 +226,17 @@ def print_bar_chart(lab_list, new_findings, count, params, log_dir=None, figsize
 
 def unpipe(ds, size):
     return ds.unbatch().take(size)
+
+
+def custom_sort(pred, lab, img):
+    """
+    Takes three lists and return three sorted list based on prediction confidence
+    """
+    sorted_list = list(zip(pred, lab, img))
+    sorted_list.sort(key=lambda x: x[0], reverse=True)
+    
+    pred_sorted = [row[0] for row in sorted_list]
+    lab_sorted = [row[1] for row in sorted_list]
+    img_sorted = [row[2] for row in sorted_list]
+    
+    return pred_sorted, lab_sorted, img_sorted
