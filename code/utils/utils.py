@@ -259,10 +259,8 @@ def checkout_unlab(unlab, conf, params, log_dir):
     ### Create images with label names
     class_label_img = []
     font_path = '/usr/share/fonts/truetype/ubuntu/UbuntuMono-B.ttf'
-    # img_width = conf["img_shape"][0]
     img_width = 512
     font_size = int(img_width*0.15)
-    # print ('font size:',font_size)
     letters_per_line = 13
 
     for i in range(params["num_classes"]):
@@ -337,5 +335,50 @@ def checkout_unlab(unlab, conf, params, log_dir):
 
     plt.axis('off')
     plt.tight_layout(True)
-    plt.savefig("{}/unlab_data_checkout-{}.pdf".format(log_dir, 'all'), format='pdf')
+    plt.savefig("{}/checkout-{}.pdf".format(log_dir, 'all'), format='pdf')
+    plt.show()
+
+
+
+
+def checkout_class(checkout, unlab, conf, params, log_dir):
+    """
+    unlab: pred, lab, img
+    """
+    # Which class number correspond to that class name
+#     try:
+    class_idx = np.where(params["class_names"] == checkout)[0]
+    if len(class_idx) == 0:
+        raise NameError('Error: class-name not found. Check spelling.')
+        
+    # List of img_list-indexes with images corresponding to that class number
+    idx_list = np.where(unlab[1] == class_idx[0])[0]
+    
+    # settings
+    nrows, ncols = 4, 6    # array of sub-plots
+    figsize = [15, 10]     # figure size, inches
+
+    # create figure (fig), and array of axes (ax)
+    fig, ax = plt.subplots(nrows=nrows, ncols=ncols, 
+                           figsize=figsize, frameon=False, facecolor='white')
+    
+    # plot simple raster image on each sub-plot
+    for i, axi in enumerate(ax.flat):
+        # i runs from 0 to (nrows*ncols-1)
+        # axi is equivalent with ax[rowid][colid]
+        img = unlab[2][idx_list[i]]
+        pred = unlab[0][idx_list[i]]
+        title = "conf: "+str(round(pred, 5))
+        axi.set_title(title)
+        axi.imshow(img)
+        # get indices of row/column
+        rowid = i // ncols
+        colid = i % ncols
+        # write row/col indices as axes' title for identification
+        #axi.set_title("Row:"+str(rowid)+", Col:"+str(colid))
+        axi.set_axis_off()
+    
+    plt.axis('off')
+    plt.tight_layout(True)
+    plt.savefig("{}/checkout-{}.pdf".format(log_dir, checkout), format='pdf')
     plt.show()
