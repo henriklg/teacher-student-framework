@@ -93,7 +93,7 @@ def plot_confusion_matrix(cm, log_dir, names=None, cmap='Blues', figsize=(15,13)
                 annot[i, j] = '%.1f%%\n%d' % (p, c)
 
     #sns.set(font_scale=0.7) # for label size
-    sns.heatmap(cm, annot=annot, fmt='', cmap=cmap, annot_kws={"size": cell_font});
+    sns.heatmap(cm, annot=annot, fmt='', cmap=cmap, linewidths=0.4, linecolor="white", annot_kws={"size": cell_font});
 
     #labels, title and ticks
     ax.set_xlabel('Predicted labels');
