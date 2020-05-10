@@ -3,6 +3,10 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 
+# for checkout_unlab
+from PIL import Image, ImageDraw, ImageFont
+import textwrap
+
 
 
 def print_split_info(ds, conf, params):
@@ -228,6 +232,7 @@ def unpipe(ds, size):
     return ds.unbatch().take(size)
 
 
+
 def custom_sort(pred, lab, img):
     """
     Takes three lists and return three sorted list based on prediction confidence
@@ -240,3 +245,97 @@ def custom_sort(pred, lab, img):
     img_sorted = [row[2] for row in sorted_list]
     
     return pred_sorted, lab_sorted, img_sorted
+
+
+
+
+
+def checkout_unlab(unlab, conf, params, log_dir):
+    """
+    unlab: pred, lab, img
+    
+    Todo; remove empty rows
+    """
+    ### Create images with label names
+    class_label_img = []
+    font_path = '/usr/share/fonts/truetype/ubuntu/UbuntuMono-B.ttf'
+    # img_width = conf["img_shape"][0]
+    img_width = 512
+    font_size = int(img_width*0.15)
+    # print ('font size:',font_size)
+    letters_per_line = 13
+
+    for i in range(params["num_classes"]):
+        img = Image.new('RGB', (img_width, img_width), color = (0, 0, 0))
+        fnt = ImageFont.truetype(font_path, font_size)
+        d = ImageDraw.Draw(img)
+        if (len(params["class_names"][i])>letters_per_line):
+            text = textwrap.fill(params["class_names"][i], width=letters_per_line)
+        else:
+            text = params["class_names"][i]
+        linebreaks = text.count('\n')
+        d.text((1,(img_width//2.2)-linebreaks*img_width*0.1), text, font=fnt, fill=(255, 255, 255))
+
+        class_label_img.append(img)
+        
+    ### Create a list with 6 samples per class
+    # black image
+    img_black = Image.new('RGB', (conf["img_shape"][0], conf["img_shape"][1]), color = (0, 0, 0))
+
+    class_examples = []
+    class_preds = []
+    for class_idx in range(params["num_classes"]):
+        curr_class_examples = []
+        curr_class_preds = []
+
+        indekser = np.where(np.asarray(unlab[1], dtype=np.int64)==class_idx)[0]
+        for i in range(6):
+            # get 6 finding images from class_idx-class
+            # no image - index out of bounds
+            if not indekser.size > i:
+                curr_class_examples.append(img_black)
+                curr_class_preds.append(0)
+            # found image
+            else:
+                curr_class_examples.append(unlab[2][indekser[i]])
+                curr_class_preds.append(unlab[1][indekser[i]])
+
+        class_examples.append(curr_class_examples)
+        class_preds.append(curr_class_preds)
+
+    assert (len(params["class_names"])==len(class_examples)), 'must be same length'
+    
+    ### Display the predicted images in each class
+    # settings
+    nrows, ncols = params["num_classes"], 7  # array of sub-plots
+    figsize = [ncols*3, params["num_classes"]*3]     # figure size, inches
+
+    # create figure (fig), and array of axes (ax)
+    fig, ax = plt.subplots(nrows=nrows, ncols=ncols, 
+                           figsize=figsize, frameon=False, facecolor='white')
+
+    # plot simple raster image on each sub-plot
+    try:
+        for i, axi in enumerate(ax.flat):
+            # i runs from 0 to (nrows*ncols-1)
+            # axi is equivalent with ax[rowid][colid]
+            rowid = i // ncols
+            colid = i % ncols
+
+            if colid == 0:
+                img = class_label_img[rowid]
+            else:
+                pred = class_preds[rowid][colid-1]
+                title = "conf: "+str(round(pred, 3))
+                if pred: axi.set_title(title)
+                img = class_examples[rowid][colid-1]
+            axi.imshow(img)
+
+            axi.set_axis_off()
+    except IndexError:
+        pass
+
+    plt.axis('off')
+    plt.tight_layout(True)
+    plt.savefig("{}/unlab_data_checkout-{}.pdf".format(log_dir, 'all'), format='pdf')
+    plt.show()
