@@ -105,17 +105,15 @@ def create_dataset(conf):
     # Save train_ds count - before sampling
     _, train_dist = class_distribution(ds["train"], num_classes)
     
-    # Resample the dataset. NB: dataset is cached in resamler
-    train_cache = True
-    if conf["resample"]:
-        ds["train"] = oversample(ds["train"], num_classes, conf)
-        train_cache = False
     
     # Create cache-dir if not already exists
     pathlib.Path(conf["cache_dir"]).mkdir(parents=True, exist_ok=True)
     
+    # Save a clean copy of training data
+    clean_train = ds["train"]
+    
     # Cache, shuffle, repeat, batch, prefetch pipeline
-    train_ds = prepare_for_training(ds["train"], 'train', conf, cache=train_cache)
+    train_ds = prepare_for_training(ds["train"], 'train', conf, cache=True)
     test_ds = prepare_for_training(ds["test"], 'test', conf, cache=True)
     val_ds = prepare_for_training(ds["val"], 'val', conf, cache=True)
     
@@ -129,7 +127,7 @@ def create_dataset(conf):
         "val_size": split_size[2],
         "class_names": class_names,
     }
-    return train_ds, test_ds, val_ds, return_params
+    return clean_train, train_ds, test_ds, val_ds, return_params
 
 
 
@@ -139,8 +137,12 @@ def prepare_for_training(ds, ds_name, conf, cache):
     """
     AUTOTUNE = tf.data.experimental.AUTOTUNE
     
+    # Resample dataset. NB: dataset is cached in resamler
+    if conf["resample"] and ds_name=='train':
+        ds = oversample(ds, 23, conf)
+    
     # Cache to SSD
-    if cache:
+    elif cache:
         cache_string = "{}/{}_{}_{}".format(
             conf["cache_dir"], conf["img_shape"][0], conf["ds_info"], ds_name
         )
