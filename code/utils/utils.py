@@ -396,7 +396,7 @@ def checkout_dataset(ds, params=None, log_dir=None):
     batch = next(iter(ds))
     images, labels = batch
     images = images.numpy()
-    label = labels.numpy()
+    labels = labels.numpy()
 
     nrows, ncols = 3, 4  # array of sub-plots
     figsize = [ncols*3, nrows*3]     # figure size, inches
@@ -410,10 +410,10 @@ def checkout_dataset(ds, params=None, log_dir=None):
         # i runs from 0 to (nrows*ncols-1)
         # axi is equivalent with ax[rowid][colid]
         img = images[i]
+        axi.imshow(img)
         if params:
             lab = labels[i]
-            axi.imshow(img)
-            title = "test"
+            title = params["class_names"][lab]
             axi.set_title(title)
         axi.set_axis_off()
 
