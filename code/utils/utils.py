@@ -346,7 +346,6 @@ def checkout_class(checkout, unlab, conf, params, log_dir):
     unlab: pred, lab, img
     """
     # Which class number correspond to that class name
-#     try:
     class_idx = np.where(params["class_names"] == checkout)[0]
     if len(class_idx) == 0:
         raise NameError('Error: class-name not found. Check spelling.')
@@ -379,13 +378,9 @@ def checkout_class(checkout, unlab, conf, params, log_dir):
             axi.set_title(title)
             axi.imshow(img)
         except IndexError:
+            # No more images - skip last suplots
             pass
         finally:
-            # get indices of row/column
-            rowid = i // ncols
-            colid = i % ncols
-            # write row/col indices as axes' title for identification
-            #axi.set_title("Row:"+str(rowid)+", Col:"+str(colid))
             axi.set_axis_off()
     
     plt.axis('off')
@@ -396,11 +391,12 @@ def checkout_class(checkout, unlab, conf, params, log_dir):
 
 
 
-def checkout_dataset(ds):
+def checkout_dataset(ds, params=None, log_dir=None):
     # Show some images from training dataset (mainly to check augmentation)
     batch = next(iter(ds))
     images, labels = batch
     images = images.numpy()
+    label = labels.numpy()
 
     nrows, ncols = 3, 4  # array of sub-plots
     figsize = [ncols*3, nrows*3]     # figure size, inches
@@ -414,15 +410,15 @@ def checkout_dataset(ds):
         # i runs from 0 to (nrows*ncols-1)
         # axi is equivalent with ax[rowid][colid]
         img = images[i]
-        axi.imshow(img)
-        # get indices of row/column
-        rowid = i // ncols
-        colid = i % ncols
-        # write row/col indices as axes' title for identification
-        #axi.set_title("Row:"+str(rowid)+", Col:"+str(colid))
+        if params:
+            lab = labels[i]
+            axi.imshow(img)
+            title = "test"
+            axi.set_title(title)
         axi.set_axis_off()
 
     plt.axis('off')
     plt.tight_layout(True)
-    # plt.savefig("{}/unlab_data_checkout-{}.pdf".format(log_dir, checkout), format='pdf')
+    if log_dir:
+        plt.savefig("{}/checkout-train_ds.pdf".format(log_dir), format='pdf')
     plt.show()
