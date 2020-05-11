@@ -382,3 +382,37 @@ def checkout_class(checkout, unlab, conf, params, log_dir):
     plt.tight_layout(True)
     plt.savefig("{}/checkout-{}.pdf".format(log_dir, checkout), format='pdf')
     plt.show()
+
+
+
+
+def checkout_dataset(ds):
+    # Show some images from training dataset (mainly to check augmentation)
+    batch = next(iter(ds))
+    images, labels = batch
+    images = images.numpy()
+
+    nrows, ncols = 3, 4  # array of sub-plots
+    figsize = [ncols*3, nrows*3]     # figure size, inches
+
+    # create figure (fig), and array of axes (ax)
+    fig, ax = plt.subplots(nrows=nrows, ncols=ncols, 
+                           figsize=figsize, frameon=False, facecolor='white')
+
+    # plot simple raster image on each sub-plot
+    for i, axi in enumerate(ax.flat):
+        # i runs from 0 to (nrows*ncols-1)
+        # axi is equivalent with ax[rowid][colid]
+        img = images[i]
+        axi.imshow(img)
+        # get indices of row/column
+        rowid = i // ncols
+        colid = i % ncols
+        # write row/col indices as axes' title for identification
+        #axi.set_title("Row:"+str(rowid)+", Col:"+str(colid))
+        axi.set_axis_off()
+
+    plt.axis('off')
+    plt.tight_layout(True)
+    # plt.savefig("{}/unlab_data_checkout-{}.pdf".format(log_dir, checkout), format='pdf')
+    plt.show()
