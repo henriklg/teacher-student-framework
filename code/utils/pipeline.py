@@ -101,7 +101,10 @@ def create_dataset(conf):
     # Create dataset of label, image pairs from the tf.dataset of image paths
     for split in ds:
         ds[split] = ds[split].map(process_path, num_parallel_calls=AUTOTUNE)
-        
+    
+    # Save train_ds count - before sampling
+    _, train_dist = class_distribution(ds["train"], num_classes)
+    
     # Resample the dataset. NB: dataset is cached in resamler
     train_cache = True
     if conf["resample"]:
@@ -115,11 +118,12 @@ def create_dataset(conf):
     train_ds = prepare_for_training(ds["train"], 'train', conf, cache=train_cache)
     test_ds = prepare_for_training(ds["test"], 'test', conf, cache=True)
     val_ds = prepare_for_training(ds["val"], 'val', conf, cache=True)
-            
+    
     # Return some parameters
     return_params = {
         "num_classes": num_classes,
         "ds_size": ds_size,
+        "train_dist": train_dist,
         "train_size": split_size[0],
         "test_size": split_size[1],
         "val_size": split_size[2],
