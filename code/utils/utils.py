@@ -279,14 +279,15 @@ def checkout_unlab(unlab, conf, params, log_dir):
     ### Create a list with 6 samples per class
     # black image
     img_black = Image.new('RGB', (conf["img_shape"][0], conf["img_shape"][1]), color = (0, 0, 0))
-
+    
+    lab_arr = np.asarray(unlab[1], dtype=np.uint8)
     class_examples = []
     class_preds = []
     for class_idx in range(params["num_classes"]):
         curr_class_examples = []
         curr_class_preds = []
 
-        indekser = np.where(np.asarray(unlab[1], dtype=np.int64)==class_idx)[0]
+        indekser = np.where(lab_arr==class_idx)[0]
         for i in range(6):
             # get 6 finding images from class_idx-class
             # no image - index out of bounds
