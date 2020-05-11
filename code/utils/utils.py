@@ -353,10 +353,16 @@ def checkout_class(checkout, unlab, conf, params, log_dir):
         
     # List of img_list-indexes with images corresponding to that class number
     idx_list = np.where(unlab[1] == class_idx[0])[0]
+    num_images = len(idx_list)
+    if (num_images == 0):
+        raise IndexError("No findings in this class.")
     
     # settings
-    nrows, ncols = 4, 6    # array of sub-plots
-    figsize = [15, 10]     # figure size, inches
+    figint = np.sqrt(num_images)
+    nrows = int(np.floor(figint)) if figint <= 5 else 5
+    ncols = int(np.ceil(figint)) if figint <= 5 else 5
+    
+    figsize = [ncols*3, nrows*3]     # figure size, inches
 
     # create figure (fig), and array of axes (ax)
     fig, ax = plt.subplots(nrows=nrows, ncols=ncols, 
@@ -366,17 +372,21 @@ def checkout_class(checkout, unlab, conf, params, log_dir):
     for i, axi in enumerate(ax.flat):
         # i runs from 0 to (nrows*ncols-1)
         # axi is equivalent with ax[rowid][colid]
-        img = unlab[2][idx_list[i]]
-        pred = unlab[0][idx_list[i]]
-        title = "conf: "+str(round(pred, 5))
-        axi.set_title(title)
-        axi.imshow(img)
-        # get indices of row/column
-        rowid = i // ncols
-        colid = i % ncols
-        # write row/col indices as axes' title for identification
-        #axi.set_title("Row:"+str(rowid)+", Col:"+str(colid))
-        axi.set_axis_off()
+        try:
+            img = unlab[2][idx_list[i]]
+            pred = unlab[0][idx_list[i]]
+            title = "conf: "+str(round(pred, 5))
+            axi.set_title(title)
+            axi.imshow(img)
+        except IndexError:
+            pass
+        finally:
+            # get indices of row/column
+            rowid = i // ncols
+            colid = i % ncols
+            # write row/col indices as axes' title for identification
+            #axi.set_title("Row:"+str(rowid)+", Col:"+str(colid))
+            axi.set_axis_off()
     
     plt.axis('off')
     plt.tight_layout(True)
