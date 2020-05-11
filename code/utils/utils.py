@@ -233,18 +233,19 @@ def unpipe(ds, size):
 
 
 
-def custom_sort(pred, lab, img):
+def custom_sort(pred, lab, img, path):
     """
     Takes three lists and return three sorted list based on prediction confidence
     """
-    sorted_list = list(zip(pred, lab, img))
+    sorted_list = list(zip(pred, lab, img, path))
     sorted_list.sort(key=lambda x: x[0], reverse=True)
     
     pred_sorted = [row[0] for row in sorted_list]
     lab_sorted = [row[1] for row in sorted_list]
     img_sorted = [row[2] for row in sorted_list]
+    path_sorted = [row[3] for row in sorted_list]
     
-    return pred_sorted, lab_sorted, img_sorted
+    return pred_sorted, lab_sorted, img_sorted, path_sorted
 
 
 
@@ -297,7 +298,7 @@ def checkout_unlab(unlab, conf, params, log_dir):
             # found image
             else:
                 curr_class_examples.append(unlab[2][indekser[i]])
-                curr_class_preds.append(unlab[1][indekser[i]])
+                curr_class_preds.append(unlab[0][indekser[i]])
 
         class_examples.append(curr_class_examples)
         class_preds.append(curr_class_preds)
@@ -393,6 +394,9 @@ def checkout_class(checkout, unlab, conf, params, log_dir):
 
 
 def checkout_dataset(ds, params=None, log_dir=None):
+    """
+    ds is assumed to be from prepare_for_training - so batched, repeated etc
+    """
     # Show some images from training dataset (mainly to check augmentation)
     batch = next(iter(ds))
     images, labels = batch
