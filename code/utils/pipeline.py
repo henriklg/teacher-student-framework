@@ -8,7 +8,7 @@ import pathlib
 import matplotlib.pyplot as plt
 import scipy.ndimage as ndimage
 
-from utils import class_distribution, print_class_info_ttv, print_class_info
+from utils import class_distribution, print_class_info_ttv, print_class_info, print_split_info
 
 def create_dataset(conf):
     """
@@ -107,21 +107,27 @@ def create_dataset(conf):
     # Save a clean copy of training data
     clean_train = ds["train"]
     
+    # print info about the dataset split
+    if verbosity:
+        print_split_info(ds, num_classes, class_names)
+    
     # Cache, shuffle, repeat, batch, prefetch pipeline
-    train_ds = prepare_for_training(ds["train"], 'train', num_classes, conf, cache=True)
-    test_ds = prepare_for_training(ds["test"], 'test', num_classes, conf, cache=True)
-    val_ds = prepare_for_training(ds["val"], 'val', num_classes, conf, cache=True)
+    for split in ds:
+        ds[split] = prepare_for_training(ds[split], split, num_classes, conf, cache=True)
     
     # Return some parameters
     return_params = {
         "num_classes": num_classes,
-        "ds_size": ds_size,
-        "train_size": split_size[0],
-        "test_size": split_size[1],
-        "val_size": split_size[2],
+        "sizes": {"total":ds_size, 
+                  "train":split_size[0], 
+                  "test":split_size[1], 
+                  "val":split_size[2]},
+        "steps": {"train":split_size[0]//conf["batch_size"], 
+                  "test":split_size[1]//conf["batch_size"],
+                  "val":split_size[2]//conf["batch_size"]}
         "class_names": class_names,
     }
-    return clean_train, train_ds, test_ds, val_ds, return_params
+    return clean_train, ds["train"], ds["test"], ds["val"], return_params
 
 
 
