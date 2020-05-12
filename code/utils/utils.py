@@ -9,22 +9,24 @@ import textwrap
 
 
 
-def print_split_info(ds, conf, params):
+def print_split_info(ds, num_classes, class_names):
     """
     """
     # Count samples in each dataset by calling class_distribution
     line = "{:28}: ".format('Category')
+    cnt_list = []
     for split in ds:
-        _, ds[split] = class_distribution(ds[split], params["num_classes"])
+        _, cnt = class_distribution(ds[split], num_classes)
+        cnt_list.append(cnt)
         line += "{:5} | ".format(split)
     print (line, '\n-------------')
     
-    for i in range(params["num_classes"]):
-        line = "{:28}: ".format(params["class_names"][i])
-        for split in ds:
+    for i in range(num_classes):
+        line = "{:28}: ".format(class_names[i])
+        for j in range(len(ds)):
 #             path = str(conf["data_dir"])+'/'+split+'/'+params["class_names"][i]
 #             num_files = len([name for name in os.listdir(path)])
-            line += "{:5d} | ".format(int(ds[split][i]))
+            line += "{:5d} | ".format(int(cnt_list[j][i]))
         print (line)
 
 
@@ -142,22 +144,28 @@ def class_distribution(count_ds, num_classes, count_batches=10, bs=1024):
 
 
 
-
-def calculate_weights(count_ds, num_classes):
+def get_class_weights(ds, conf, params):
     """
-    Find distribution of dataset by counting .
-    
-    Args: count_ds - dataset to be counted.
-    Return: a list of class distributions
     """
-    _, final_counts = class_distribution(count_ds, num_classes)
+    if not conf["class_weight"]:
+        return None
     
-    total = final_counts.sum()
+    assert not conf["resample"], "Should only use resample or class_weight. Not both." 
     
-    score = total / (final_counts*num_classes)
+    ds = unpipe(ds, params["sizes"]["train"])
+    
+    _, cnt = class_distribution(ds, params["num_classes"])
+    total = cnt.sum()
+    score = total / (cnt*params["num_classes"])
     # Set scores lower than 1.0 to 1
     score[score<1.0] = 1.0
-    return score
+
+    class_weights = dict(enumerate(score))
+    
+    if conf["verbosity"]:
+        print ("Class weights:\n", class_weights)
+    
+    return class_weights
 
 
 
@@ -337,7 +345,7 @@ def checkout_unlab(unlab, conf, params, log_dir):
 
     plt.axis('off')
     plt.tight_layout(True)
-    plt.savefig("{}/checkout-{}.pdf".format(log_dir, 'all'), format='pdf')
+    plt.savefig("{}/checkout-all.pdf".format(log_dir), format='pdf')
     plt.show()
 
 
@@ -362,7 +370,6 @@ def checkout_class(checkout, unlab, conf, params, log_dir):
     figint = np.sqrt(num_images)
     nrows = int(np.floor(figint)) if figint <= 5 else 5
     ncols = int(np.ceil(figint)) if figint <= 5 else 5
-    
     figsize = [ncols*3, nrows*3]     # figure size, inches
 
     # create figure (fig), and array of axes (ax)
@@ -427,3 +434,18 @@ def checkout_dataset(ds, params=None, log_dir=None):
     if log_dir:
         plt.savefig("{}/checkout-train_ds.pdf".format(log_dir), format='pdf')
     plt.show()
+    
+    
+def write_to_file(var, conf, fname):
+    """
+    """
+    if type(var) == dict:
+        # Write conf and params dictionary to text file
+        list_of_strings = [ '{:20} : {}'.format(key, var[key]) for key in var ]
+        with open("{}/{}.txt".format(conf["log_dir"], fname),"w") as f:
+            [ f.write(f'{st}\n') for st in list_of_strings ]
+        f.close()
+    else:
+        f = open("{}/{}.txt".format(conf["log_dir"], fname),"w")
+        f.write( str(var) )
+        f.close()
