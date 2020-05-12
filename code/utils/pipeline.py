@@ -10,6 +10,71 @@ import scipy.ndimage as ndimage
 
 from utils import class_distribution, print_class_info_ttv, print_class_info, print_split_info
 
+
+# Global variables used by create_dataset and create_dataset_unlab
+IMG_SIZE = None
+CLASS_NAMES = None
+POS_CLASS_NAMES = None
+
+# Helper functions for the data pipeline
+def get_label(file_path):
+    # convert the path to a list of path components
+    parts = tf.strings.split(file_path, os.path.sep)
+    # get class integer from class-list
+    label_int = tf.reduce_min(tf.where(tf.equal(parts[-2], CLASS_NAMES)))
+    # cast to tensor array with dtype=uint8
+    return tf.dtypes.cast(label_int, tf.int32)
+        
+def decode_img(img):
+    # convert the compressed string to a 3D uint8 tensor
+    img = tf.image.decode_jpeg(img, channels=3)
+    # Use `convert_image_dtype` to convert to floats in the [0,1] range.
+    img = tf.image.convert_image_dtype(img, tf.float32)
+    # resize the image to the desired size.
+    return tf.image.resize(img, [IMG_SIZE, IMG_SIZE])
+
+def process_path(file_path):
+    label = get_label(file_path)
+    # load the raw data from the file as a string
+    img = tf.io.read_file(file_path)
+    img = decode_img(img)
+    return img, label
+
+###############################
+
+def get_label_bin(file_path):
+        parts = tf.strings.split(file_path, os.path.sep)
+        bc = parts[-2] == POS_CLASS_NAMES
+        nz_cnt = tf.math.count_nonzero(bc)
+        if (nz_cnt > 0):
+            return tf.constant(1, tf.int32)
+        return tf.constant(0, tf.int32)
+
+def process_path_bin(file_path):
+    label = get_label_bin(file_path)
+    # load the raw data from the file as a string
+    img = tf.io.read_file(file_path)
+    img = decode_img(img)
+    return img, label
+
+################################
+
+def get_filename(file_path):
+    parts = tf.strings.split(file_path, os.path.sep)
+    # the last item of parts is the filename
+    filename = parts[-1]
+    return filename
+
+def process_path_unlab(file_path):
+    filename = get_filename(file_path)
+    # load the raw data from the file as a string
+    img = tf.io.read_file(file_path)
+    img = decode_img(img)
+    return img, filename
+
+
+
+
 def create_dataset(conf):
     """
     Create a tf.data Dataset based on a config file.
@@ -26,6 +91,9 @@ def create_dataset(conf):
     3x tf.data.Dataset for each train, test and val
     Dictionary with some settings like ds_size, class-names etc.
     """
+    global CLASS_NAMES
+    global IMG_SIZE
+    IMG_SIZE = conf["img_shape"][0]
     # Some parameters
     data_dir = conf["data_dir"]
     outcast = conf["outcast"]
@@ -41,6 +109,7 @@ def create_dataset(conf):
     class_names = np.array(
         [item.name for item in data_dir.glob('train/*') if item.name != 'metadata.json']
     )
+    CLASS_NAMES = class_names
     
     # Remove the outcast folder
     if outcast != None:
@@ -69,37 +138,6 @@ def create_dataset(conf):
                                     seed=tf.constant(seed, tf.int64) if seed else None
                                     )
     
-    # Functions for the data pipeline
-    def get_label(file_path):
-        # convert the path to a list of path components
-        parts = tf.strings.split(file_path, os.path.sep)
-        # get class integer from class-list
-        label_int = tf.reduce_min(tf.where(tf.equal(parts[-2], class_names)))
-        # cast to tensor array with dtype=uint8
-        return tf.dtypes.cast(label_int, tf.int32)
-        
-    def decode_img(img):
-        # convert the compressed string to a 3D uint8 tensor
-        img = tf.image.decode_jpeg(img, channels=3)
-        # Use `convert_image_dtype` to convert to floats in the [0,1] range.
-        img = tf.image.convert_image_dtype(img, tf.float32)
-        # resize the image to the desired size.
-        return tf.image.resize(img, [conf["img_shape"][0], conf["img_shape"][1]])
-
-    def process_path(file_path):
-        label = get_label(file_path)
-        # load the raw data from the file as a string
-        img = tf.io.read_file(file_path)
-        img = decode_img(img)
-        return img, label
-    
-    def process_path_bin(file_path):
-        label = get_label_bin(file_path)
-        # load the raw data from the file as a string
-        img = tf.io.read_file(file_path)
-        img = decode_img(img)
-        return img, label
-    
     # Create dataset of label, image pairs from the tf.dataset of image paths
     for split in ds:
         ds[split] = ds[split].map(process_path, num_parallel_calls=AUTOTUNE)
@@ -124,7 +162,7 @@ def create_dataset(conf):
                   "val":split_size[2]},
         "steps": {"train":split_size[0]//conf["batch_size"], 
                   "test":split_size[1]//conf["batch_size"],
-                  "val":split_size[2]//conf["batch_size"]}
+                  "val":split_size[2]//conf["batch_size"]},
         "class_names": class_names,
     }
     return clean_train, ds["train"], ds["test"], ds["val"], return_params
@@ -188,8 +226,7 @@ def oversample(ds, cache_name, num_classes, conf):
         initial_dist, count = class_distribution(ds, num_classes)
         print (initial_dist)
 
-    ####################################
-    ## Resample
+    ## Prep cache
     cache_dir = './cache/{}_{}_{}_resampled/'.format(
         conf["img_shape"][0], 
         conf["ds_info"],
@@ -209,10 +246,8 @@ def oversample(ds, cache_name, num_classes, conf):
         datasets.append(data)
     
     target_dist = [ 1.0/num_classes ] * num_classes
-    
     balanced_ds = tf.data.experimental.sample_from_datasets(datasets, target_dist)
     
-    ####################################
     ## Check the sample distribution after oversampling the dataset
     if conf["verbosity"] > 0:
         print ("\n---- Ratios after resampling ----")
@@ -259,8 +294,33 @@ def augment_ds(ds, conf, AUTOTUNE):
 
 
 
+def create_unlab_ds(conf):
+    AUTOTUNE = tf.data.experimental.AUTOTUNE
+    
+    global IMG_SIZE
+    IMG_SIZE = conf["img_shape"][0]
+
+    ds_size_unlab = len(list(conf["unlab_dir"].glob('*.*g')))
+
+    files_string = str(conf["unlab_dir"]/'*.*g')
+    list_ds_unlabeled = tf.data.Dataset.list_files(
+            files_string, 
+            shuffle=conf["shuffle_buffer_size"]>1, 
+            seed=tf.constant(conf["seed"], tf.int64)
+    )
+    
+    unlab_ds = list_ds_unlabeled.map(process_path_unlab, num_parallel_calls=AUTOTUNE)
+
+    print ("Loaded {} images into unlabeled_ds.".format(ds_size_unlab))
+    
+    return unlab_ds, ds_size_unlab
+
+
+
+
 def split_and_create_dataset(conf):
     """
+    NB: Old method no longer in use, but still here for legacy
     Create a tf.data Dataset based on a config file.
     Expects dataset to be stored in data_dir/categories. This also accepts binary datasets.
     pipeline: list_files -> get_label -> read_file -> decode_image -> split -> resample
@@ -273,6 +333,9 @@ def split_and_create_dataset(conf):
     3x tf.data.Dataset for each train, test and val
     Dictionary with some settings like ds_size, class-names etc.
     """
+    global POS_CLASS_NAMES
+    global IMG_SIZE
+    IMG_SIZE = conf["img_shape"][0]
     # Some parameters
     data_dir = conf["data_dir"]
     outcast = conf["outcast"]
@@ -299,6 +362,7 @@ def split_and_create_dataset(conf):
         num_classes = len(class_names)
         neg_class_name = conf['neg_class'] # 'normal'-class
         pos_class_names = np.delete(directories, np.where(neg_class_name == directories))
+        POS_CLASS_NAMES = pos_class_names
         # Print info about neg/pos split
         if verbosity > 0: 
             ds_size, neg_count, pos_count = print_bin_class_info(
@@ -329,44 +393,6 @@ def split_and_create_dataset(conf):
             seed=tf.constant(seed, tf.int64) if seed else None
     )
     
-    # Functions for the data pipeline
-    def get_label(file_path):
-        # convert the path to a list of path components
-        parts = tf.strings.split(file_path, os.path.sep)
-        # get class integer from class-list
-        label_int = tf.reduce_min(tf.where(tf.equal(parts[-2], class_names)))
-        # cast to tensor array with dtype=uint8
-        return tf.dtypes.cast(label_int, tf.int32)
-
-    def get_label_bin(file_path):
-        parts = tf.strings.split(file_path, os.path.sep)
-        bc = parts[-2] == pos_class_names
-        nz_cnt = tf.math.count_nonzero(bc)
-        if (nz_cnt > 0):
-            return tf.constant(1, tf.int32)
-        return tf.constant(0, tf.int32)
-        
-    def decode_img(img):
-        # convert the compressed string to a 3D uint8 tensor
-        img = tf.image.decode_jpeg(img, channels=3)
-        # Use `convert_image_dtype` to convert to floats in the [0,1] range.
-        img = tf.image.convert_image_dtype(img, tf.float32)
-        # resize the image to the desired size.
-        return tf.image.resize(img, [conf["img_shape"][0], conf["img_shape"][1]])
-
-    def process_path(file_path):
-        label = get_label(file_path)
-        # load the raw data from the file as a string
-        img = tf.io.read_file(file_path)
-        img = decode_img(img)
-        return img, label
-    
-    def process_path_bin(file_path):
-        label = get_label_bin(file_path)
-        # load the raw data from the file as a string
-        img = tf.io.read_file(file_path)
-        img = decode_img(img)
-        return img, label
 
     # Create dataset of label, image pairs from the tf.dataset of image paths
     if conf["ds_info"] == 'binary':
@@ -416,3 +442,5 @@ def split_and_create_dataset(conf):
         "pos_count": pos_count
     }
     return train_ds, test_ds, val_ds, return_params
+
+
