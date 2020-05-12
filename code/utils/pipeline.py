@@ -33,6 +33,8 @@ def create_dataset(conf):
     shuffle_buffer_size = conf["shuffle_buffer_size"]
     seed = conf["seed"]
     
+    # Create cache-dir if not already exists
+    pathlib.Path(conf["cache_dir"]).mkdir(parents=True, exist_ok=True)
     np.random.seed(seed=seed)
     AUTOTUNE = tf.data.experimental.AUTOTUNE
     ds_size = len(list(data_dir.glob('*/*/*.*g')))
@@ -102,26 +104,18 @@ def create_dataset(conf):
     for split in ds:
         ds[split] = ds[split].map(process_path, num_parallel_calls=AUTOTUNE)
     
-    # Save train_ds count - before sampling
-    _, train_dist = class_distribution(ds["train"], num_classes)
-    
-    
-    # Create cache-dir if not already exists
-    pathlib.Path(conf["cache_dir"]).mkdir(parents=True, exist_ok=True)
-    
     # Save a clean copy of training data
     clean_train = ds["train"]
     
     # Cache, shuffle, repeat, batch, prefetch pipeline
-    train_ds = prepare_for_training(ds["train"], 'train', conf, cache=True)
-    test_ds = prepare_for_training(ds["test"], 'test', conf, cache=True)
-    val_ds = prepare_for_training(ds["val"], 'val', conf, cache=True)
+    train_ds = prepare_for_training(ds["train"], 'train', num_classes, conf, cache=True)
+    test_ds = prepare_for_training(ds["test"], 'test', num_classes, conf, cache=True)
+    val_ds = prepare_for_training(ds["val"], 'val', num_classes, conf, cache=True)
     
     # Return some parameters
     return_params = {
         "num_classes": num_classes,
         "ds_size": ds_size,
-        "train_dist": train_dist,
         "train_size": split_size[0],
         "test_size": split_size[1],
         "val_size": split_size[2],
@@ -131,15 +125,15 @@ def create_dataset(conf):
 
 
 
-def prepare_for_training(ds, ds_name, conf, cache):
+def prepare_for_training(ds, ds_name, num_classes, conf, cache):
     """
     Cache -> shuffle -> repeat -> augment -> batch -> prefetch
     """
     AUTOTUNE = tf.data.experimental.AUTOTUNE
     
     # Resample dataset. NB: dataset is cached in resamler
-    if conf["resample"] and ds_name=='train':
-        ds = oversample(ds, 23, conf)
+    if conf["resample"] and 'train' in ds_name:
+        ds = oversample(ds, ds_name, num_classes, conf)
     
     # Cache to SSD
     elif cache:
@@ -170,7 +164,7 @@ def prepare_for_training(ds, ds_name, conf, cache):
 
 
 
-def oversample(ds, num_classes, conf):
+def oversample(ds, cache_name, num_classes, conf):
     """
     Resample the dataset. Accepts both binary and multiclass datasets.
     
@@ -190,9 +184,10 @@ def oversample(ds, num_classes, conf):
 
     ####################################
     ## Resample
-    cache_dir = './cache/{}_{}_train_resampled/'.format(
+    cache_dir = './cache/{}_{}_{}_resampled/'.format(
         conf["img_shape"][0], 
-        conf["ds_info"]
+        conf["ds_info"],
+        cache_name
     )
     # create directory if not already exist
     pathlib.Path(cache_dir).mkdir(parents=True, exist_ok=True)
