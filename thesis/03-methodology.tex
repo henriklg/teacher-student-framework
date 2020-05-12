@@ -119,6 +119,8 @@ When we use the trained teacher model to generate new pseudo labels from the dat
 
 After subtracting samples from the unlabeled dataset through predicting and saving images with a probability score higher than the threshold, we sort the images based on the probability scores. This is done so for majority classes with a large amount of samples can be squeezed to fit the minority classes and we can select the samples with the highest probability scores.
 
+The sorted samples from the unlabeled dataset is then resampled based on the original distribution of samples in the training data. Since the original dataset is resampled that means we will pick out X samples for each class to keep the distribution even between classes during training.
+
 \subsubsection{Inspecting the pseudo labels}
 Since the unlabeled dataset don't contain labels, it is difficult to fully comprehend the results of the extracted data.
 %TODO mention that the result are checked with a specialist
