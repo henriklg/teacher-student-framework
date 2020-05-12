@@ -438,6 +438,7 @@ def checkout_dataset(ds, params=None, log_dir=None):
     
 def write_to_file(var, conf, fname):
     """
+    Write 'var' to a .txt file inside log_dir. 
     """
     if type(var) == dict:
         # Write conf and params dictionary to text file
