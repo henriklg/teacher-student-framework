@@ -62,7 +62,6 @@ def get_confusion_matrix(true_labels, predicted_labels):
 
 def plot_confusion_matrix(cm, log_dir, names=None, cmap='Blues', figsize=(15,13)):
     """
-    TODO: adde toggle for save_fig
     """
     # Font sizes
     axis_font = 8 # font size of x,y labels
@@ -93,7 +92,8 @@ def plot_confusion_matrix(cm, log_dir, names=None, cmap='Blues', figsize=(15,13)
                 annot[i, j] = '%.1f%%\n%d' % (p, c)
 
     #sns.set(font_scale=0.7) # for label size
-    sns.heatmap(cm, annot=annot, fmt='', cmap=cmap, linewidths=0.4, linecolor="white", annot_kws={"size": cell_font});
+    sns.heatmap(cm, annot=annot, fmt='', cmap=cmap, 
+                linewidths=0.4, linecolor="white", annot_kws={"size": cell_font});
 
     #labels, title and ticks
     ax.set_xlabel('Predicted labels');
@@ -177,7 +177,7 @@ def plot_lr_and_accuracy(history, conf):
     
 
 
-def show_dataset_predictions(true_labels, pred_labels, pred_confidence, images, conf, params):
+def show_dataset_predictions(true_labels, pred_labels, pred_confidence, images, conf):
     grid_width = 5
     grid_height = 5
     f, ax = plt.subplots(grid_width, grid_height)
@@ -186,9 +186,9 @@ def show_dataset_predictions(true_labels, pred_labels, pred_confidence, images, 
     img_idx = 0
     for i in range(0, grid_width):
         for j in range(0, grid_height):
-            actual = params["class_names"][true_labels[img_idx]]
-            lab = params["class_names"][pred_labels[img_idx]]
-            pred = np.round(pred_labels[img_idx], 2)
+            actual = conf["class_names"][true_labels[img_idx]]
+            lab = conf["class_names"][pred_labels[img_idx]]
+            pred = np.round(pred_confidence[img_idx], 2)
 
             title = 'Actual: '+actual+'\nPred: '+lab+ '\nConf: '+str(pred)
             ax[i][j].axis('off')

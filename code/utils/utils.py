@@ -24,7 +24,7 @@ def print_split_info(ds, num_classes, class_names):
     for i in range(num_classes):
         line = "{:28}: ".format(class_names[i])
         for j in range(len(ds)):
-#             path = str(conf["data_dir"])+'/'+split+'/'+params["class_names"][i]
+#             path = str(conf["data_dir"])+'/'+split+'/'+conf["class_names"][i]
 #             num_files = len([name for name in os.listdir(path)])
             line += "{:5d} | ".format(int(cnt_list[j][i]))
         print (line)
@@ -144,7 +144,7 @@ def class_distribution(count_ds, num_classes, count_batches=10, bs=1024):
 
 
 
-def get_class_weights(ds, conf, params):
+def get_class_weights(ds, conf):
     """
     """
     if not conf["class_weight"]:
@@ -152,11 +152,11 @@ def get_class_weights(ds, conf, params):
     
     assert not conf["resample"], "Should only use resample or class_weight. Not both." 
     
-    ds = unpipe(ds, params["sizes"]["train"])
+    ds = unpipe(ds, conf["sizes"]["train"])
     
-    _, cnt = class_distribution(ds, params["num_classes"])
+    _, cnt = class_distribution(ds, conf["num_classes"])
     total = cnt.sum()
-    score = total / (cnt*params["num_classes"])
+    score = total / (cnt*conf["num_classes"])
     # Set scores lower than 1.0 to 1
     score[score<1.0] = 1.0
 
@@ -189,13 +189,13 @@ def show_image(img, class_names=None, title=None):
 
 
 
-def print_bar_chart(lab_list, new_findings, count, params, log_dir=None, figsize=(15,6)):
+def print_bar_chart(lab_list, new_findings, count, conf, log_dir=None, figsize=(15,6)):
     lab_array = np.asarray(lab_list, dtype=np.int64)
-    findings = np.bincount(lab_array, minlength=int(params["num_classes"]))
-    assert len(params["class_names"]) == len(findings), "Must be same length."
+    findings = np.bincount(lab_array, minlength=int(conf["num_classes"]))
+    assert len(conf["class_names"]) == len(findings), "Must be same length."
 
     # x = findings[:,0]
-    x = np.arange(params["num_classes"])
+    x = np.arange(conf["num_classes"])
     width = 0.5
 
     fig, ax = plt.subplots(figsize=figsize)
@@ -208,7 +208,7 @@ def print_bar_chart(lab_list, new_findings, count, params, log_dir=None, figsize
     title_string = "Found {} new samples in unlabeled_ds after looking at {} images."
     ax.set_title(title_string.format(new_findings, count))
     ax.set_xticks(x)
-    ax.set_xticklabels(params["class_names"])
+    ax.set_xticklabels(conf["class_names"])
     ax.set_axisbelow(True)
     ax.legend()
 
@@ -231,7 +231,7 @@ def print_bar_chart(lab_list, new_findings, count, params, log_dir=None, figsize
 
     fig.tight_layout()
     if log_dir:
-        plt.savefig(log_dir+'/unlab_data_prediction.pdf', format='pdf')
+        plt.savefig(log_dir+'/unlab_data-prediction.pdf', format='pdf')
     plt.show()
 
 
@@ -257,9 +257,7 @@ def custom_sort(pred, lab, img, path):
 
 
 
-
-
-def checkout_unlab(unlab, conf, params, log_dir):
+def checkout_unlab(unlab, conf):
     """
     unlab: pred, lab, img
     
@@ -272,14 +270,14 @@ def checkout_unlab(unlab, conf, params, log_dir):
     font_size = int(img_width*0.15)
     letters_per_line = 13
 
-    for i in range(params["num_classes"]):
+    for i in range(conf["num_classes"]):
         img = Image.new('RGB', (img_width, img_width), color = (0, 0, 0))
         fnt = ImageFont.truetype(font_path, font_size)
         d = ImageDraw.Draw(img)
-        if (len(params["class_names"][i])>letters_per_line):
-            text = textwrap.fill(params["class_names"][i], width=letters_per_line)
+        if (len(conf["class_names"][i])>letters_per_line):
+            text = textwrap.fill(conf["class_names"][i], width=letters_per_line)
         else:
-            text = params["class_names"][i]
+            text = conf["class_names"][i]
         linebreaks = text.count('\n')
         d.text((1,(img_width//2.2)-linebreaks*img_width*0.1), text, font=fnt, fill=(255, 255, 255))
 
@@ -292,7 +290,7 @@ def checkout_unlab(unlab, conf, params, log_dir):
     lab_arr = np.asarray(unlab[1], dtype=np.uint8)
     class_examples = []
     class_preds = []
-    for class_idx in range(params["num_classes"]):
+    for class_idx in range(conf["num_classes"]):
         curr_class_examples = []
         curr_class_preds = []
 
@@ -311,52 +309,48 @@ def checkout_unlab(unlab, conf, params, log_dir):
         class_examples.append(curr_class_examples)
         class_preds.append(curr_class_preds)
 
-    assert (len(params["class_names"])==len(class_examples)), 'must be same length'
+    assert (len(conf["class_names"])==len(class_examples)), 'must be same length'
     
     ### Display the predicted images in each class
     # settings
-    nrows, ncols = params["num_classes"], 7  # array of sub-plots
-    figsize = [ncols*3, params["num_classes"]*3]     # figure size, inches
+    nrows, ncols = conf["num_classes"], 7  # array of sub-plots
+    figsize = [ncols*3, conf["num_classes"]*3]     # figure size, inches
 
     # create figure (fig), and array of axes (ax)
     fig, ax = plt.subplots(nrows=nrows, ncols=ncols, 
                            figsize=figsize, frameon=False, facecolor='white')
 
     # plot simple raster image on each sub-plot
-    try:
-        for i, axi in enumerate(ax.flat):
-            # i runs from 0 to (nrows*ncols-1)
-            # axi is equivalent with ax[rowid][colid]
-            rowid = i // ncols
-            colid = i % ncols
+    for i, axi in enumerate(ax.flat):
+        # i runs from 0 to (nrows*ncols-1)
+        # axi is equivalent with ax[rowid][colid]
+        rowid = i // ncols
+        colid = i % ncols
 
-            if colid == 0:
-                img = class_label_img[rowid]
-            else:
-                pred = class_preds[rowid][colid-1]
-                title = "conf: "+str(round(pred, 3))
-                if pred: axi.set_title(title)
-                img = class_examples[rowid][colid-1]
-            axi.imshow(img)
-
-            axi.set_axis_off()
-    except IndexError:
-        pass
+        if colid == 0:
+            img = class_label_img[rowid]
+        else:
+            pred = class_preds[rowid][colid-1]
+            title = "conf: "+str(round(pred, 3))
+            if pred: axi.set_title(title)
+            img = class_examples[rowid][colid-1]
+            
+        axi.imshow(img)
+        axi.set_axis_off()
 
     plt.axis('off')
     plt.tight_layout(True)
-    plt.savefig("{}/checkout-all.pdf".format(log_dir), format='pdf')
+    plt.savefig("{}/checkout-all.pdf".format(conf["log_dir"]), format='pdf')
     plt.show()
 
 
 
-
-def checkout_class(checkout, unlab, conf, params, log_dir):
+def checkout_class(checkout, unlab, conf):
     """
     unlab: pred, lab, img
     """
     # Which class number correspond to that class name
-    class_idx = np.where(params["class_names"] == checkout)[0]
+    class_idx = np.where(conf["class_names"] == checkout)[0]
     if len(class_idx) == 0:
         raise NameError('Error: class-name not found. Check spelling.')
         
@@ -394,13 +388,12 @@ def checkout_class(checkout, unlab, conf, params, log_dir):
     
     plt.axis('off')
     plt.tight_layout(True)
-    plt.savefig("{}/checkout-{}.pdf".format(log_dir, checkout), format='pdf')
+    plt.savefig("{}/checkout-{}.pdf".format(conf["log_dir"], checkout), format='pdf')
     plt.show()
 
 
 
-
-def checkout_dataset(ds, params=None, log_dir=None):
+def checkout_dataset(ds, conf=None):
     """
     ds is assumed to be from prepare_for_training - so batched, repeated etc
     """
@@ -411,7 +404,7 @@ def checkout_dataset(ds, params=None, log_dir=None):
     labels = labels.numpy()
 
     nrows, ncols = 3, 4  # array of sub-plots
-    figsize = [ncols*3, nrows*3]     # figure size, inches
+    figsize = [ncols*4, nrows*4]     # figure size, inches
 
     # create figure (fig), and array of axes (ax)
     fig, ax = plt.subplots(nrows=nrows, ncols=ncols, 
@@ -423,19 +416,20 @@ def checkout_dataset(ds, params=None, log_dir=None):
         # axi is equivalent with ax[rowid][colid]
         img = images[i]
         axi.imshow(img)
-        if params:
+        if conf:
             lab = labels[i]
-            title = params["class_names"][lab]
+            title = conf["class_names"][lab]
             axi.set_title(title)
         axi.set_axis_off()
 
     plt.axis('off')
     plt.tight_layout(True)
-    if log_dir:
-        plt.savefig("{}/checkout-train_ds.pdf".format(log_dir), format='pdf')
+    if conf:
+        plt.savefig("{}/train_ds-samples.pdf".format(conf["log_dir"]), format='pdf')
     plt.show()
-    
-    
+
+
+
 def write_to_file(var, conf, fname):
     """
     Write 'var' to a .txt file inside log_dir. 

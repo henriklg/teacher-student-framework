@@ -7,7 +7,7 @@ from tensorflow.python.keras.models import Sequential, Model, load_model
 from tensorflow.keras import layers
 
 
-def create_model(conf, num_classes):
+def create_model(conf):
     """
     """
     if conf["model"] == 'EfficientNetB0': 
@@ -36,7 +36,7 @@ def create_model(conf, num_classes):
     model.add(layers.Dropout(conf["dropout"]))
     model.add(layers.Dense(512, activation='relu'))
     model.add(layers.Dropout(conf["dropout"]))
-    model.add(layers.Dense(num_classes, activation=conf["final_activation"]))
+    model.add(layers.Dense(conf["num_classes"], activation=conf["final_activation"]))
     
     # from keras import regularizers
     # teacher_model = Sequential()
@@ -71,12 +71,12 @@ def create_model(conf, num_classes):
 
 
 
-def create_callbacks(conf, params):
+def create_callbacks(conf):
     """
     """
     # By using LearnignRateScheduler
     initial_learning_rate = conf["learning_rate"]
-    decay_steps = params["steps"]["train"]
+    decay_steps = conf["steps"]["train"]
     batch_size = conf['batch_size']
     decay_rate = conf['decay_rate']
 
