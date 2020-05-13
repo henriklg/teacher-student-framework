@@ -40,8 +40,8 @@ def process_path(file_path):
     img = decode_img(img)
     return img, label
 
-###############################
 
+#### Binary dataset-specific
 def get_label_bin(file_path):
         parts = tf.strings.split(file_path, os.path.sep)
         bc = parts[-2] == POS_CLASS_NAMES
@@ -49,7 +49,7 @@ def get_label_bin(file_path):
         if (nz_cnt > 0):
             return tf.constant(1, tf.int32)
         return tf.constant(0, tf.int32)
-
+    
 def process_path_bin(file_path):
     label = get_label_bin(file_path)
     # load the raw data from the file as a string
@@ -57,8 +57,8 @@ def process_path_bin(file_path):
     img = decode_img(img)
     return img, label
 
-################################
 
+### Unlabeled dataset-specific
 def get_filename(file_path):
     parts = tf.strings.split(file_path, os.path.sep)
     # the last item of parts is the filename
@@ -125,8 +125,10 @@ def create_dataset(conf):
     ds = {split: str(data_dir/split/'*/*.*g') for split in ["train","test","val"]}
 
     split_size = [len(list(glob.glob(ds[split]))) for split in ds] # train/test/val
-    if verbosity > 0: print ("Dataset split:", split_size)
-        
+    if verbosity > 0: 
+        print ("Dataset split:", split_size)
+    
+    # Display file-strings for globbing
     if verbosity > 0:
         [print(key) for key in ds.values()]
         print ()
@@ -153,19 +155,17 @@ def create_dataset(conf):
     for split in ds:
         ds[split] = prepare_for_training(ds[split], split, num_classes, conf, cache=True)
     
-    # Return some parameters
-    return_params = {
-        "num_classes": num_classes,
-        "sizes": {"total":ds_size, 
+    conf["class_names"] = class_names
+    conf["num_classes"] = num_classes
+    conf["sizes"] = {"total":ds_size, 
                   "train":split_size[0], 
                   "test":split_size[1], 
-                  "val":split_size[2]},
-        "steps": {"train":split_size[0]//conf["batch_size"], 
+                  "val":split_size[2]}
+    conf["steps"] = {"train":split_size[0]//conf["batch_size"], 
                   "test":split_size[1]//conf["batch_size"],
-                  "val":split_size[2]//conf["batch_size"]},
-        "class_names": class_names,
-    }
-    return clean_train, ds["train"], ds["test"], ds["val"], return_params
+                  "val":split_size[2]//conf["batch_size"]}
+    
+    return clean_train, ds["train"], ds["test"], ds["val"]
 
 
 
@@ -259,9 +259,17 @@ def oversample(ds, cache_name, num_classes, conf):
 
 
 def augment_ds(ds, conf, AUTOTUNE):
+    """
+    Apply augmentation of the dataset. 
+    Toggle which augmentations to be done in conf["augment"] list
+    
+    Returns a tf.data.Dataset.map
+    """
+    mul = conf["aug_mult"]
     def random_rotate_image(img):
-        img = ndimage.rotate(img, np.random.uniform(-30, 30), reshape=False)
+        img = ndimage.rotate(img, np.random.uniform(-40*mul, 40*mul), reshape=False)
         return img
+    
     def augment(img, label):
         # Augment the image using tf.image
         if "rotate" in conf["augment"]:
@@ -269,28 +277,32 @@ def augment_ds(ds, conf, AUTOTUNE):
             [img,] = tf.py_function(random_rotate_image, [img], [tf.float32])
             img.set_shape(im_shape)
         if "crop" in conf["augment"]:
-            # Pad image with 10 percent og image size, and randomly crop back to size
-            pad = int(conf["img_shape"][0]*0.15)
+            # Pad image with 15 percent og image size, and randomly crop back to size
+            pad = int(conf["img_shape"][0]*0.4*mul)
             img = tf.image.resize_with_crop_or_pad(
                     img, conf["img_shape"][0] + pad, conf["img_shape"][1] + pad)
             img = tf.image.random_crop(img, conf["img_shape"], seed=conf["seed"])
         if "flip" in conf["augment"]:
-              # Randomly flip image
+            # Randomly flip image
             img = tf.image.random_flip_left_right(img, seed=conf["seed"])
             img = tf.image.random_flip_up_down(img, seed=conf["seed"])
         if "brightness" in conf["augment"]:
             # Change brightness and saturation
-            img = tf.image.random_brightness(img, max_delta=0.15, seed=conf["seed"])
+            img = tf.image.random_brightness(img, max_delta=0.25*mul, seed=conf["seed"])
         if "saturation" in conf["augment"]:
-            img = tf.image.random_saturation(img, lower = 0.5, upper =1.5, seed=conf["seed"])
+            # lower: 0.4-0.9 | upper: 
+            delta = 0.5
+            img = tf.image.random_saturation(
+                img, lower=0.9-delta*mul, upper=1.1+delta*mul, seed=conf["seed"])
         if "contrast" in conf["augment"]:
-              img = tf.image.random_contrast(img, lower=0.6, upper=1.6, seed=conf["seed"])
+            delta = 0.5
+            img = tf.image.random_contrast(
+                img, lower=1.0-delta*mul, upper=1.1+delta*mul, seed=conf["seed"])
         # Make sure imgae is still in [0, 1]
         img = tf.clip_by_value(img, 0.0, 1.0)
         return img, label
     
     return ds.map(augment, num_parallel_calls=AUTOTUNE)
-
 
 
 
@@ -430,17 +442,16 @@ def split_and_create_dataset(conf):
     test_ds = prepare_for_training(test_ds, 'test', conf, cache=True)
     val_ds = prepare_for_training(val_ds, 'val', conf, cache=True)
             
-    # Return some parameters
-    return_params = {
-        "num_classes": num_classes,
-        "ds_size": ds_size,
-        "train_size": train_size,
-        "test_size": test_size,
-        "val_size": val_size,
-        "class_names": class_names,
-        "neg_count": neg_count,
-        "pos_count": pos_count
-    }
-    return train_ds, test_ds, val_ds, return_params
+    conf["class_names"] = class_names
+    conf["num_classes"] = num_classes
+    conf["sizes"] = {"total":ds_size, 
+                  "train":split_size[0], 
+                  "test":split_size[1], 
+                  "val":split_size[2]}
+    conf["steps"] = {"train":split_size[0]//conf["batch_size"], 
+                  "test":split_size[1]//conf["batch_size"],
+                  "val":split_size[2]//conf["batch_size"]}
+    
+    return train_ds, test_ds, val_ds
 
 
