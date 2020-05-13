@@ -188,50 +188,64 @@ def show_image(img, class_names=None, title=None):
         plt.axis('off')
 
 
-
-def print_bar_chart(lab_list, new_findings, count, conf, log_dir=None, figsize=(15,6)):
-    lab_array = np.asarray(lab_list, dtype=np.int64)
-    findings = np.bincount(lab_array, minlength=int(conf["num_classes"]))
-    assert len(conf["class_names"]) == len(findings), "Must be same length."
-
-    # x = findings[:,0]
+def print_bar_chart(data, conf, title=None, fname=None, figsize=(15,6)):
+    """
+    Takes in list of data and makes a bar chart of it.
+    Dynamically allocates placement for bars.
+    """
     x = np.arange(conf["num_classes"])
-    width = 0.5
+    width = 0.7      # 1.0 = bars side by side
+    width = width/len(data)
+
+    num_bars = len(data)
+    if num_bars == 1:
+        bar_placement = [0]
+    # even number of bars
+    elif (num_bars % 2) == 0:
+        bar_placement = np.arange(-num_bars/2, num_bars/2+1)    #[-2, -1, 0, 1, 2]
+        bar_placement = np.delete(bar_placement, num_bars//2)   #delete 0
+        bar_placement = [bar+0.5 if bar<0 else bar-0.5 for bar in bar_placement]
+    # odd number of bars
+    else:
+        bar_placement = np.arange(-np.floor(num_bars/2), np.floor(num_bars/2)+1)
+
 
     fig, ax = plt.subplots(figsize=figsize)
-    # rects1 = ax.bar(x, findings[:,1], width, label='Findings')
-    rects1 = ax.bar(x, findings, width, label='Findings')
-    #rects2 = ax.bar(x + width/2, women_means, width, label='Women')
 
-    # Add some text for labels, title and custom x-axis tick labels, etc.
+    rects = []
+    for cnt, (dat, placement) in enumerate(zip(data, bar_placement)):
+        rects.append(ax.bar(x+placement*width, dat, width, label='Iter {}'.format(cnt)))
+
     ax.set_ylabel('Number of samples')
-    title_string = "Found {} new samples in unlabeled_ds after looking at {} images."
-    ax.set_title(title_string.format(new_findings, count))
+    if title:
+        title_string = title
+        ax.set_title(title_string)
     ax.set_xticks(x)
     ax.set_xticklabels(conf["class_names"])
     ax.set_axisbelow(True)
-    ax.legend()
+    ax.legend(loc='upper left');
 
     # Rotate the tick labels and set their alignment.
     plt.setp(ax.get_xticklabels(), rotation=25, ha="right",
-             rotation_mode="anchor")
+                 rotation_mode="anchor")
     plt.grid(axis='y')
 
     def autolabel(rects):
         """Attach a text label above each bar in *rects*, displaying its height."""
         for rect in rects:
-            height = rect.get_height()
+            height = int(rect.get_height())
             ax.annotate('{}'.format(height),
-                        xy=(rect.get_x() + rect.get_width() / 2, height),
-                        xytext=(0, 3),  # 3 points vertical offset
-                        textcoords="offset points",
-                        ha='center', va='bottom')
+                            xy=(rect.get_x() + rect.get_width() / 2, height),
+                            xytext=(0, 3),  # 3 points vertical offset
+                            textcoords="offset points",
+                            ha='center', va='bottom')
 
-    autolabel(rects1)
+    # autolabel(rects1)
+    autolabel(rects[-1])
 
     fig.tight_layout()
-    if log_dir:
-        plt.savefig(log_dir+'/unlab_data-prediction.pdf', format='pdf')
+    if fname:
+        plt.savefig('{}/{}.pdf'.format(conf["log_dir"], fname), format='pdf')
     plt.show()
 
 
@@ -425,7 +439,7 @@ def checkout_dataset(ds, conf=None):
     plt.axis('off')
     plt.tight_layout(True)
     if conf:
-        plt.savefig("{}/train_ds-samples.pdf".format(conf["log_dir"]), format='pdf')
+        plt.savefig("{}/checkout-train_ds.pdf".format(conf["log_dir"]), format='pdf')
     plt.show()
 
 
@@ -444,3 +458,62 @@ def write_to_file(var, conf, fname):
         f = open("{}/{}.txt".format(conf["log_dir"], fname),"w")
         f.write( str(var) )
         f.close()
+
+
+
+def resample_unlab(dataset, unlab, path_list, conf):
+    """
+    unlab: pred, lab, img
+    """
+    lab_list = unlab[1]
+    img_list = unlab[2]
+    
+    # Get the _last_ distribution used for training - NB: this must be updated for each teacher/student iteration
+    _, orig_dist = class_distribution(dataset, conf["num_classes"])
+
+    num_to_match = np.max(orig_dist)
+    idx_to_match = np.argmax(orig_dist)
+    print ('Limit set by {} with {} samples'.format(conf["class_names"][idx_to_match], int(num_to_match)))
+    print ("-"*40)
+
+    new_findings = ([], [])
+    new_findings_filepaths = []
+    lab_arr = np.asarray(lab_list, dtype=np.uint8)
+
+    for class_idx in range(conf["num_classes"]):
+        # how many samples already in this class
+        in_count = orig_dist[class_idx]
+
+        indexes = np.where(lab_arr==class_idx)[0]
+        num_new_findings = len(indexes)
+
+        count = 0
+        for count, idx in enumerate(indexes, start=1):
+            if in_count >= num_to_match:
+                count -= 1 # reduce by one cuz of enumerate updates index early
+                break
+            new_findings[0].append(img_list[idx])         # image
+            new_findings[1].append(lab_list[idx])         # label
+            new_findings_filepaths.append(path_list[idx]) # filepath
+            in_count += 1
+        
+        if conf["verbosity"]:
+            print ("{:27}: added {}/{} samples.".format(conf["class_names"][class_idx], count, num_new_findings))
+    
+    return new_findings, new_findings_filepaths
+
+
+
+def reduce_dataset(ds, remove_filenames):
+    """
+    """
+    def remove_samples(img, path):
+        """
+        Filter out images which filename exists in new_findings_filepaths.
+        Return boolean.
+        """
+        bool_list = tf.equal(path, remove_filenames)
+        in_list = tf.math.count_nonzero(bool_list) > 0
+        return not in_list
+    
+    return ds.filter(remove_samples)
