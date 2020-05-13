@@ -330,6 +330,21 @@ def create_unlab_ds(conf):
 
 
 
+def fn2img(fn, folder):
+    """
+    Used for reading unlab_ds images
+    """
+    global IMG_SIZE
+    
+    fn = fn.numpy().decode("utf-8")
+    img = tf.io.read_file("{}/{}".format(folder, fn))
+    img = tf.image.decode_jpeg(img, channels=3)
+    img = tf.image.convert_image_dtype(img, tf.float32)
+    img = tf.image.resize(img, [IMG_SIZE, IMG_SIZE])
+    return img
+
+
+
 
 def split_and_create_dataset(conf):
     """
