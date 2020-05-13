@@ -1,11 +1,12 @@
 import tensorflow as tf
 import numpy as np
 import os
+import textwrap
 import matplotlib.pyplot as plt
 
 # for checkout_unlab
 from PIL import Image, ImageDraw, ImageFont
-import textwrap
+from pipeline import fn2img
 
 
 
@@ -255,28 +256,32 @@ def unpipe(ds, size):
 
 
 
-def custom_sort(pred, lab, img, path):
+def custom_sort(pred, lab, path):
     """
     Takes three lists and return three sorted list based on prediction confidence
     """
-    sorted_list = list(zip(pred, lab, img, path))
+    sorted_list = list(zip(pred, lab, path))
     sorted_list.sort(key=lambda x: x[0], reverse=True)
     
     pred_sorted = [row[0] for row in sorted_list]
     lab_sorted = [row[1] for row in sorted_list]
-    img_sorted = [row[2] for row in sorted_list]
-    path_sorted = [row[3] for row in sorted_list]
+    path_sorted = [row[2] for row in sorted_list]
     
-    return pred_sorted, lab_sorted, img_sorted, path_sorted
+    return pred_sorted, lab_sorted, path_sorted
+
+
 
 
 
 def checkout_unlab(unlab, conf):
     """
-    unlab: pred, lab, img
+    unlab: pred, lab, path
     
     Todo; remove empty rows
     """
+    pred_list = unlab[0]
+    lab_list = unlab[1]
+    name_list = unlab[2]
     ### Create images with label names
     class_label_img = []
     font_path = '/usr/share/fonts/truetype/ubuntu/UbuntuMono-B.ttf'
@@ -301,7 +306,7 @@ def checkout_unlab(unlab, conf):
     # black image
     img_black = Image.new('RGB', (conf["img_shape"][0], conf["img_shape"][1]), color = (0, 0, 0))
     
-    lab_arr = np.asarray(unlab[1], dtype=np.uint8)
+    lab_arr = np.asarray(lab_list, dtype=np.uint8)
     class_examples = []
     class_preds = []
     for class_idx in range(conf["num_classes"]):
@@ -317,8 +322,11 @@ def checkout_unlab(unlab, conf):
                 curr_class_preds.append(0)
             # found image
             else:
-                curr_class_examples.append(unlab[2][indekser[i]])
-                curr_class_preds.append(unlab[0][indekser[i]])
+                fn = name_list[indekser[i]]
+                img = fn2img(fn, conf["unlab_dir"])
+                
+                curr_class_examples.append(img)
+                curr_class_preds.append(pred_list[indekser[i]])
 
         class_examples.append(curr_class_examples)
         class_preds.append(curr_class_preds)
@@ -361,15 +369,19 @@ def checkout_unlab(unlab, conf):
 
 def checkout_class(checkout, unlab, conf):
     """
-    unlab: pred, lab, img
+    unlab: pred, lab, name
     """
+    pred_list = unlab[0]
+    lab_list = unlab[1]
+    name_list = unlab[2]
+    
     # Which class number correspond to that class name
     class_idx = np.where(conf["class_names"] == checkout)[0]
     if len(class_idx) == 0:
         raise NameError('Error: class-name not found. Check spelling.')
         
     # List of img_list-indexes with images corresponding to that class number
-    idx_list = np.where(unlab[1] == class_idx[0])[0]
+    idx_list = np.where(lab_list == class_idx[0])[0]
     num_images = len(idx_list)
     if (num_images == 0):
         raise IndexError("No findings in this class.")
@@ -386,11 +398,14 @@ def checkout_class(checkout, unlab, conf):
     
     # plot simple raster image on each sub-plot
     for i, axi in enumerate(ax.flat):
+        idx = idx_list[i]
         # i runs from 0 to (nrows*ncols-1)
         # axi is equivalent with ax[rowid][colid]
         try:
-            img = unlab[2][idx_list[i]]
-            pred = unlab[0][idx_list[i]]
+            fn = name_list[idx]
+            img = fn2img(fn, conf["unlab_dir"])
+            
+            pred = pred_list[idx_list[i]]
             title = "conf: "+str(round(pred, 5))
             axi.set_title(title)
             axi.imshow(img)
@@ -461,12 +476,12 @@ def write_to_file(var, conf, fname):
 
 
 
-def resample_unlab(dataset, unlab, path_list, conf):
+def resample_unlab(dataset, unlab, conf):
     """
-    unlab: pred, lab, img
+    unlab: pred, lab, name
     """
     lab_list = unlab[1]
-    img_list = unlab[2]
+    name_list = unlab[2]
     
     # Get the _last_ distribution used for training - NB: this must be updated for each teacher/student iteration
     _, orig_dist = class_distribution(dataset, conf["num_classes"])
@@ -492,9 +507,12 @@ def resample_unlab(dataset, unlab, path_list, conf):
             if in_count >= num_to_match:
                 count -= 1 # reduce by one cuz of enumerate updates index early
                 break
-            new_findings[0].append(img_list[idx])         # image
+            fn = name_list[idx]
+            img = fn2img(fn, conf["unlab_dir"])
+            
+            new_findings[0].append(img)         # image
             new_findings[1].append(lab_list[idx])         # label
-            new_findings_filepaths.append(path_list[idx]) # filepath
+            new_findings_filepaths.append(name_list[idx]) # filepath
             in_count += 1
         
         if conf["verbosity"]:
