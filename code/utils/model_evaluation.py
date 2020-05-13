@@ -198,4 +198,4 @@ def show_dataset_predictions(true_labels, pred_labels, pred_confidence, images, 
 
     plt.subplots_adjust(left=0, bottom=0, right=2, top=2, wspace=0.5, hspace=0.5)
     plt.tight_layout()
-    plt.savefig("{}/eval_ds-sample-pred.pdf".format(conf["log_dir"]), format="pdf")
+    plt.savefig("{}/checkout-eval_ds-pred.pdf".format(conf["log_dir"]), format="pdf")
