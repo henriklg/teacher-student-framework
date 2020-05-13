@@ -103,6 +103,7 @@ def create_dataset(conf):
     
     # Create cache-dir if not already exists
     pathlib.Path(conf["cache_dir"]).mkdir(parents=True, exist_ok=True)
+    pathlib.Path(conf["log_dir"]).mkdir(parents=True, exist_ok=True)
     np.random.seed(seed=seed)
     AUTOTUNE = tf.data.experimental.AUTOTUNE
     ds_size = len(list(data_dir.glob('*/*/*.*g')))
