@@ -494,13 +494,50 @@ Having found the error, the gradient of the cost function with regards to the we
 
 \section{Popular network architectures} %NOTE : drop this and merge with deep learning?
 
+
 \subsection{ResNet}
+% source1: https://missinglink.ai/guides/keras/keras-resnet-building-training-scaling-residual-nets-keras/
+% ----------------------------------------------------------
+%TODO reference paper
+Residual Netowrk (ResNet) is in a way an upgraded form of previously mentioned Convolutional Neural Networks. This architecture enable the model to have hundreds of layers. The original CNN would succumb to to the "vanishing gradient" problem, meaning that during the backpropegation the weights that minimizes the loss function would multiplied so many times that the gradient becomes smaller and smaller. In this case adding more layers will no longer lead to better performance and in some cases even degrade model performance. 
+
+What makes this architecture so efficient for high number of layers is "identity shortcut connections". ResNet stacks up these connections which is initially don't do anything. During training these layers are skipped, and the model uses the activation functions from previous layers. This compresses the model down to only a few layers at the beginning of training, this enables faster learning. When the model trains again all the layers are expanded again and the "residual" parts of the network explore more and more of the feature space of the source image.
+
+%TODO add figure
+
+ResNet outperforms shallower networks and are easy to implement in TensorFlow, Keras etc. And is therefor very popular in computer vision tasks. In the years after its authors published the model many new and prominent versions of the architectures have emerged.
+
+%TODO add table with performance metrics?
+
+
+
 \subsection{EfficientNet}
+% Source1: https://medium.com/@nainaakash012/efficientnet-rethinking-model-scaling-for-convolutional-neural-networks-92941c5bfb95
+% ----------------------------------------------------------
+EfficientNets \cite{EfficientNetRethinking19} focuses on improving the accuracy of the state of the art models even further, but also on increasing the efficiency of the model by tweaking the scaling. There are three different dimensions which can be scaled in a CNN; depth, width, and resolution. Depth is how many layers are in the model. Width is how wide the network is. One measure of width is how many channels are in the images - usually three, one  channel each for red, green and blue, or one for gray-scale images. Resolution is the number of pixels for height and width of the source image. Scaling in computer vision tasks is usually fixed, and set so that a given model performs optimally on a given tasks. 
+
+%TODO add figure of model scaling
+
+%TODO write more about the effects of tweaking depth, widht and resolution and then finally write about compound scaling
+
+\citeauthor*{EfficientNetRethinking19} proposed a novel technique which uses compound scaling to uniformly scale network width, depth and resolution.
+
+%TODO add compund scaling functions
+%TODO read through the paper again
+
+
+
 \subsection{Student teacher model}
+%source1:
+% ----------------------------------------------------------
+
+
+
 
 
 
 \section{Model evaluation}
+% how do we evaluate how good a model is. binary vs multiclass. f1-score, confusion matrix, sensitivity.
 % ----------------------------------------------------------
 
 
@@ -513,6 +550,11 @@ Having found the error, the gradient of the cost function with regards to the we
 % mention pre-trained models and 'set correct initial bias'
 % ----------------------------------------------------------
 
+
+\subsection{Cross dataset validation}
+% write about how we can use another separate dataset as validation data to compare models
+% especially good for imbalanced datasets.
+% ----------------------------------------------------------
 
 
 
@@ -527,7 +569,7 @@ Having found the error, the gradient of the cost function with regards to the we
 %TODO : add list of diseases from datasets (like stated in \ref{sec:colon_cancer})
 
 % Introduction
-The datasets used in our experiments are Kvasir Pillcam, Kvasir and Hyper-Kvasir. This section will demonstrate the main differences between the three datasets and explain how they can be found and used for fact checking. All three datasets are collected using endoscopic equipment at Vestre Viken Health Trust in Norway. The VV consists of 4 hospitals and provides health care for 470.000 people. One of the hospitals is Bærum Hospital, which has a large gastroenterology department from where the data is collected.
+The datasets used in our experiments are Hyper-PillCam, Kvasir and Hyper-Kvasir. This section will demonstrate the main differences between the three datasets and explain how they can be found and used for fact checking. All three datasets are collected using endoscopic equipment at Vestre Viken Health Trust in Norway. The VV consists of 4 hospitals and provides health care for 470.000 people. One of the hospitals is Bærum Hospital, which has a large gastroenterology department from where the data is collected.
 
 % Section layout
 We will also go through some other publicly and restrictively available datasets, and explain why there is a need for a novel wireless video endoscopy capsule dataset. We will introduce Augere Medical, and their tagging tool implementation which we have used to label our WCE videos. In the later part of this section we will discuss some of the difficulties of the aforementioned datasets.
