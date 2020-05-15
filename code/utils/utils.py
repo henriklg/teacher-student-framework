@@ -521,7 +521,7 @@ def resample_unlab(unlab, dataset,  conf):
 
 
 
-def reduce_dataset(ds, remove_filenames=None):
+def reduce_dataset(ds, remove=None):
     """
     """
     def remove_samples(img, path):
@@ -529,7 +529,7 @@ def reduce_dataset(ds, remove_filenames=None):
         Filter out images which filename exists in new_findings_filepaths.
         Return boolean.
         """
-        bool_list = tf.equal(path, remove_filenames)
+        bool_list = tf.equal(path, remove)
         in_list = tf.math.count_nonzero(bool_list) > 0
         return not in_list
     
