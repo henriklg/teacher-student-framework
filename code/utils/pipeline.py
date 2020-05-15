@@ -125,9 +125,11 @@ def create_dataset(conf):
     # Create a tf.dataset of the file paths
     ds = {split: str(data_dir/split/'*/*.*g') for split in ["train","test","val"]}
 
-    split_size = [len(list(glob.glob(ds[split]))) for split in ds] # train/test/val
+#     split_size = [len(list(glob.glob(ds[split]))) for split in ds] # train/test/val
+    ds_sizes = {name:len(list(glob.glob(path))) for (name, path) in ds.items()}
+    ds_sizes["total"] = ds_size
     if verbosity > 0: 
-        print ("Dataset split:", split_size)
+        print ("Dataset split:", ds_sizes)
     
     # Display file-strings for globbing
     if verbosity > 0:
@@ -156,17 +158,14 @@ def create_dataset(conf):
     for split in ds:
         ds[split] = prepare_for_training(ds[split], split, num_classes, conf, cache=True)
     
+    steps = {name:ds_sizes[name]//conf["batch_size"] for (name, data) in ds.items()}
     conf["class_names"] = class_names
     conf["num_classes"] = num_classes
-    conf["sizes"] = {"total":ds_size, 
-                  "train":split_size[0], 
-                  "test":split_size[1], 
-                  "val":split_size[2]}
-    conf["steps"] = {"train":split_size[0]//conf["batch_size"], 
-                  "test":split_size[1]//conf["batch_size"],
-                  "val":split_size[2]//conf["batch_size"]}
+    conf["ds_sizes"] = ds_sizes
+    conf["steps"] = steps
+    ds["clean_train"] = clean_train
     
-    return clean_train, ds["train"], ds["test"], ds["val"]
+    return ds
 
 
 
@@ -247,7 +246,7 @@ def oversample(ds, cache_name, num_classes, conf):
         datasets.append(data)
     
     target_dist = [ 1.0/num_classes ] * num_classes
-    balanced_ds = tf.data.experimental.sample_from_datasets(datasets, target_dist)
+    balanced_ds = tf.data.experimental.sample_from_datasets(datasets, target_dist, seed=conf["seed"])
     
     ## Check the sample distribution after oversampling the dataset
     if conf["verbosity"] > 0:
@@ -327,21 +326,6 @@ def create_unlab_ds(conf):
     print ("Loaded {} images into unlabeled_ds.".format(ds_size_unlab))
     
     return unlab_ds, ds_size_unlab
-
-
-
-def fn2img(fn, folder):
-    """
-    Used for reading unlab_ds images
-    """
-    global IMG_SIZE
-    
-    fn = fn.numpy().decode("utf-8")
-    img = tf.io.read_file("{}/{}".format(folder, fn))
-    img = tf.image.decode_jpeg(img, channels=3)
-    img = tf.image.convert_image_dtype(img, tf.float32)
-    img = tf.image.resize(img, [IMG_SIZE, IMG_SIZE])
-    return img
 
 
 
