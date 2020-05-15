@@ -4,9 +4,8 @@ import os
 import textwrap
 import matplotlib.pyplot as plt
 
-# for checkout_unlab
+from tqdm.notebook import tqdm
 from PIL import Image, ImageDraw, ImageFont
-from pipeline import fn2img
 
 
 
@@ -273,7 +272,7 @@ def custom_sort(pred, lab, path):
 
 
 
-def checkout_unlab(unlab, conf):
+def checkout_findings(unlab, conf):
     """
     unlab: pred, lab, path
     
@@ -323,7 +322,7 @@ def checkout_unlab(unlab, conf):
             # found image
             else:
                 fn = name_list[indekser[i]]
-                img = fn2img(fn, conf["unlab_dir"])
+                img = fn2img(fn, conf["unlab_dir"], img_width)
                 
                 curr_class_examples.append(img)
                 curr_class_preds.append(pred_list[indekser[i]])
@@ -403,7 +402,7 @@ def checkout_class(checkout, unlab, conf):
         # axi is equivalent with ax[rowid][colid]
         try:
             fn = name_list[idx]
-            img = fn2img(fn, conf["unlab_dir"])
+            img = fn2img(fn, conf["unlab_dir"], 256)
             
             pred = pred_list[idx_list[i]]
             title = "conf: "+str(round(pred, 5))
@@ -476,7 +475,7 @@ def write_to_file(var, conf, fname):
 
 
 
-def resample_unlab(dataset, unlab, conf):
+def resample_unlab(unlab, dataset,  conf):
     """
     unlab: pred, lab, name
     """
@@ -508,7 +507,7 @@ def resample_unlab(dataset, unlab, conf):
                 count -= 1 # reduce by one cuz of enumerate updates index early
                 break
             fn = name_list[idx]
-            img = fn2img(fn, conf["unlab_dir"])
+            img = fn2img(fn, conf["unlab_dir"], conf["img_shape"][0])
             
             new_findings[0].append(img)         # image
             new_findings[1].append(lab_list[idx])         # label
@@ -522,7 +521,7 @@ def resample_unlab(dataset, unlab, conf):
 
 
 
-def reduce_dataset(ds, remove_filenames):
+def reduce_dataset(ds, remove_filenames=None):
     """
     """
     def remove_samples(img, path):
@@ -535,3 +534,25 @@ def reduce_dataset(ds, remove_filenames):
         return not in_list
     
     return ds.filter(remove_samples)
+
+
+
+def get_tqdm(unlab_size, count, new_findings):
+    tqdm_predicting = tqdm(total=unlab_size, desc='Predicting', position=0, initial=count)
+    tqdm_findings = tqdm(total=unlab_size, desc='Findings', 
+                     position=1, bar_format='{desc}:{bar}{n_fmt}', initial=new_findings)
+    
+    return tqdm_predicting, tqdm_findings
+
+
+
+def fn2img(fn, folder, size):
+    """
+    Used for reading unlab_ds images
+    """    
+    fn = fn.numpy().decode("utf-8")
+    img = tf.io.read_file("{}/{}".format(folder, fn))
+    img = tf.image.decode_jpeg(img, channels=3)
+    img = tf.image.convert_image_dtype(img, tf.float32)
+    img = tf.image.resize(img, [size, size])
+    return img
