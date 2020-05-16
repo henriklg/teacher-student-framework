@@ -55,8 +55,7 @@ Pathological findings consist of:
 
 We have also included one category for foreign bodies which includes images with things found inside the small intestine which does not fit in any of the previously mentioned categories. This includes thing like other VCE-devices and tables. The images annotated with the \textit{normal} tag is meant to be used for binary classification where all the others classes are combined into a single class for \textit{finding} and one class for no findings. \textit{Normal} images are hand picked from portions of video where there are no findings, and taken from each video to get a diverse category.
 
-
-When all 44 videos have been precisely labeled the dataset is exported from Augere Medical tagging tool and split into folders for each class. The number of images per class are given in Table \ref{table:kvasir_pillcam_samples}. In total we have 43,905 labeled images in 12 classes. The sample distribution across the classes is skewed depending on how many findings there are in the videos. Some findings occur often and some very rarely. The dataset also contain one class for 'normal' images, which there is quite a bit more of than findings.
+When all 44 videos have been precisely labeled the dataset is exported from Augere Medical tagging tool and split into folders for each class. The number of images per class are given in Table \ref{table:kvasir_pillcam_samples}. In total we have 43,905 labeled images in 12 classes. The sample distribution across the classes is skewed depending on how many findings there are in the videos. Some findings occur often and some very rarely. 
 
 Imbalanced dataset pose a challenge for predictive algorithms as most learning algorithms are based on the assumption of an equal number of samples for each class. This results in models that have poor predictive performance, especially for minority class or classes. This is a great problem because in many medical datasets the minority class is the most important and therefore more sensitive for classification errors.
 
@@ -83,7 +82,7 @@ In addition to labeling the images the dataset also contain a JSON format file w
     Unknown			& 190	& xx,x \\
     \hline
   \end{tabular}
-  \caption{Hyper-PillCam class names and corresponding amount of samples.}
+  \caption{Hyper-PillCam class names, corresponding amount of samples and the percentage of samples in each class.}
   \label{table:kvasir_pillcam_samples}
 \end{table}
 
