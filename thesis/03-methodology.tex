@@ -17,8 +17,8 @@ In this chapter we will discuss how we created the dataset used in our research,
 % ----------------------------------------------------------
 % Present how you gathered the data and labels
 % ----------------------------------------------------------
-%TODO : add list of diseases from datasets (like stated in \ref{sec:colon_cancer})
 As discussed in Section \ref{sec:available_datasets} there is number of publicly available datasets online, and some which are restricted. Some of these datasets are difficult to access, and there is a need for more publicly available datasets which are collected for the purpose of deep learning. To assist the under-explored field of research within medical computer assisted analysis tools the datasets need to be large and well annotated. Some of the mentioned datasets lack adequately documented, annotated samples from a good source and is not well suited for our research. Thus, as a vital part of our research, we aim to produce a collection of well annotated and adequately big dataset that can be used not only in this study, but also contribute to the research community and have a impact on the research comparability in future. We achieve this by collecting medical data, sorting and annotating it and making the dataset publicly available and free for non-commercial, educational and research purposes.
+
 
 \subsection{Privacy, Legal and Ethics Issues}
 %Source: pogorelov thesis 3.1.1
@@ -29,12 +29,33 @@ A medical study conducted at 2 academic hospitals from May 2017 to September 201
 We solved this problem by collaborating with a number of Norwegian hospitals and research teams working there. One of the research teams we collaborated with is Augere Medical (See Section \ref{sec:augere_medical} for more info), and through them we got in contact with Vestre Viken Hospital Trust, allowing our research team to download anonymous data from hospital systems and transfer it using secure media to our facility. Upon downloading the data we further stripped the metadata files for potential information regarding patients like time stamps, dates and camera equipment used.
 %TODO : ethics?
 
+% From ds-paper
+% The study was approved by the Privacy Data Protection Authority.  It was exempted from approval from the RegionalCommittee for Medical and Health Research Ethics - South East Norway. Since the data is anonymized, the dataset is publiclyshareable based on Norwegian and General Data Protection Regulation (GDPR) laws.
+
 
 
 \subsection{Kvasir-PillCam} \label{sec:kvasir_pillcam}
 % Where is the dataset collected from?
-The dataset we used in our experiments consist of endoscopic videos collected from Bærum Hospital, a hospital in Vestre Viken Hospital Trust. Unlike Kvasir and Hyper-Kvasir datasets we have made the Kvasir-PillCam dataset for the purpose of this thesis. In total we have 44 videos which have gone through some re encoding to reduce the file sizes, and also because the original encoding is proprietary Sony technology. After that the videos are uploaded to Augere Medical\footnote{\url{https://augere.md/}} tagging tool. The data export from Bærum contains a number of  findings for each video and they are annotated, extracted, converted to frame number and that helped us a great deal with tagging the videos. %TODO : rewrite 
-%We also have Thomas de Lange to thank, because he helped us a lot with the medical aspect of the classification process. ** bad sentence **
+The dataset we used in our experiments consist of endoscopic videos collected from Bærum Hospital, a hospital in Vestre Viken Hospital Trust. Unlike Kvasir and Hyper-Kvasir datasets we have made the Kvasir-PillCam dataset for the purpose of this thesis. Initially we received 44 VCE videos, which were first reviewed by a clinician, whom selected thumbnails of region of interests of both lesions and normal findings. The videos were then exported from Vestre Viken Hospital Trust and re-encoded to an open source file format (MP4?), from proprietary Sony technology format (whats the name?) %TODO what format?
+Prior to being exported the videos were anonymized by removing all metadata and renaming the files with randomly generated file names. A few videos had to be shortened to cut out images taken by the capsule before entering the mouth of the patient. After that the videos are uploaded to Augere Medical AS\footnote{\url{https://augere.md/}} tagging tool. Three MSc students went through all the frames of the videos in collaboration with an expert and labeled and marked findings with bounding boxes. When the student encountered images they were uncertain of the expert reviewed the case.
+
+There are a total of XX different findings in the dataset. The findings are split in two different types; anatomical landmarks and pathological findings. Anatomical landmarks consist of two categories:
+\begin{itemize}
+\item Pylorus valve; where the capsule enters the small intestine from the stomach.
+\item Ileocecal valve; the transition from small intestine to large intestine. 
+\end{itemize}
+
+Pathological findings consist of:
+\begin{itemize}
+\item Protruding lesions; polyps, varices and tumors.
+\item Excavated lesions; scars, ulcers, erosions, angiectasia, and dieulafoy lesions.
+\item Mocusa; edematous, scalloping, hemorrhagic, erythematous, and ulcerated mucosa.
+\item Normal; no pathological finding.
+\end{itemize}
+
+We have also included one category for foreign bodies which includes images with things found inside the small intestine which does not fit in any of the previously mentioned categories. This includes thing like other VCE-devices and tables. The images annotated with the \textit{normal} tag is meant to be used for binary classification where all the others classes are combined into a single class for \textit{finding} and one class for no findings. \textit{Normal} images are hand picked from portions of video where there are no findings, and taken from each video to get a diverse category.
+
+
 When all 44 videos have been precisely labeled the dataset is exported from Augere Medical tagging tool and split into folders for each class. The number of images per class are given in Table \ref{table:kvasir_pillcam_samples}. In total we have 43,905 labeled images in 12 classes. The sample distribution across the classes is skewed depending on how many findings there are in the videos. Some findings occur often and some very rarely. The dataset also contain one class for 'normal' images, which there is quite a bit more of than findings.
 
 Imbalanced dataset pose a challenge for predictive algorithms as most learning algorithms are based on the assumption of an equal number of samples for each class. This results in models that have poor predictive performance, especially for minority class or classes. This is a great problem because in many medical datasets the minority class is the most important and therefore more sensitive for classification errors.
@@ -44,29 +65,30 @@ In addition to labeling the images the dataset also contain a JSON format file w
 %TODO : update this table with the final classes and numbers
 \begin{table} % table:kvasir_pillcam
   \centering
-  \begin{tabular}{|l|l|}
+  \begin{tabular}{|l|r|l|}
   	\hline
-  	Class name & Samples \\
+  	Class name & # samples & Percentage \\
     \hline
-    Angiectasia		& 908 \\ 
-    Blood			& 658 \\ 
-    Erosion			& 525 \\ 
-    Erythematous	& 251 \\
-    Foreign Bodies	& 776 \\
-    Hematin			& 12 \\
-    Ileo-cecal valve& 4704 \\
-    Normal			& 33,129 \\
-    Polyp			& 583 \\
-    Pylorus			& 1410 \\
-    Ulcer			& 759 \\
-    Unknown			& 190 \\
+    Angiectasia		& 908	& xx,x \\ 
+    Blood			& 658	& xx,x \\ 
+    Erosion			& 525	& xx,x \\ 
+    Erythematous	& 251	& xx,x \\
+    Foreign Bodies	& 776	& xx,x \\
+    Hematin			& 12	& xx,x \\
+    Ileo-cecal valve& 4704	& xx,x \\
+    Normal			& 33,129& xx,x \\
+    Polyp			& 583	& xx,x \\
+    Pylorus			& 1410	& xx,x \\
+    Ulcer			& 759	& xx,x \\
+    Unknown			& 190	& xx,x \\
     \hline
   \end{tabular}
   \caption{Hyper-PillCam class names and corresponding amount of samples.}
   \label{table:kvasir_pillcam_samples}
 \end{table}
 
-
+Later, we received an additional XX videos. These videos were not annotated but used for unlabeled data. (and/or sample-videos?)
+These videos were processed exactly the same as previous videos, so that it will be compatible (**describe**) with the annotated dataset.
 
 
 
@@ -96,7 +118,7 @@ In this step we also reduce the image dimensions to make the data easier to use 
 
 \subsection{Data pipeline}
 % tensorflow.data.Dataset pipeline with prefech, batching, shuffling, caching etc
-The preprocessing pipeline is implemented by using tensorflows data.Dataset library. This was chosen over datagenerator due to the easy of use, but later became an issue due to the complexity. The main benefits by using data.Dataset is that all data is handled in tensors and computed by the GPU which enhance the load distribution of processing power. 
+The preprocessing pipeline is implemented by using TensorFlows \textit{data.Dataset} library. This was chosen over \textit{datagenerator} due to the easy of use, but later became an issue due to the complexity. The main benefits by using data.Dataset is that all data is handled in tensors and computed by the GPU which enhance the load distribution of processing power. 
 
 The pipeline outline can be seen in Figure XX.
 %TODO add figure of data pipeline and describe each step and why its done
@@ -105,6 +127,9 @@ The pipeline outline can be seen in Figure XX.
 We call this consumer / producer overlap, where the consumer is the GPU and the producer is the CPU. %or is this prefetching?
 
 
+
+\subsection{Training}
+%TODO Include a table of computer hardware used for training, and versions of all libraries used (like hicks p.73
 
 
 % ----------------------------------------------------------
