@@ -453,5 +453,3 @@ def split_and_create_dataset(conf):
                   "val":split_size[2]//conf["batch_size"]}
     
     return train_ds, test_ds, val_ds
-
-
