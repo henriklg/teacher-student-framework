@@ -24,7 +24,7 @@ parser.add_argument('--data_dir', default='data', help="Directory with the datas
 parser.add_argument('--output_dir', default='data', help="Where to write the new data")
 parser.add_argument('--split', nargs=2, help="Train, test, val split given as [0.7 0.15]")
 parser.add_argument('--size', default=256, help="Image size")
-parser.add_argument('--seed', default=42, help="What seed to use when shuffling the data")
+parser.add_argument('--seed', default=2511, help="What seed to use when shuffling the data")
 
 def resize_and_save(filename, output_dir, size):
     """Resize the image contained in `filename` and save it to the `output_dir`"""
