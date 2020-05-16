@@ -3,10 +3,10 @@ Split dataset into train/test/val and resize images to correct size.
 
 The dataset comes in the following format:
     data_folder/
-        class1
-        ... images
-        class2/
-        ... images
+        image1
+        image2
+        image3
+        ...
 """
 
 import argparse
