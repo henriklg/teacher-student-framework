@@ -682,7 +682,7 @@ The Kvasir dataset \cite{KVASIRMultiClass17} contains images from inside the gas
     2 & polyrus & 8000 \\ 
     \hline
   \end{tabular}
-  \caption{Kvasir class names and corresponding class numbers.}
+  \caption{Kvasir-V2 class names and corresponding class numbers.}
   \label{table:kvasir}
 \end{table}
 
@@ -723,7 +723,13 @@ The Hyper-Kvasir dataset is licensed under a Creative Commons Attribution 4.0 In
 \subsubsection{Labeled images}
 Hyper-Kvasir contains 10,662 labeled images. The images are split into 23 different classes, and are stored in a folder with the same name as its corresponding class. All of the images are stored in JPEG format \cite{JPEGStill92}, which means it has some image quality loss but quite insignificant compared to the reduction in file size. Like in situations most often encountered the classes has a different number of samples, this is a challenge in the medical field because some findings occur more often than others. In Table \ref{table:hyper_kvasir} you can see the 23 classes and how many images there is for each class.
 
-% ask Pål for the figure with class/sample distribution from original hyper-kvasir paper
+\begin{figure}[H] % hyper-kvasir-dist
+  \begin{center}
+    \includegraphics[width=0.9\textwidth]{hyper-kvasir-dist.png}
+    \caption{Number of samples for each of the 23 classes in Hyper-Kvasir dataset.}
+    \label{fig:hyper-kvasir-dist}
+  \end{center}
+\end{figure}
 
 \subsubsection{Unlabeled images}
 This part of the dataset contains 99.417 unlabeled images. When extracted they can be found in a separate subfolder. The images are accompanied with extracted global features and clusters assignments in Hyper-Kvasir Github repository. 
