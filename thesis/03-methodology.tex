@@ -172,28 +172,47 @@ Once we have a dataset object we can transform it into a new dataset by chaining
 % ----------------------------------------------------------
 To build a efficient pipeline it is required that the Graphical Processor Unit (GPU) is fed data at the right time. If the GPU is waiting to receive data the pipeline is not optimized and training will take longer. Preferably the pipeline delivers data for the next step before the current step has finished. 
 
-The main steps involved in training a model is (1); opening a file, (2); reading the data from that file and (3); using the data for training. If these operations are performed in sequential order the model can not train while it is waiting idle for an image to be opened and loaded. Therefor the training step time is the sum of all three steps. 
+The main steps involved in training a model is (1); opening a file, (2); reading the data from that file and (3); using the data for training. If these operations are performed in synchronous and sequential order the model can not train while it is waiting idle for an image to be opened and read. Therefore the training step time is the sum of all three steps, see Figure \ref{fig:pipeline_naive}. 
 
 \begin{figure} % fig:pipeline_naive
   \begin{center}
     \includegraphics[width=1.0\textwidth]{pipeline_naive}
-    \caption[The time spent for reading, opening, pre-processing and training the naive method.]{The time spent for reading, opening, pre-processing and training the naive method.}
+    \caption[Naive pipeline.]{The time spent for reading, opening and training - the naive method.}
     \label{fig:pipeline_naive}
   \end{center}
 \end{figure}
 
-To mitigate this time-consuming issue we can use caching.
+To mitigate this time-consuming issue the tf.data API have a couple of tools at disposal. The first one is prefetching. 
+Prefetching overlaps the preprocessing and model execution of a training step. While the model is executing training step $s$, the input pipeline is reading the data for step $s+1$. Doing so reduces the training step time by a significant amount as seen on Figure \ref{fig:pipeline_prefetch}.
+Because we are using a tf.data.Dataset object for holding all our images it is very easy to introduce prefetching to the pipeline. The tf.data API provides the tf.data.Dataset.prefetch transformation which decouple the time when data is produced by the CPU from the time when data is consumed by the GPU. 
 
-%\begin{figure} % fig:
-%  \begin{center}
-%    \includegraphics[width=0.7\textwidth]{}
-%    \caption[]{}
-%    \label{fig:prefetched_pipeline}
-%  \end{center}
-%\end{figure}
+\begin{figure} % fig:pipeline_prefetch
+  \begin{center}
+    \includegraphics[width=1.0\textwidth]{pipeline_prefetch}
+    \caption[Pipeline with prefetching.]{Time spent on reading, opening and training with pipeline prefetching enabled.}
+    \label{fig:pipeline_prefetch}
+  \end{center}
+\end{figure}
 
-We call this consumer / producer overlap, where the consumer is the GPU and the producer is the CPU. %or is this prefetching?
+We rely heavily on data augmentation to help the model to generalize and not overfit. This is done when preparing the data by using tf.data.Dataset.map transformations, which applies a user-defined function to each element of the input dataset. Because the samples are independent of one another, the process can be parallelized across multiple CPU cores. The tf.data API provides a num\_paralell\_calls argument to specify the level of parallelism, this argument can be set manually or automatically. We have chosen to go with the automatic delegation, which sets the level of parallelism on runtime. See Figure \ref{fig:pipeline_sequential} for the naive approach, and Figure \ref{fig:pipeline_parallel_map} for overhead when using parallel mapping.
 
+\begin{figure} % fig:pipeline_sequential
+  \begin{center}
+    \includegraphics[width=1.0\textwidth]{pipeline_sequential}
+    \caption[Naive pipeline with mapping.]{Naive pipeline, here the times spent on opening, reading, pre-processing and training steps sum together for a single iteration.}
+    \label{fig:pipeline_sequential}
+  \end{center}
+\end{figure}
+
+\begin{figure} % fig:pipeline_parallel_map
+  \begin{center}
+    \includegraphics[width=1.0\textwidth]{pipeline_parallel_map}
+    \caption[Pipeline with parallel mapping.]{Here you can see pre-processing steps overlap, and the overal time for each iteration is reduced.}
+    \label{fig:pipeline_parallel_map}
+  \end{center}
+\end{figure}
+
+The last step we take to optimize the training efficiency is to cache the dataset to local storage (an NVMe SSD in our case). 
 
 \subsection{Shuffle the data}
 
