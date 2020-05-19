@@ -106,18 +106,13 @@ The pipeline outline can be seen in Figure XX.
 All the code for handling the data pipeline is managed in a separate script called pipeline.py. Psuedo code for the script is:
 %TODO : add code outline / psuedo code
 
-\subsection{Data preprocessing}
-% data normalization, splitting, augmentation etc
+
+
+\subsection{Splitting and resize images}
+% could also be called 'image preprocessing'?
 % ----------------------------------------------------------
-\begin{itemize}
-\item When splitting the dataset it is important to ensure minority classes are represented in both training, validation and test dataset. Found that opencv resizes images a bit faster (1.2s vs 1.6 for pillow)
-\item What is the necessity of rotating the samples. Will they not always be 'square'?
-\item Normalization; any benefit of using L2 normalization in last dense layer when using a pre-defined model?
-\end{itemize}
+Although not strictly a part of the pipeline itself the preprocessing is a vital step in machine learning as the quality of the data and the useful information that can be derived from it directly affects the ability of our model to learn.
 
-
-
-\subsection{Splitting dataset}
 Initially the dataset was split into three; training data, test data, and validation data. This was done by using tf.data.Dataset core operations \textit{take} and \textit{skip}. The take function, when called upon, returns a sub-dataset with the same number of samples as the number it receives as a argument. Skip function returns a sub-dataset where it skips the number of elements as stated in input argument and return the remaining samples.
 
 \begin{lstlisting}[language=Python]
@@ -127,9 +122,9 @@ Initially the dataset was split into three; training data, test data, and valida
 [7, 8, 9]
 \end{lstlisting}
 
-However, because of the imbalanced dataset we have been working with this turned out to drop minority classes in some runs. This happened because the take and skip methods picks samples from the entire dataset as whole, and not per class. In Hyper-Kvasir the class with smallest number of samples is hemorrhoids with 6 samples, and depending on shuffling these samples would often all end up in one of the dataset splits and not be represented in the other two.
+However, because of the imbalanced dataset we have been working with this turned out to drop minority classes in some runs. This happened because the take and skip methods picks samples from the entire dataset as whole, and not per class. In Hyper-Kvasir the class with smallest number of samples, called a minority class, is hemorrhoids with 6 samples. Depending on the random shuffling for each run these samples would often all end up in one of the dataset splits and not be represented in the other two.
 %Discovered non-optimal implementation of dataset splitting, which left some of the most vulnerable minority classes with no samples in the test data. 
-To mitigate this issue I created a new script for pre-splitting dataset into sub folders for each, training, testing and validation dataset. The outline of this script is given below.
+To mitigate this issue I created a separate script for pre-splitting dataset into sub folders for each, training, testing and validation dataset. The outline of this script is given below.
 
 \begin{lstlisting}[language=Python]
 for every class name in directories:
@@ -141,17 +136,62 @@ for every class name in directories:
 			resize and save the image
 \end{lstlisting}
 
-We split the data into 60\% training data, and leave 15\% for test data and validation data respectively. To make the split reproducible we first sort the data with alphabetically after file names then use seeded random to shuffle before splitting. 
-% Mention seed etc
-In this step we also reduce the image dimensions to 256 by 256 pixels to make the data easier to use during the next preprocessing steps and to reduce dataset file size. In Hyper-Kvasir this size reduction correspond to a magnitude in file size reduction.
+We split the data into 60\% training data, and leave 15\% for test data and validation data respectively. To make the split reproducible we first sort the data in alphabetically order after file names then use seeded random to shuffle the filenames so the three datasets contains a random assortment of images from the original dataset. 
+In this step we also reduce the image dimensions to 256 by 256 pixels to make the data easier to use during the next preprocessing steps. For downscaling the images we use a \textit{resize} function from the highly optimized library openCV's, with a bilinear interpolation. We used openCV because for this particular task it was about 30\% faster than Pillow, another popular Python imaging library. However this downscaling might introduce aliasing and artifacts to the images as the Hyper-Kvasir's median image dimensions are 768 by 576 pixels, which means we are reducing the dimensions with a factor of three. Area based interpolation \cite{AreaBased99} or Gaussian resampling, with a suitable chosen radius, may give better results. This is something I would like to have tested if I had more time.
+
+Another benefit we get from running all images through this processing script is the reduction in dataset file size. In Hyper-Kvasir this size reduction correspond to a magnitude in total file size reduction, from 28 gigabytes to 2.8 gigabytes. This helps to efficiently load the images into the pipeline during training.
+
+At this step it would be natural to also apply normalization to the images, but TensorFlow handles this gracefully while reading the images from disk, so we have opted to leave this out of the script. To normalize an image in the context of machine learning means to squeeze the pixels values into a range from zero to one. This is done because usually when reading an image from disk it is represented with an integer value between 0 and 255. Although this integer value can be directly represented to the neural network models, this can result in challenges during training like slower learning.
+
+Finally the images are saved to a corresponding directory for each train, test and validation data in the given output directory.
 
 
-\subsection{Sample the dataset or class weight}
-Found that when weighting the classes the model learns slower. Which means decay rate of learning rate must be lowered for it not to drop too soon. Also increase the buffer for early stopping of training.
+\subsection{Loading images into the pipeline}
+% write about the first part of create_dataset script
+% ----------------------------------------------------------
+To efficiently read and process the images in the pipeline we use TensorFlow's function \textit{list\_files} from the tensorflow.data API. This function creates a Python iterable dataset object of all files matching a glob pattern. An example of a glob pattern could be "/source/datasets/*.jpg". In this example the "*.jpg" is a wildcard followed by a image format extension, which means that a dataset will be created out of all jpg images inside the "datasets" directory. This function then returns a dataset of strings corresponding to filenames. Although not strictly necessary because the images were randomly shuffled before being split into train, test and validation datasets, the filenames are shuffled again upon entering the dataset. This is repeated three times for each of the train, test and validation datasets. If we get 5 samples from this dataset of strings this is how they would be represented:
 
-%TODO add formula for calculating class weights
+\begin{lstlisting}[language=Python]
+>>> for path in dataset.take(5):
+>>> 	print (path)
+tf.Tensor(b'/data/normal-cecum/cc6ed77fbc04.jpg', shape=(), dtype=string)
+tf.Tensor(b'/data/polyps/119100adf1de.jpg', shape=(), dtype=string)
+tf.Tensor(b'/data/esophagitis/f3be6279f5f7.jpg', shape=(), dtype=string)
+tf.Tensor(b'/data/dyed-lifted-polyps/cbdfb00c142d.jpg', shape=(), dtype=string)
+tf.Tensor(b'/data/dyed-lifted-polyps/b1aa0268867b.jpg', shape=(), dtype=string)
+\end{lstlisting}
 
-\subsection{Caching}
+Next we apply a transformation function to each element of the dataset to create (image, label) pairs from the filepaths. This transformation function does three things; one-hot encodes the label based on the parent directory; decodes the image so the image is represented with a tensor with dimensions (image width, image height, color channels); resize the image to the correct dimensions. 
+
+Once we have a dataset object we can transform it into a new dataset by chaining method calls on the dataset object.
+
+
+\subsection{Optimize performance}
+%source1: https://www.tensorflow.org/guide/data_performance#optimize_performance
+%source2: https://www.tensorflow.org/api_docs/python/tf/data/Dataset#cache
+% ----------------------------------------------------------
+To build a efficient pipeline it is required that the Graphical Processor Unit (GPU) is fed data at the right time. If the GPU is waiting to receive data the pipeline is not optimized and training will take longer. Preferably the pipeline delivers data for the next step before the current step has finished. 
+
+The main steps involved in training a model is (1); opening a file, (2); reading the data from that file and (3); using the data for training. If these operations are performed in sequential order the model can not train while it is waiting idle for an image to be opened and loaded. Therefor the training step time is the sum of all three steps. 
+
+\begin{figure} % fig:pipeline_naive
+  \begin{center}
+    \includegraphics[width=1.0\textwidth]{pipeline_naive}
+    \caption[The time spent for reading, opening, pre-processing and training the naive method.]{The time spent for reading, opening, pre-processing and training the naive method.}
+    \label{fig:pipeline_naive}
+  \end{center}
+\end{figure}
+
+To mitigate this time-consuming issue we can use caching.
+
+%\begin{figure} % fig:
+%  \begin{center}
+%    \includegraphics[width=0.7\textwidth]{}
+%    \caption[]{}
+%    \label{fig:prefetched_pipeline}
+%  \end{center}
+%\end{figure}
+
 We call this consumer / producer overlap, where the consumer is the GPU and the producer is the CPU. %or is this prefetching?
 
 
@@ -162,14 +202,23 @@ We call this consumer / producer overlap, where the consumer is the GPU and the 
 
 
 \subsection{Data augmentation}
+What is the necessity of rotating the samples. Will they not always be 'square'?
 
 
 \subsection{Batching}
 
 
+\subsection{Sample the dataset or class weight}
+Found that when weighting the classes the model learns slower. Which means decay rate of learning rate must be lowered for it not to drop too soon. Also increase the buffer for early stopping of training.
+
+%TODO add formula for calculating class weights
+
+
+
 \subsection{Training}
 %TODO Include a table of computer hardware used for training, and versions of all libraries used (like hicks p.73
 
+Normalization; any benefit of using L2 normalization in last dense layer when using a pre-defined model?
 
 % ----------------------------------------------------------
 \section{System implementation} \label{sec:system_implementation}
