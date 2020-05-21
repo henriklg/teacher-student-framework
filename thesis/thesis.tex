@@ -1,16 +1,13 @@
 % ----------------------------------------------------------
 % -----------------------Preamble---------------------------
 % ----------------------------------------------------------
-\documentclass[english,a4paper,twoside]{report}
-
+\documentclass[a4paper,english,11pt,twoside,openright]{report}
+%\documentclass[USenglish]{ifimaster}  %% ... or USenglish or norsk or nynorsk
 % Packages
-\usepackage[a4paper,				% change layout of different elements such as paper size
-			width=150mm,top=25mm,
-			bottom=25mm]{geometry}
+\usepackage{geometry}
 \usepackage[font=small,
 			labelfont=bf]{caption}	% nice figure captions
 \usepackage{subfiles}
-%\usepackage{fancyhdr}				% header - activate with pagestyle{fancy}
 \usepackage[english]{babel}         % Ordelingsregler, osv (velg språk her)
 \usepackage{duo/duomasterforside}	% DUO master-forside
 \usepackage[utf8]{inputenc}         % Riktig tegnsett
@@ -30,11 +27,6 @@
 			style=ieee, 
 			sortcites=true, 
 			]{biblatex}
-\usepackage[symbols,
-			nogroupskip,
-			nonumberlist,
-			sort=use]
-			{glossaries-extra}		% list of symbols
 
 
 % ---------------------------------------------------------
@@ -43,15 +35,15 @@
 %  backrefpage = {page},% originally "cited on page"
 %  backrefpages = {pages},% originally "cited on pages"
 %}
+%% Margin adjustments:
+\addtolength{\topmargin}{-2\baselineskip}
+\addtolength{\textheight}{4\baselineskip}
+\addtolength{\evensidemargin}{-5mm}  % Compensate for binding
+\addtolength{\oddsidemargin}{5mm}
 
-% make the glossaries for list of symbols
-\makenoidxglossaries
+\pretolerance = 2000
+\tolerance = 5000   \hbadness = \tolerance
 
-\glsxtrnewsymbol[description={position}]{x}{\ensuremath{x}}
-%\glsxtrnewsymbol[description={velocity}]{v}{\ensuremath{v}}
-%\glsxtrnewsymbol[description={acceleration}]{a}{\ensuremath{a}}
-%\glsxtrnewsymbol[description={time}]{t}{\ensuremath{t}}
-%\glsxtrnewsymbol[description={force}]{F}{\ensuremath{F}}
 
 % Folder for figures
 \graphicspath{
@@ -154,12 +146,20 @@
 \externaldocument[C4-]{build/04-experiments}
 \externaldocument[C5-]{build/05-conclusions}
 
+%\frontmatter{}
+\cleardoublepage \pagenumbering{roman}
 \section*{Abstract}
 Colorectal Cancer (CRC) is the third most common diagnosed cancer in both men and women. And a leading cause for CRC mortality is that patients in early stages have few and defuse symptoms which makes CRC hard to detect before later stages of the disease. To combat this the health care implemented regular screening for population most at risk. Yet for some the treatment come too late. 
 We propose a system for automatically detection of diseases in the gastrointestal tract (GI-tract) using wireless capsule endoscopy and deep learning. A system like this requires a large amount of labeled data to train the prediction models. Although the health sector collects large amount of patient data, the most used deep learning systems need to have access to labeled data to properly train. This labeled data is difficult to create as doctors and other professionals need to manually inspect and annotate. Our proposal uses a model which only need a small amount of labeled data to operate, and an additional bulk of unlabeled data to advance. 
 
-\cleardoublepage
 
+\tableofcontents
+\listoffigures
+\addcontentsline{toc}{chapter}{\listfigurename}
+\listoftables
+\addcontentsline{toc}{chapter}{\listtablename}
+
+\cleardoublepage
 \section*{Acknowledgements}
 This thesis is submitted as part of the master's degree in informatics: Computational Science: Imaging and Biomedical Computing. It has been very interesting to work with ..
 \medbreak \noindent
@@ -168,22 +168,6 @@ I would especially like to thank my supervisor Pål for ..
 Thanks to my internal supervisor Professor Anne H. Solberg and the rest of the DSB group, for....
 \medbreak \noindent
 Finally, I would like to thank my parents for their encouragement and everlasting love.
-
-
-\tableofcontents
-
-\listoffigures
-\addcontentsline{toc}{chapter}{\listfigurename}
-
-\listoftables
-\addcontentsline{toc}{chapter}{\listtablename}
-
-\printnoidxglossary[
-			type=symbols,
-			style=long,
-			title={List of Symbols}
-			]
-% example of gls usage: Reference symbols: $\gls{x}$
 % -----------------------END--------------------------------
 
 
@@ -191,9 +175,8 @@ Finally, I would like to thank my parents for their encouragement and everlastin
 % ----------------------------------------------------------
 % -------------------The main body--------------------------
 % ----------------------------------------------------------
-\cleardoublepage
-%\pagestyle{fancy}  NB: need fancyhdr package
-\pagenumbering{arabic}
+%\mainmatter{}
+\cleardoublepage \pagenumbering{arabic}
 
 \subfile{01-introduction}
 \subfile{02-background}
@@ -207,7 +190,8 @@ Finally, I would like to thank my parents for their encouragement and everlastin
 % ----------------------------------------------------------
 % -------------------The endmatter--------------------------
 % ----------------------------------------------------------
-\newpage
+%\backmatter{}
+\cleardoublepage
 \printbibliography[heading=bibintoc]
 
 \end{document}
