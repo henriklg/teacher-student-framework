@@ -127,38 +127,37 @@ An lower endoscopy is a procedure used to examine the lower gastrointestinal tra
 \bigbreak \noindent
 
 %Source: https://www.cancer.net/navigating-cancer-care/diagnosing-cancer/tests-and-procedures/types-endoscopy
-%TODO : fit table to linewidth. remove procedure names?
 \begin{table} % tab:endoscope_types
   \centering
-  \begin{tabular}{ l l l l}
+  \makebox[\textwidth][c]{
+  \begin{tabular}{|p{.2\textwidth}|p{.2\textwidth}|p{.35\textwidth}|p{.33\textwidth}|}
   	\hline
-    Name of procedure	&Name of tool	&Area/organ viewed	&Insertion point	\\
+    \textbf{Procedure}	&\textbf{Name of tool}	&\textbf{Area/organ viewed}	&\textbf{Insertion point}	\\
     \hline
-    Anoscopy			&Anoscope		&Anus and/or rectum	&Anus				\\
-    Arthroscopy			&Arthroscope	&Joints				&Incision at the joint\\ 
+    Anoscopy			&Anoscope		&Anus and/or rectum	&Anus				\\ \hline
+    Arthroscopy			&Arthroscope	&Joints				&Incision at the joint\\ \hline
     Bronchoscopy		&Bronchoscope	&Trachea, windpipe
-    										and the lungs	&Mouth				\\ 
+    										and the lungs	&Mouth				\\ \hline
     Colonoscopy			&Colonoscope	&Colon and large
-    										intestine		&Anus				\\				
-    Colposcopy			&Colposcope		&Vagina and cervix	&Vagina				\\
-    Cystoscopy			&Cystoscope		&Inside of bladder	&Urethra			\\
-    Esophagoscopy		&Esophagoscope	&Esophagus			&Mouth				\\
-    Gastroscopy			&Gastroscope	&Stomach, duodenum	&Mouth				\\
-    Hysteroscopy		&Hysteroscope	&Uterus				&Vagina				\\
+    										intestine		&Anus				\\ \hline			
+    Colposcopy			&Colposcope		&Vagina and cervix	&Vagina				\\ \hline	
+    Cystoscopy			&Cystoscope		&Inside of bladder	&Urethra			\\ \hline	
+    Esophagoscopy		&Esophagoscope	&Esophagus			&Mouth				\\ \hline	
+    Gastroscopy			&Gastroscope	&Stomach, duodenum	&Mouth				\\ \hline	
+    Hysteroscopy		&Hysteroscope	&Uterus				&Vagina				\\ \hline	
     Laparoscopy			&Laparoscope	&Stomach, liver or
-    									other abdominal organs	&Incision in the abdomen \\
-    Laryngoscopy		&Laryngoscope	&Larynx				&Mouth				\\
-    Neuroendoscopy		&Neuroendoscope	&Areas of the brain	&Incision in the skull \\
+    									other abdominal organs	&Incision in the abdomen \\ \hline	
+    Laryngoscopy		&Laryngoscope	&Larynx				&Mouth				\\ \hline	
+    Neuroendoscopy		&Neuroendoscope	&Areas of the brain	&Incision in the skull \\ \hline	
     Proctoscopy			&Proctoscope	&Rectum and sigmoid
-    										colon			&Anus				\\
-    Sigmoidoscopy		&Sigmoidoscope	&Sigmoid of colon	&Anus				\\
-    Thoracoscopy		&Thoracoscope	&Pleura				&Incision in the chest \\
+    										colon			&Anus				\\ \hline	
+    Sigmoidoscopy		&Sigmoidoscope	&Sigmoid of colon	&Anus				\\ \hline	
+    Thoracoscopy		&Thoracoscope	&Pleura				&Incision in the chest \\	
     \hline
-  \end{tabular}
+  \end{tabular}}
   \caption[List of the most common types of endoscopy.]{List of the most common types of endoscopy.}
   \label{tab:endoscope_types}
 \end{table}
-
 
 \noindent
 An endoscopy is usually a safe procedure, and the risk of serious complications is very low. Rare complications are; an infection in the part of the body the endoscope is used, or piercing or tearing in an organ, or bleeding, or reaction to the sedation used.
@@ -600,8 +599,8 @@ Traditional colonoscopy have been around for longer and have been under more res
 %Sizes: \tiny, \scriptsize, \footnotesize, \small, \normalsize
 \begin{table}[h!] % table:dataset_overview
   \scriptsize
-  \centering
-  \begin{tabular}{|p{.15\textwidth}|p{.11\textwidth}|p{.1\textwidth}|p{.16\textwidth}|p{.1\textwidth}|p{.2\textwidth}|}
+  \makebox[\textwidth][c]{
+  \begin{tabular}{|p{.15\textwidth}|p{.11\textwidth}|p{.1\textwidth}|p{.16\textwidth}|p{.17\textwidth}|p{.2\textwidth}|}
   	\hline
   	\textbf{Dataset Name}	&\textbf{Data Source}	&\textbf{Findings}	&\textbf{Size}	&\textbf{Status}		&\textbf{Description} \\
     \hline
@@ -632,7 +631,7 @@ polyp mask (ground truth) \\
 	\hline
 	Medico \cite{MedicoMultimedia18}	&Various	&GI lesions, landmarks and findings	&14,033 images, 16 classes, from 4 to 2,331 images per class	&Available, public, free for research and educational purposes	&XXX \\
 	\hline
-  \end{tabular}
+  \end{tabular}}
   \caption[Existing colonoscopy image and video datasets]{Existing colonoscopy image and video datasets.}
   \label{table:dataset_overview}
 \end{table}
@@ -655,7 +654,7 @@ polyp mask (ground truth) \\
 	\hline
 	CAD-CAP \cite{CADCAP2520}	&VCE	&Normal, Vascular Lesions and Inflammatory Lesions	&25,000 images	&Discontinued	&By request \\
 	\hline
-	Kvasir-PillCam	&VCE	&GI lesions, landmarks and findings	&XXX images with ROI, XX classes and XXX unlabeled images/videos	&Available, public, free for research and educational purposes	&Ours, See Section \ref{sec:kvasir_pillcam}. \\
+	Kvasir-PillCam	&VCE	&GI lesions, landmarks and findings	&XXX images with ROI, XX classes and XXX unlabeled images/videos	&Available, public, free for research and educational purposes	&Ours, See Section \ref{sec:hyper-capsulecam}. \\
 	\hline
   \end{tabular}
   \caption[An overview of existing VCE datasets from the GI tract]{An overview of existing VCE datasets from the GI tract.}
@@ -831,7 +830,7 @@ Another important feature in this architecture is that in the upsampling portion
 
 A common problem in training neural networks are too little labeled training data. This is also the case for us. We require a lot of medical data, and personell with the expertise to correctly label our data are of high demand and they usually have very little time for projects like these. This is why \citeauthor*{UNetConvolutional15} use different methods of data augmentation to generate more training data. They apply elastic deformations to the available images, and this allows the network to learn invariance to such deformations without the need to see these transformations in the annotated image corpus. Which is particular important in biomedical segmentation since deformation used to be the most common variation in tissue and realistic deformations can be simulated efficiently \cite{UNetConvolutional15}. By doing this \citeauthor*{UNetConvolutional15} were able to achieve very good results (Table \ref{tab:segmentation_results}).
 
-\begin{table} % table:segmentation_results
+\begin{table} % tab:segmentation_results
   \centering
   \begin{tabular}{ l l l }
   	\hline
