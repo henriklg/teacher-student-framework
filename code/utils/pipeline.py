@@ -267,7 +267,7 @@ def augment_ds(ds, conf, AUTOTUNE):
     """
     mul = conf["aug_mult"]
     def random_rotate_image(img):
-        img = ndimage.rotate(img, np.random.uniform(-40*mul, 40*mul), reshape=False)
+        img = ndimage.rotate(img, np.random.uniform(-30*mul, 30*mul), reshape=False)
         return img
     
     def augment(img, label):
@@ -278,7 +278,7 @@ def augment_ds(ds, conf, AUTOTUNE):
             img.set_shape(im_shape)
         if "crop" in conf["augment"]:
             # Pad image with 15 percent og image size, and randomly crop back to size
-            pad = int(conf["img_shape"][0]*0.4*mul)
+            pad = int(conf["img_shape"][0]*0.2*mul)
             img = tf.image.resize_with_crop_or_pad(
                     img, conf["img_shape"][0] + pad, conf["img_shape"][1] + pad)
             img = tf.image.random_crop(img, conf["img_shape"], seed=conf["seed"])
@@ -290,12 +290,12 @@ def augment_ds(ds, conf, AUTOTUNE):
             # Change brightness and saturation
             img = tf.image.random_brightness(img, max_delta=0.25*mul, seed=conf["seed"])
         if "saturation" in conf["augment"]:
-            # lower: 0.4-0.9 | upper: 
-            delta = 0.5
+            # lower: 0.4-0.9 | upper: 1.1-1.6
+            delta = 0.4
             img = tf.image.random_saturation(
-                img, lower=0.9-delta*mul, upper=1.1+delta*mul, seed=conf["seed"])
+                img, lower=1.0-delta*mul, upper=1.1+delta*mul, seed=conf["seed"])
         if "contrast" in conf["augment"]:
-            delta = 0.5
+            delta = 0.4
             img = tf.image.random_contrast(
                 img, lower=1.0-delta*mul, upper=1.1+delta*mul, seed=conf["seed"])
         # Make sure imgae is still in [0, 1]
