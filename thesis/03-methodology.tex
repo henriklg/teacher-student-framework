@@ -24,7 +24,7 @@ As discussed in Section \ref{sec:available_datasets} there is number of publicly
 %Source: pogorelov thesis 3.1.1
 % ----------------------------------------------------------
 To obtain medical videos from a hospital in Norway is very difficult and not straight forward. All medical data is considered personal and is therefore strongly protected from unauthorized use and distribution by the \textbf{Pasientjournalloven??} legislation.
-A medical study conducted at 2 academic hospitals from May 2017 to September 2018 found that most patients are willing to share their data and biospecimens for research purposes \cite{PatientPerspectives19}. Regardless of the patient opting in to share their data and biospecimens it is difficult for researchers to get their hands on it. 
+A medical study conducted at 2 academic hospitals from May 2017 to September 2018 found that most patients are willing to share their data and bio-specimens for research purposes \cite{PatientPerspectives19}. Regardless of the patient opting in to share their data and bio-specimens it is difficult for researchers to get their hands on it. 
 %TODO : why is it difficult to access data?
 We solved this problem by collaborating with a number of Norwegian hospitals and research teams working there. One of the research teams we collaborated with is Augere Medical (See Section \ref{sec:augere_medical} for more info), and through them we got in contact with Vestre Viken Hospital Trust, allowing our research team to download anonymous data from hospital systems and transfer it using secure media to our facility. Upon downloading the data we further stripped the metadata files for potential information regarding patients like time stamps, dates and camera equipment used.
 %TODO : ethics?
@@ -279,9 +279,9 @@ The datasets we will be performing our experiments on, like many medical domain 
 
 Having a large amount of labeled images is important for the performance of all medical image classification models to effectively learn. Data augmentation overcomes this issue by artificially inflating the training set with label preserving transformations. This helps the model to generalize better and to overfit less - overall a more robust model.
 
-This augmented data is acquired by performing a series of pre-processing transformations to existing data. These transformations can include horizontal and vertical flipping of the image, skewing, cropping, rotating and much more. By doing this, the augmented data is able to simulate a variety of subtly different data points, as opposed to just duplicating the same data over and over.
+This augmented data is acquired by performing a series of pre-processing transformations to existing data. These transformations can include horizontal and vertical flipping of the image, skewing, cropping, rotating and much more. By doing this, the augmented data is able to simulate a variety of subtly different data points, as opposed to just duplicating the same data over and over. In Figure \ref{fig:data_aug-crop-rot} we have taken one Image from the Hyper-Kvasir dataset and created a tf.data.Dataset object which has then been repeated and gone through the same data augmentations that we use in the input pipeline for the training data.
 
-This is especially important in the medical domain of VCE videos, as the camera capsule will orient itself randomly as it travels through the small intestine, and the model have to able to detect a polyp regardless of the orientation.
+This is especially important in the medical domain of VCE videos due to two reasons; (1), the camera capsule will orient itself randomly as it travels through the small intestine, and the model have to able to detect a polyp regardless of the orientation and (2), we have a very uneven class balance within the dataset and oversample the minority classes requires some sort of data augmentation to reduce overfitting.
 
 Data augmentation will however not solve all data problems, but it has been proven to be very effective for training neural networks. By implementing data augmentation in our pipeline we saw that during training the model would overfit far less. The augmentation transformation we use is as follow:
 
@@ -292,17 +292,30 @@ Data augmentation will however not solve all data problems, but it has been prov
 	\begin{pmatrix} cos \theta & -sin \theta \\ sin \theta & cos \theta \end{pmatrix}
 	\begin{pmatrix} x \\ y \end{pmatrix} \]
 We find that setting $\theta$ to a random number between $-30$ degrees and $+30$ degrees give good results.
-\item \textbf{Crop}; 
-	
+\item \textbf{Crop}; pad the image by adding black pixels around the image and then randomly crop it back down to the original image dimensions. We have chosen that the image is padded with 20\% of its original dimensions. For example a image with the dimensions 128 by 128 will be padded with 25 pixels.
+\item \textbf{Brightness}; convert RGB image to float representation, adjusts the brightness, and then convert the image back to original data type. We have set a value, $max\_delta=0.25$, and randomly pick a value from the interval [-max\_delta, max\_delta] which is the amount to add to the pixel values.
+\item \textbf{Saturation}; converts the image to HSV, adds an offset to the saturation channel and then converts the image back to RGB. The offset is randomly selected from the interval [lower, upper]. In our experiments we have set the interval to [0.6, 1.5].
+\item \textbf{Contrast}; converts images to float representation, adjusts their contrast, and then converts them back to the original data type. Contrast is adjusted independently for each channel of each image. This is done by computing the mean of the image pixels for each channel and then adjusts component $x$ of each pixel to $(x-mean)*contrast\_factor+mean$. Where contrast\_factor is randomly picked from the interval [lower, upper] $=[0.6, 1.5]$.
 \end{itemize}
 
-%TODO mention RandAugment and AutoAugment
+To selectively choose how much the dataset is augmented during training of a model we have implemented a system which dial back the aforementioned parameters by a percentage. This enables us to train the teacher model with very little augmentation and then increase the image augmentations for the student model.
 
-%TODO add figure of normal vs augmented data
+\begin{figure} % fig:data_aug-crop-rot
+  \begin{center}
+    \includegraphics[width=.8\textwidth]{data_aug-crop-rot}
+    \caption[The effect of data augmentation on sample images.]{The effect of data augmentation on an image from Hyper-Kvasir. Image taken from barrets-short-segment class.}
+    \label{fig:data_aug-crop-rot}
+  \end{center}
+\end{figure}
+
+In recent years, automated augmentation strategies have led to state-of-the-art results in image classification and object detection \cite{AutoAugmentLearning19, RandAugmentPractical19}. These novel automated augmentation policies have shown to improve accuracy, model robustness, and performance on semi-supervised learning for image classification without no additional computational cost at inference time. Due to time constraint we did not test this on our network, but is something we would like to implement in future studies.
+
+% include discussion part form "Data augmentation for improving deep learning in image classification problem"?
+
 
 \subsubsection{tf.image}
 % https://www.tensorflow.org/api_docs/python/tf/image
-
+We have used tf.image API from TensorFlow for all our data augmentations within the input pipeline. This module contains functions for image processing and decoding-encoding operations, and use little computational overhead. All functions that select a random value from an interval have the option to be seeded so that our data is reproducible.
 
 
 \subsection{Batching}
