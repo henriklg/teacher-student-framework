@@ -238,13 +238,8 @@ The mapping that are applied before the caching is: read the label and one-hot e
 \end{figure}
 
 
-<<<<<<< HEAD
-
 
 \subsection{Shuffle the dataset}
-
-=======
-\subsection{Shuffle the data}
 % source tf: https://www.tensorflow.org/api_docs/python/tf/data/Dataset#shuffle
 % ----------------------------------------------------------
 We shuffle the data to reduce variance and to make sure the model remain general and overfit less. This is especially important as our dataset is sorted by their classes.
@@ -254,7 +249,7 @@ The pipeline shuffles the entire list of image filepaths initially, and then a s
 TensorFlows data API have a dedicated shuffle function which randomly shuffles the elements of the input dataset. It does this by filling a buffer of $n$ elements, then randomly sample elements from this buffer, replacing the selected elements with new elements. For perfect shuffling of the entire dataset we use $n>$ \textit{total\_samples}. The argument \textit{reshuffle\_each\_iteration} is set to \textit{True} so every epoch get an unique batch of images.
 
 Another method of creating unique batches is to first repeat the dataset, then shuffle and create batches.
->>>>>>> c3cd62f627a4310f5c476d0e6d0cba6045a73056
+
 
 
 \subsection{Repeat}
@@ -276,9 +271,9 @@ Because the dataset is infinitely repeated we must specify how many steps the mo
 
 
 
-
-
 \subsection{Data augmentation}
+%
+% ----------------------------------------------------------
 What is the necessity of rotating the samples. Will they not always be 'square'?
 
 
