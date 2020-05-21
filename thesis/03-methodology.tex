@@ -219,20 +219,62 @@ We rely heavily on data augmentation to help the model to generalize and not ove
 \begin{figure} % fig:pipeline_parallel_map
   \begin{center}
     \includegraphics[width=1.0\textwidth]{pipeline_parallel_map}
-    \caption[Pipeline with parallel mapping.]{Here you can see pre-processing steps overlap, and the overal time for each iteration is reduced.}
+    \caption[Pipeline with parallel mapping.]{Here you can see pre-processing steps overlap, and the overall time for each iteration is reduced.}
     \label{fig:pipeline_parallel_map}
   \end{center}
 \end{figure}
 
-The last step we take to optimize the training efficiency is to cache the dataset to local storage (an NVMe SSD in our case). 
+The last step we take to optimize the training efficiency is to cache the dataset to local storage (an NVMe SSD in our case). This will save some operations, like opening and reading data, from being executed each epoch during training of the model. 
+When the dataset is cached, the images will be opened, read and in our case some pre-processing are performed, the first epoch during training, and the following epochs will reuse the data stored in the local cache. See Figure \ref{fig:pipeline_cache} for an example of how this affects time consumption.
+We split the pre-processing steps into two steps. The first step is applied before caching the dataset and the last step is performed after. This is done because some pre-processing steps are to be performed on every element of the dataset in a deliberate way, and some steps are randomized every time the process is applied.
+The mapping that are applied before the caching is: read the label and one-hot encode to integer, read and decode the image, normalize image and resize image dimensions. The mappings that are performed after caching is: shuffling, batching, augmenting.
 
+\begin{figure} % fig:pipeline_cache
+  \begin{center}
+    \includegraphics[width=1.0\textwidth]{pipeline_cache}
+    \caption[Pipeline with cache.]{Cached pipeline, here the pre-processing is only executed during the first training step.}
+    \label{fig:pipeline_cache}
+  \end{center}
+\end{figure}
+
+
+<<<<<<< HEAD
 
 
 \subsection{Shuffle the dataset}
 
+=======
+\subsection{Shuffle the data}
+% source tf: https://www.tensorflow.org/api_docs/python/tf/data/Dataset#shuffle
+% ----------------------------------------------------------
+We shuffle the data to reduce variance and to make sure the model remain general and overfit less. This is especially important as our dataset is sorted by their classes.
+In our pipeline the data is shuffled twice for redundancy. We can afford this because the tf.data API has a low computational performance hit the way it applies the shuffle transformation. 
+The pipeline shuffles the entire list of image filepaths initially, and then a shuffle transformation is applied a second time after the dataset is cached, this ensure that the dataset is shuffled between every epoch during training as well. This is important because we have the risk of creating batches that are not representative of the overall dataset, and therefore gradient estimate will be off.
+
+TensorFlows data API have a dedicated shuffle function which randomly shuffles the elements of the input dataset. It does this by filling a buffer of $n$ elements, then randomly sample elements from this buffer, replacing the selected elements with new elements. For perfect shuffling of the entire dataset we use $n>$ \textit{total\_samples}. The argument \textit{reshuffle\_each\_iteration} is set to \textit{True} so every epoch get an unique batch of images.
+
+Another method of creating unique batches is to first repeat the dataset, then shuffle and create batches.
+>>>>>>> c3cd62f627a4310f5c476d0e6d0cba6045a73056
 
 
 \subsection{Repeat}
+% is the data always repeated? how resampling effect this?
+% ----------------------------------------------------------
+In some situations it is desirable to extend the dataset with duplicates of past samples. One example of this is for oversampling the dataset. 
+We use the \textit{repeat} function from the tf.data API to "infinitely" repeat the dataset samples.
+
+\begin{lstlisting}[language=Python]
+>>dataset = tf.data.Dataset.from_tensor_slices([1, 2, 3])
+>>dataset = dataset.repeat()
+>>list(dataset.as_numpy_iterator())
+[1, 2, 3, 1, 2, 3, 1, 2, 3, .....]
+\end{lstlisting}
+
+This repeat transformation is applied after caching and shuffling, so that we are sure the model sees every sample of the dataset each epoch. We then apply image augmentation at random to each dataset sample so for every finished epoch during training every image is shown once, with a distinctive augmentation filter.
+
+Because the dataset is infinitely repeated we must specify how many steps the model should iterate during training.
+
+
 
 
 
@@ -246,6 +288,8 @@ What is the necessity of rotating the samples. Will they not always be 'square'?
 
 
 \subsection{Sample the dataset or class weight}
+% remember to mention what changes in caching and shuffling
+% ----------------------------------------------------------
 Found that when weighting the classes the model learns slower. Which means decay rate of learning rate must be lowered for it not to drop too soon. Also increase the buffer for early stopping of training.
 
 %TODO add formula for calculating class weights
