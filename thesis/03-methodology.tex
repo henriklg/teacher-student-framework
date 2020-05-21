@@ -34,9 +34,10 @@ We solved this problem by collaborating with a number of Norwegian hospitals and
 
 
 
-\subsection{Kvasir-PillCam} \label{sec:kvasir_pillcam}
+\subsection{Hyper-CasuleCam} \label{sec:hyper-capsulecam}
 % Where is the dataset collected from?
-The dataset we used in our experiments consist of endoscopic videos collected from Bærum Hospital, a hospital in Vestre Viken Hospital Trust. Unlike Kvasir and Hyper-Kvasir datasets we have made the Kvasir-PillCam dataset for the purpose of this thesis. Initially we received 44 VCE videos, which were first reviewed by a clinician, whom selected thumbnails of region of interests of both lesions and normal findings. The videos were then exported from Vestre Viken Hospital Trust and re-encoded to an open source file format (MP4?), from proprietary Sony technology format (whats the name?) %TODO what format?
+% ----------------------------------------------------------
+The dataset we used in our experiments consist of endoscopic videos collected from Bærum Hospital, a hospital in Vestre Viken Hospital Trust. Unlike Kvasir V2 and Hyper-Kvasir datasets we have made the Hyper-CasuleCam dataset for the purpose of this thesis. Initially we received 44 VCE videos, which were first reviewed by a clinician, whom selected thumbnails of region of interests of both lesions and normal findings. The videos were then exported from Vestre Viken Hospital Trust and re-encoded to an open source file format (MP4?), from proprietary Sony technology format (whats the name?) %TODO what format?
 Prior to being exported the videos were anonymized by removing all metadata and renaming the files with randomly generated file names. A few videos had to be shortened to cut out images taken by the capsule before entering the mouth of the patient. After that the videos are uploaded to Augere Medical AS\footnote{\url{https://augere.md/}} tagging tool. Three MSc students went through all the frames of the videos in collaboration with an expert and labeled and marked findings with bounding boxes. When the student encountered images they were uncertain of the expert reviewed the case.
 
 There are a total of XX different findings in the dataset. The findings are split in two different types; anatomical landmarks and pathological findings. Anatomical landmarks consist of two categories:
@@ -55,7 +56,15 @@ Pathological findings consist of:
 
 We have also included one category for foreign bodies which includes images with things found inside the small intestine which does not fit in any of the previously mentioned categories. This includes thing like other VCE-devices and tables. The images annotated with the \textit{normal} tag is meant to be used for binary classification where all the others classes are combined into a single class for \textit{finding} and one class for no findings. \textit{Normal} images are hand picked from portions of video where there are no findings, and taken from each video to get a diverse category.
 
-When all 44 videos have been precisely labeled the dataset is exported from Augere Medical tagging tool and split into folders for each class. The number of images per class are given in Table \ref{table:kvasir_pillcam_samples}. In total we have 43,905 labeled images in 12 classes. The sample distribution across the classes is skewed depending on how many findings there are in the videos. Some findings occur often and some very rarely. 
+When all 44 videos have been precisely labeled the dataset is exported from Augere Medical tagging tool and split into folders for each class. The number of images per class are given in Table \ref{table:kvasir_pillcam_samples} and Figure{fig:hyper-capsulecam-dist} with an algorithmic scale. In total we have 43,905 labeled images in 12 classes. The sample distribution across the classes is skewed depending on how many findings there are in the videos. Some findings occur often and some very rarely. 
+
+\begin{figure} % fig:hyper-capsulecam-dist
+  \begin{center}
+    \includegraphics[width=1.0\textwidth]{hyper-capsulecam-dist}
+    \caption[Naive pipeline.]{The time spent for reading, opening and training - the naive method.}
+    \label{fig:hyper-capsulecam-dist}
+  \end{center}
+\end{figure}
 
 Imbalanced dataset pose a challenge for predictive algorithms as most learning algorithms are based on the assumption of an equal number of samples for each class. This results in models that have poor predictive performance, especially for minority class or classes. This is a great problem because in many medical datasets the minority class is the most important and therefore more sensitive for classification errors.
 
@@ -90,6 +99,9 @@ Later, we received an additional XX videos. These videos were not annotated but 
 These videos were processed exactly the same as previous videos, so that it will be compatible (**describe**) with the annotated dataset.
 
 
+\subsubsection{Labeled images}
+\subsubsection{Unlabeled images}
+\subsubsection{Videos}
 
 % ----------------------------------------------------------
 \section{Data pipeline} \label{sec:data_pipeline}
@@ -214,17 +226,23 @@ We rely heavily on data augmentation to help the model to generalize and not ove
 
 The last step we take to optimize the training efficiency is to cache the dataset to local storage (an NVMe SSD in our case). 
 
-\subsection{Shuffle the data}
+
+
+\subsection{Shuffle the dataset}
+
 
 
 \subsection{Repeat}
+
 
 
 \subsection{Data augmentation}
 What is the necessity of rotating the samples. Will they not always be 'square'?
 
 
+
 \subsection{Batching}
+
 
 
 \subsection{Sample the dataset or class weight}
