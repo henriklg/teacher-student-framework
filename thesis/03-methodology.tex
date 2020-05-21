@@ -56,12 +56,12 @@ Pathological findings consist of:
 
 We have also included one category for foreign bodies which includes images with things found inside the small intestine which does not fit in any of the previously mentioned categories. This includes thing like other VCE-devices and tables. The images annotated with the \textit{normal} tag is meant to be used for binary classification where all the others classes are combined into a single class for \textit{finding} and one class for no findings. \textit{Normal} images are hand picked from portions of video where there are no findings, and taken from each video to get a diverse category.
 
-When all 44 videos have been precisely labeled the dataset is exported from Augere Medical tagging tool and split into folders for each class. The number of images per class are given in Table \ref{table:kvasir_pillcam_samples} and Figure{fig:hyper-capsulecam-dist} with an algorithmic scale. In total we have 43,905 labeled images in 12 classes. The sample distribution across the classes is skewed depending on how many findings there are in the videos. Some findings occur often and some very rarely. 
+When all 44 videos have been precisely labeled the dataset is exported from Augere Medical tagging tool and split into folders for each class. The number of images per class are given in Table \ref{table:kvasir_pillcam_samples} and Figure \ref{fig:hyper-capsulecam-dist} with an algorithmic scale. In total we have 43,905 labeled images in 12 classes. The sample distribution across the classes is skewed depending on how many findings there are in the videos. Some findings occur often and some very rarely. 
 
 \begin{figure} % fig:hyper-capsulecam-dist
   \begin{center}
     \includegraphics[width=1.0\textwidth]{hyper-capsulecam-dist}
-    \caption[Naive pipeline.]{The time spent for reading, opening and training - the naive method.}
+    \caption[Distribution of samples per class in the Hyper-CapsuleCam dataset.]{TDistribution of samples per class in the Hyper-CapsuleCam dataset. NB, the Y-axis of this plot is in algorithmic scale.}
     \label{fig:hyper-capsulecam-dist}
   \end{center}
 \end{figure}
@@ -91,7 +91,7 @@ In addition to labeling the images the dataset also contain a JSON format file w
     Unknown			& 190	& xx,x \\
     \hline
   \end{tabular}
-  \caption{Hyper-PillCam class names, corresponding amount of samples and the percentage of samples in each class.}
+  \caption[Hyper-CapsuleCam class names and number of samples.]{Hyper-CapsuleCam class names, corresponding amount of samples and the percentage of samples in each class.}
   \label{table:kvasir_pillcam_samples}
 \end{table}
 
@@ -267,14 +267,41 @@ We use the \textit{repeat} function from the tf.data API to "infinitely" repeat 
 
 This repeat transformation is applied after caching and shuffling, so that we are sure the model sees every sample of the dataset each epoch. We then apply image augmentation at random to each dataset sample so for every finished epoch during training every image is shown once, with a distinctive augmentation filter.
 
-Because the dataset is infinitely repeated we must specify how many steps the model should iterate during training.
+Because the dataset is infinitely repeated we must specify how many steps the model should iterate during training, or else it would not know where to stop iterating through the dataset object.
 
 
 
 \subsection{Data augmentation}
-%
+% https://www.kdnuggets.com/2020/02/easy-image-dataset-augmentation-tensorflow.html
+% What is the necessity of rotating the samples. Will they not always be 'square'?
 % ----------------------------------------------------------
-What is the necessity of rotating the samples. Will they not always be 'square'?
+The datasets we will be performing our experiments on, like many medical domain datasets, share a common unbalanced data problem. That is images of the target classes, only appear in a very small portion of the the entire dataset. 
+
+Having a large amount of labeled images is important for the performance of all medical image classification models to effectively learn. Data augmentation overcomes this issue by artificially inflating the training set with label preserving transformations. This helps the model to generalize better and to overfit less - overall a more robust model.
+
+This augmented data is acquired by performing a series of pre-processing transformations to existing data. These transformations can include horizontal and vertical flipping of the image, skewing, cropping, rotating and much more. By doing this, the augmented data is able to simulate a variety of subtly different data points, as opposed to just duplicating the same data over and over.
+
+This is especially important in the medical domain of VCE videos, as the camera capsule will orient itself randomly as it travels through the small intestine, and the model have to able to detect a polyp regardless of the orientation.
+
+Data augmentation will however not solve all data problems, but it has been proven to be very effective for training neural networks. By implementing data augmentation in our pipeline we saw that during training the model would overfit far less. The augmentation transformation we use is as follow:
+
+\begin{itemize}
+\item \textbf{Flip}; mirroring the images across its vertical or horizontal axis. It is computationally efficient and easy to implement as it only requires rows or columns of image matrices to be reversed.
+\item \textbf{Rotation}; rotates the image around its center via mapping each pixel $(x,y)$ of an image to $(x',y')$ with the following transformation
+	\[ \begin{pmatrix} x' \\ y' \end{pmatrix} =
+	\begin{pmatrix} cos \theta & -sin \theta \\ sin \theta & cos \theta \end{pmatrix}
+	\begin{pmatrix} x \\ y \end{pmatrix} \]
+We find that setting $\theta$ to a random number between $-30$ degrees and $+30$ degrees give good results.
+\item \textbf{Crop}; 
+	
+\end{itemize}
+
+%TODO mention RandAugment and AutoAugment
+
+%TODO add figure of normal vs augmented data
+
+\subsubsection{tf.image}
+% https://www.tensorflow.org/api_docs/python/tf/image
 
 
 
