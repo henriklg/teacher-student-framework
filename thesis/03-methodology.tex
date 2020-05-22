@@ -281,6 +281,14 @@ Having a large amount of labeled images is important for the performance of all 
 
 This augmented data is acquired by performing a series of pre-processing transformations to existing data. These transformations can include horizontal and vertical flipping of the image, skewing, cropping, rotating and much more. By doing this, the augmented data is able to simulate a variety of subtly different data points, as opposed to just duplicating the same data over and over. In Figure \ref{fig:data_aug-crop-rot} we have taken one Image from the Hyper-Kvasir dataset and created a tf.data.Dataset object which has then been repeated and gone through the same data augmentations that we use in the input pipeline for the training data.
 
+\begin{figure} % fig:data_aug-crop-rot
+  \begin{center}
+    \includegraphics[width=.7\textwidth]{data_aug-crop-rot}
+    \caption[The effect of data augmentation on sample image.]{The effect of data augmentation on an image from Hyper-Kvasir. Image taken from barrets-short-segment class.}
+    \label{fig:data_aug-crop-rot}
+  \end{center}
+\end{figure}
+
 This is especially important in the medical domain of VCE videos due to two reasons; (1), the camera capsule will orient itself randomly as it travels through the small intestine, and the model have to able to detect a polyp regardless of the orientation and (2), we have a very uneven class balance within the dataset and oversample the minority classes requires some sort of data augmentation to reduce overfitting.
 
 Data augmentation will however not solve all data problems, but it has been proven to be very effective for training neural networks. By implementing data augmentation in our pipeline we saw that during training the model would overfit far less. The augmentation transformation we use is as follow:
@@ -298,19 +306,20 @@ We find that setting $\theta$ to a random number between $-30$ degrees and $+30$
 \item \textbf{Contrast}; converts images to float representation, adjusts their contrast, and then converts them back to the original data type. Contrast is adjusted independently for each channel of each image. This is done by computing the mean of the image pixels for each channel and then adjusts component $x$ of each pixel to $(x-mean)*contrast\_factor+mean$. Where contrast\_factor is randomly picked from the interval [lower, upper] $=[0.6, 1.5]$.
 \end{itemize}
 
-To selectively choose how much the dataset is augmented during training of a model we have implemented a system which dial back the aforementioned parameters by a percentage. This enables us to train the teacher model with very little augmentation and then increase the image augmentations for the student model.
+To selectively choose how much the dataset is augmented during training of a model we have implemented a system which dial back the aforementioned parameters by a percentage. This enables us to train the teacher model with very little augmentation and then increase the image augmentations for the student model. In Figure \ref{fig:data_aug-reduced} is an example of a batch of 12 images which is shown to the network during training.
 
-\begin{figure} % fig:data_aug-crop-rot
+One possible draw-back from using data augmentation is the network might miss important features during training if those features are cropped or rotated out of view. With this in mind we use cropping and rotation with care. For cropping we dial back the padding to just 10\% and rotation is dialed back to only 10 degrees rotation at most.
+% include discussion part form "Data augmentation for improving deep learning in image classification problem"?
+
+\begin{figure} % fig:data_aug-reduced
   \begin{center}
-    \includegraphics[width=.8\textwidth]{data_aug-crop-rot}
-    \caption[The effect of data augmentation on sample images.]{The effect of data augmentation on an image from Hyper-Kvasir. Image taken from barrets-short-segment class.}
-    \label{fig:data_aug-crop-rot}
+    \includegraphics[width=.7\textwidth]{data_aug-reduced}
+    \caption[The effect of reduced data augmentation on sample image.]{The effect of reduced data augmentation on images from Hyper-Kvasir dataset. Here the effect of cropping is reduced by padding the image with 10\% of its original dimensions, and rotation is reduced to max 10 degrees.}
+    \label{fig:data_aug-reduced}
   \end{center}
 \end{figure}
 
 In recent years, automated augmentation strategies have led to state-of-the-art results in image classification and object detection \cite{AutoAugmentLearning19, RandAugmentPractical19}. These novel automated augmentation policies have shown to improve accuracy, model robustness, and performance on semi-supervised learning for image classification without no additional computational cost at inference time. Due to time constraint we did not test this on our network, but is something we would like to implement in future studies.
-
-% include discussion part form "Data augmentation for improving deep learning in image classification problem"?
 
 
 \subsubsection{tf.image}
@@ -318,15 +327,47 @@ In recent years, automated augmentation strategies have led to state-of-the-art 
 We have used tf.image API from TensorFlow for all our data augmentations within the input pipeline. This module contains functions for image processing and decoding-encoding operations, and use little computational overhead. All functions that select a random value from an interval have the option to be seeded so that our data is reproducible.
 
 
+
 \subsection{Batching}
+% https://www.tensorflow.org/api_docs/python/tf/data/Dataset#batch
+% https://machinelearningmastery.com/how-to-control-the-speed-and-stability-of-training-neural-networks-with-gradient-descent-batch-size/
+% ----------------------------------------------------------
+% Why is batching useful
+The batch size is a hyperparameter that defines the number of samples to work through before updating the internal model parameters. At the end of each batch, the image predictions are compared to the expected output of the model and an error is calculated. The update algorithm use that error to improve the model, e.g move down along the error gradient.
+In the domain of machine learning is is common to name the learning algorithm based on three criterion:
+\begin{itemize}
+\item \textbf{Batch Gradient Descent}: all training samples are used to create one batch.
+\item \textbf{Stochastic Gradient Descent}: batch size is one element of the training data.
+\item \textbf{Mini-Batch Gradient Descent}: batch size is more than one sample and less than the size of the entire dataset
+\end{itemize}
+
+% How do we batch
+Like with the rest of the operations performed in the input pipeline, TensorFlow tf.data API have its own module for batching a dataset. This module have two parameters, one for batch size, and the other for whether the last batch should be dropped in the case it has fewer elements than set by the first parameter. Since our input pipeline repeats the dataset we never run into the issue of having batches which are truncated, so we set this to False.
+
+% Example of tf.data API .batch()
+\begin{lstlisting}[language=Python, caption={Notice how \text{[6, 7]} is missing because drop\_remainder is set to True.}, captionpos=b]
+>>>dataset = tf.data.Dataset.range(8)
+>>>dataset = dataset.batch(3, drop_remainder=True)
+>>>list(dataset.as_numpy_iterator())
+[array([0, 1, 2]), array([3, 4, 5])]
+\end{lstlisting}
+
+% What batch size do we use   - Smaller batch sizes are noisy, offering a regularizing effect and lower generalization error
+One advantage of using mini-batch gradient descent is that it requires less memory. In our case the complete dataset will not fit in memory regardless so batch gradient descent is not possible to test. Another advantage is that typically networks train faster, achieves better training stability and generalization performance with mini-batches \cite{RevisitingSmall18}. \citeauthor{RevisitingSmall18} found that when experimenting with different batch sizes on ImageNet, CIFAR-10 and CIFAR-100, batch sizes of 32 or less provides more up-to-date gradient calculations, which yields more stable and reliable training. Other scientific papers also support that batch size of 32 is a good choice \cite{PracticalRecommendations12, GeneralInefficiency03}.
+We find that the limiting factor for setting the batch size is GPU memory, especially for larger models like EfficientNetsB2-B7. All models are trained on NVIDIA GTX 1080 ti with 11GB of memory, which can endure at most 64 images with dimensions of 256 by 256 being trained on EfficientNetB0 which has 5.3 million parameters.
 
 
 
 \subsection{Sample the dataset or class weight}
 % remember to mention what changes in caching and shuffling
 % ----------------------------------------------------------
+To combat the class imbalance in our dataset we have experimented with two 
 Found that when weighting the classes the model learns slower. Which means decay rate of learning rate must be lowered for it not to drop too soon. Also increase the buffer for early stopping of training.
 
+\subsubsection{Oversample}
+
+
+\subsubsection{Class weights}
 %TODO add formula for calculating class weights
 
 
