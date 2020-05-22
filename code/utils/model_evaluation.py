@@ -17,10 +17,10 @@ def get_metrics(true_labels, predicted_labels):
     
     
     
-def display_classification_report(true_labels, predicted_labels, 
+def get_classification_report(true_labels, predicted_labels, 
                                   classes, target_names=None, digits=3):
     """
-    Does not work for some reason..
+    Returns a classification report with recall, precission and f1 score.
     """
     report = m.classification_report(
                 y_true=true_labels,
@@ -30,7 +30,7 @@ def display_classification_report(true_labels, predicted_labels,
                 digits=digits,
                 zero_division=0
     )
-    print(report)
+    return report
     
     
     
