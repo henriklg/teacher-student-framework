@@ -267,7 +267,7 @@ def augment_ds(ds, conf, AUTOTUNE):
     """
     mul = conf["aug_mult"]
     def random_rotate_image(img):
-        img = ndimage.rotate(img, np.random.uniform(-30*mul, 30*mul), reshape=False)
+        img = ndimage.rotate(img, np.random.uniform(-10*mul, 10*mul), reshape=False)
         return img
     
     def augment(img, label):
@@ -278,7 +278,7 @@ def augment_ds(ds, conf, AUTOTUNE):
             img.set_shape(im_shape)
         if "crop" in conf["augment"]:
             # Pad image with 15 percent og image size, and randomly crop back to size
-            pad = int(conf["img_shape"][0]*0.2*mul)
+            pad = int(conf["img_shape"][0]*0.1*mul)
             img = tf.image.resize_with_crop_or_pad(
                     img, conf["img_shape"][0] + pad, conf["img_shape"][1] + pad)
             img = tf.image.random_crop(img, conf["img_shape"], seed=conf["seed"])
