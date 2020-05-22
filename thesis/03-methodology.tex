@@ -111,7 +111,15 @@ These videos were processed exactly the same as previous videos, so that it will
 % ----------------------------------------------------------
 The preprocessing pipeline is implemented by using TensorFlows \textit{data.Dataset} library. This was chosen over \textit{datagenerator} due to the easy of use, but later became an issue due to the complexity and some diffuse runtime errors. The main benefits by using data.Dataset is that all data is handled in tensors and computation is automatically distributed to the GPU which enhance the load distribution of processing power. 
 
-The pipeline outline can be seen in Figure XX.
+\begin{figure} % fig:training_pipeline
+  \begin{center}
+    \includegraphics[width=1.0\textwidth]{training_pipeline}
+    \caption[Pipeline for training model.]{The pipeline used for training our teacher model.}
+    \label{fig:training_pipeline}
+  \end{center}
+\end{figure}
+
+The input pipeline outline can be seen in Figure XX.
 %TODO add figure of data pipeline and describe each step and why its done
 
 
@@ -166,11 +174,11 @@ To efficiently read and process the images in the pipeline we use TensorFlow's f
 \begin{lstlisting}[language=Python]
 >>> for path in dataset.take(5):
 >>> 	print (path)
-tf.Tensor(b'/data/normal-cecum/cc6ed77fbc04.jpg', shape=(), dtype=string)
-tf.Tensor(b'/data/polyps/119100adf1de.jpg', shape=(), dtype=string)
-tf.Tensor(b'/data/esophagitis/f3be6279f5f7.jpg', shape=(), dtype=string)
-tf.Tensor(b'/data/dyed-lifted-polyps/cbdfb00c142d.jpg', shape=(), dtype=string)
-tf.Tensor(b'/data/dyed-lifted-polyps/b1aa0268867b.jpg', shape=(), dtype=string)
+tf.Tensor(b'/normal-cecum/cc6ed77fbc04.jpg', shape=(), dtype=string)
+tf.Tensor(b'/polyps/119100adf1de.jpg', shape=(), dtype=string)
+tf.Tensor(b'/esophagitis/f3be6279f5f7.jpg', shape=(), dtype=string)
+tf.Tensor(b'/dyed-lifted-polyps/dfb00c142d.jpg', shape=(), dtype=string)
+tf.Tensor(b'/dyed-lifted-polyps/aa0268867b.jpg', shape=(), dtype=string)
 \end{lstlisting}
 
 Next we apply a transformation function to each element of the dataset to create (image, label) pairs from the filepaths. This transformation function does three things; one-hot encodes the label based on the parent directory; decodes the image so the image is represented with a tensor with dimensions (image width, image height, color channels); resize the image to the correct dimensions. 
@@ -372,9 +380,7 @@ Found that when weighting the classes the model learns slower. Which means decay
 
 \subsubsection{Class weights}
 The way we calculate the class weights for our data is
-\[
-	
-\]
+
 %TODO add formula for calculating class weights
 
 
