@@ -361,21 +361,30 @@ We find that the limiting factor for setting the batch size is GPU memory, espec
 \subsection{Sample the dataset or class weight}
 % remember to mention what changes in caching and shuffling
 % ----------------------------------------------------------
-To combat the class imbalance in our dataset we have experimented with two 
+To combat the class imbalance in our dataset we have experimented with two tactics. The first thing we tested, which was also the easiest to implement with TensorFlow was class weighting. 
+
+
 Found that when weighting the classes the model learns slower. Which means decay rate of learning rate must be lowered for it not to drop too soon. Also increase the buffer for early stopping of training.
+
 
 \subsubsection{Oversample}
 
 
 \subsubsection{Class weights}
+The way we calculate the class weights for our data is
+\[
+	
+\]
 %TODO add formula for calculating class weights
 
 
 
 \subsection{Training}
 %TODO Include a table of computer hardware used for training, and versions of all libraries used (like hicks p.73
-
+% ----------------------------------------------------------
 Normalization; any benefit of using L2 normalization in last dense layer when using a pre-defined model?
+
+
 
 % ----------------------------------------------------------
 \section{System implementation} \label{sec:system_implementation}
