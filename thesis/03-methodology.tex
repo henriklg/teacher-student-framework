@@ -130,7 +130,6 @@ The preprocessing pipeline is implemented by using TensorFlows \textit{data.Data
   \end{center}
 \end{figure}
 
-
 All the code for handling the data pipeline is managed in a separate script called pipeline.py. The input pipeline outline can be seen in Figure \ref{fig:input_pipeline}.
 
 \begin{figure} % fig:input_pipeline
@@ -382,21 +381,28 @@ We find that the limiting factor for setting the batch size is GPU memory, espec
 
 
 
-\subsection{Sample the dataset or class weight}
+\subsection{Dealing with class imbalance}
 % remember to mention what changes in caching and shuffling
 % ----------------------------------------------------------
-To combat the class imbalance in our dataset we have experimented with two tactics. The first thing we tested, which was also the easiest to implement with TensorFlow was class weighting. 
-
-
-Found that when weighting the classes the model learns slower. Which means decay rate of learning rate must be lowered for it not to drop too soon. Also increase the buffer for early stopping of training.
+To combat the class imbalance in our dataset we have experimented with two tactics. The first thing we tested, which was also the easiest to implement with TensorFlow was class weighting. Weighting the classes means that we calculate a score for every class within the dataset, and during training of the network each classes weight is carried when computing the loss. Normally each class has a weight of 1, but we don't want this because of the nature of class imbalance. Instead, if there are twice as many samples in class A than in class B, we give class A a weight score which is half that of class B.
 
 
 \subsubsection{Oversample}
+Oversampling the dataset handled by a oversample() module inside pipeline.py. This module takes the training dataset as input parameter and then split the dataset into as many separate datasets as there are classes. Because the dataset is stored in a tf.data.Dataset object this must be done according to the tf.data API.
+
 
 
 \subsubsection{Class weights}
-The way we calculate the class weights for our data is
+The way we calculate the class weights for our data is **insert formula**. In tf.Keras we can then give the class weights as a dictionary to the model.fit function like this:
 
+\begin{lstlisting}[language=Python]
+class_weights = {"class A": 1.0,
+				 "class B": 0.5}
+				 
+model.fit(train_ds, epochs=10, batch_size=32, class_weight=class_weight)
+\end{lstlisting}
+
+Found that when weighting the classes the model learns slower. Which means decay rate of learning rate must be lowered for it not to drop too soon. Also increase the buffer for early stopping of training.
 %TODO add formula for calculating class weights
 
 
