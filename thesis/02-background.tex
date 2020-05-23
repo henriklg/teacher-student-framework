@@ -553,6 +553,7 @@ EfficientNets \cite{EfficientNetRethinking19} focuses on improving the accuracy 
 
 
 \subsection{Performance metrics}
+% decent source: https://towardsdatascience.com/handling-imbalanced-datasets-in-machine-learning-7a0e84220f28
 % ----------------------------------------------------------
 % ROC, sensitivity, confustion matrix etc. Check out metrics scores for hyper-kvasir paper
 
@@ -762,6 +763,8 @@ Write about Augere Medical, the tagging tool and export script used.
 \subsection{Imbalanced data}
 % https://machinelearningmastery.com/tactics-to-combat-imbalanced-classes-in-your-machine-learning-dataset/
 % another good source: https://towardsdatascience.com/handling-imbalanced-datasets-in-machine-learning-7a0e84220f28
+% https://towardsdatascience.com/practical-tips-for-class-imbalance-in-binary-classification-6ee29bcdb8a7
+%TODO remember to mention class imbalance solutions is to be performed on training data only!
 % ----------------------------------------------------------
 Class imbalance typically refers to a problem with classification problems where the classes are not represented equally. In the medical imaging domain this is very common for two reasons: (1) there are a lot more healthy patients than there are sick ones, and (2) for a specific unhealthy patient, there are a lot more images of healthy tissue than there are images of tissue with lesions.
 As an example you could have a VCE video which has been carefully analyzed by a clinical expert and each frame is tagged with either being in class 1; healthy, or class 2; unhealthy. Of this dataset 10 000 frames have no findings, and 50 of them have confirmed findings. You could then use this data to train a model to have 99\% accuracy which sounds great, but in reality the model only achieves these impressive results because it classifies all the data as class 1; healthy.
@@ -775,6 +778,31 @@ There are different methods to combat this class imbalance problem:
 \end{itemize}
 It is laboring, time consuming and expensive to collect more data for medical image classifications tasks because a clinical expert is required to validate the data. 
 
+
+\subsubsection{Resample}
+% https://towardsdatascience.com/handling-imbalanced-datasets-in-deep-learning-f48407a0e758
+% https://en.wikipedia.org/wiki/Oversampling_and_undersampling_in_data_analysis
+% ----------------------------------------------------------
+In Figure \ref{fig:oversample} is an example for how samples in a class are copied to generate a new, balanced dataset.
+
+\begin{figure} % fig:resampling (double figure)
+  \centering
+  \begin{subfigure}[b]{0.4\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{oversample}
+    \caption{Oversampling}
+    \label{fig:oversample}
+  \end{subfigure}
+  \quad
+  \begin{subfigure}[b]{0.4\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{undersample}
+    \caption{Undersampling}
+    \label{fig:undersample}
+  \end{subfigure}
+  \caption[Two popular resampling methods]{Two popular resampling methods.}
+  \label{fig:resampling}
+\end{figure}
 
 
 % ----------------------------------------------------------
