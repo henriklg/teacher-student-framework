@@ -152,7 +152,7 @@ def get_class_weights(ds, conf):
     
     assert not conf["resample"], "Should only use resample or class_weight. Not both." 
     
-    ds = unpipe(ds, conf["sizes"]["train"])
+    ds = unpipe(ds, conf["ds_sizes"]["train"])
     
     _, cnt = class_distribution(ds, conf["num_classes"])
     total = cnt.sum()
@@ -163,7 +163,8 @@ def get_class_weights(ds, conf):
     class_weights = dict(enumerate(score))
     
     if conf["verbosity"]:
-        print ("Class weights:\n", class_weights)
+        print ("---- Class weights ----")
+        print (class_weights)
     
     return class_weights
 
