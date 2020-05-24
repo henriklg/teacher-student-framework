@@ -9,6 +9,7 @@
 % ----------------------------------------------------------
 
 
+
 \section{Learning features from dataset}
 % use this section to write about how we managed to get a good classifier
 % batch_size, epoch_number, optimizer, dropout, model, image size and other hyper parameters
@@ -18,20 +19,42 @@
 \subsection{Binary vs multiclass}
 
 
+
+
 \subsection{Choosing an optimizer}
 
 
+
+
 \subsection{Weight initialization}
+% initializing the model with weights.
+% initializing the student with the teacher model's weights?
+% ----------------------------------------------------------
+Found that training on Hyper-Kvasir datasets yield best results when using EfficientNet with is initialized with weights from ImageNet. Early in our study the only pre-trained weights readily available were trained without the use of AutoAugment, and performed slightly worse than the ImageNet weights trained with AutoAugment, released at a later time. Especially we observed that the model would initialize the training with lower loss when trained with ImageNet-AutoAugment weigths.
+
+%TODO insert plot of training loss and accuracy (and class-report?) of imagenet-autoaugment and imagenet
+
+We tested with initializing the teacher model with original noisy-student weights but found that loss were fluxing more early in training. Also when trained for same number of epochs as with ImageNet weights the model would perform worse on the evaluation data, with lower accuracy and lower recall.
+
+%TODO insert plot of training loss and accuracy (and class-report?) of noisy-student
+
+As part of this experiment we also tested with initializing the teacher model with no weights and train from scratch. Not surprisingly, this gave slower training, and after 20 epochs we got a 15\% lower accuracy than when training with ImageNet weights.
+
 
 
 \subsection{Class Weigting vs Resample}
 Found that by re-sampling the dataset the model generelized much better than by calculating the loss from weighted class distribution.
 
 
+
 \subsection{Model depth/complexity}
 
 
+
+
 \subsection{CNN vs ResNet vs EfficientNets}
+
+
 
 
 
