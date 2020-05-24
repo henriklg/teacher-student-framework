@@ -428,7 +428,15 @@ When we run this on Hyper-Kvasir dataset we get the following output. Here we se
 
 
 \subsubsection{Class weights}
-The way we calculate the class weights for our data is **insert formula**. In tf.Keras we can then give the class weights as a dictionary to the model.fit function like this:
+The way we calculate the class weights for our data is by the following formula.
+
+% pythonic: n_samples / (n_classes * np.bincount(y))
+\[
+w_j = \frac{n}{kn_j}
+\]
+where $w_j$ is the weight to class $j$, $n$ is the number of observations, $n_j$ is the number of observations in class $j$, and $k$ is the total number of classes.
+
+In tf.Keras we can then give the class weights as a dictionary to the model.fit function like this:
 
 \begin{lstlisting}[language=Python]
 class_weights = {"class A": 0.5,
