@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import os
+import pathlib
 import textwrap
 import matplotlib.pyplot as plt
 
@@ -424,9 +425,11 @@ def checkout_class(checkout, unlab, conf):
 
 def checkout_dataset(ds, conf=None):
     """
+    Show some images from training dataset (mainly to check augmentation)
     ds is assumed to be from prepare_for_training - so batched, repeated etc
     """
-    # Show some images from training dataset (mainly to check augmentation)
+    pathlib.Path(conf["log_dir"]).mkdir(parents=True, exist_ok=True)
+    
     batch = next(iter(ds))
     images, labels = batch
     images = images.numpy()
@@ -473,74 +476,6 @@ def write_to_file(var, conf, fname):
         f = open("{}/{}.txt".format(conf["log_dir"], fname),"w")
         f.write( str(var) )
         f.close()
-
-
-
-def resample_unlab(unlab, orig_dist,  conf):
-    """
-    unlab: pred, lab, name
-    """
-    lab_list = unlab[1]
-    name_list = unlab[2]
-    
-    num_to_match = np.max(orig_dist)
-    idx_to_match = np.argmax(orig_dist)
-    print ('Limit set by {} with {} samples'.format(conf["class_names"][idx_to_match], int(num_to_match)))
-    print ("-"*40)
-
-    new_findings = ([], [])
-    new_findings_filepaths = []
-    lab_arr = np.asarray(lab_list, dtype=np.uint8)
-
-    for class_idx in range(conf["num_classes"]):
-        # how many samples already in this class
-        in_count = orig_dist[class_idx]
-
-        indexes = np.where(lab_arr==class_idx)[0]
-        num_new_findings = len(indexes)
-
-        count = 0
-        for count, idx in enumerate(indexes, start=1):
-            if in_count >= num_to_match:
-                count -= 1 # reduce by one cuz of enumerate updates index early
-                break
-            fn = name_list[idx]
-            img = fn2img(fn, conf["unlab_dir"], conf["img_shape"][0])
-            
-            new_findings[0].append(img)         # image
-            new_findings[1].append(lab_list[idx])         # label
-            new_findings_filepaths.append(name_list[idx]) # filepath
-            in_count += 1
-        
-        if conf["verbosity"]:
-            print ("{:27}: added {}/{} samples.".format(conf["class_names"][class_idx], count, num_new_findings))
-    
-    return new_findings, new_findings_filepaths
-
-
-
-def reduce_dataset(ds, remove=None):
-    """
-    """
-    def remove_samples(img, path):
-        """
-        Filter out images which filename exists in new_findings_filepaths.
-        Return boolean.
-        """
-        bool_list = tf.equal(path, remove)
-        in_list = tf.math.count_nonzero(bool_list) > 0
-        return not in_list
-    
-    return ds.filter(remove_samples)
-
-
-
-def get_tqdm(unlab_size, count, new_findings):
-    tqdm_predicting = tqdm(total=unlab_size, desc='Predicting', position=0, initial=count)
-    tqdm_findings = tqdm(total=unlab_size, desc='Findings', 
-                     position=1, bar_format='{desc}:{bar}{n_fmt}', initial=new_findings)
-    
-    return tqdm_predicting, tqdm_findings
 
 
 
