@@ -196,7 +196,7 @@ def prepare_for_training(ds, ds_name, num_classes, conf, cache):
     ds = ds.repeat()
     
     #Augment
-    if conf["augment"] and ds_name=='train':
+    if conf["augment"] and "train" in ds_name:
         ds = augment_ds(ds, conf, AUTOTUNE)
     
     # Batch
