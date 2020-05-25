@@ -107,7 +107,7 @@ def create_callbacks(conf):
         restore_best_weights=True
     )
     checkpoint_cb = ModelCheckpoint(
-        filepath=conf["log_dir"]+'/best_cp-{epoch:03d}.hdf', 
+        filepath=conf["log_dir"]+'/checkpoints/best_cp-{epoch:03d}.hdf', 
         monitor='val_loss', 
         save_best_only=True, 
         mode='auto'
