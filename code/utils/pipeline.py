@@ -307,6 +307,13 @@ def augment_ds(ds, conf, AUTOTUNE):
 
 
 def create_unlab_ds(conf):
+    """
+    Pipeline for loading unlabeled dataset.
+    
+    Return:
+    - tf.data.Dataset
+    - number of samples in dataset
+    """
     AUTOTUNE = tf.data.experimental.AUTOTUNE
     
     global IMG_SIZE
