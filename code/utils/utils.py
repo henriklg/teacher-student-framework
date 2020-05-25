@@ -257,32 +257,11 @@ def unpipe(ds, size):
 
 
 
-def custom_sort(pred, lab, path):
-    """
-    Takes three lists and return three sorted list based on prediction confidence
-    """
-    sorted_list = list(zip(pred, lab, path))
-    sorted_list.sort(key=lambda x: x[0], reverse=True)
-    
-    pred_sorted = [row[0] for row in sorted_list]
-    lab_sorted = [row[1] for row in sorted_list]
-    path_sorted = [row[2] for row in sorted_list]
-    
-    return pred_sorted, lab_sorted, path_sorted
-
-
-
-
 
 def checkout_findings(unlab, conf):
     """
-    unlab: pred, lab, path
-    
-    Todo; remove empty rows
+    Create a large plot of 6 samples from every class found in the unlabeled dataset
     """
-    pred_list = unlab[0]
-    lab_list = unlab[1]
-    name_list = unlab[2]
     ### Create images with label names
     class_label_img = []
     font_path = '/usr/share/fonts/truetype/ubuntu/UbuntuMono-B.ttf'
@@ -307,7 +286,7 @@ def checkout_findings(unlab, conf):
     # black image
     img_black = Image.new('RGB', (conf["img_shape"][0], conf["img_shape"][1]), color = (0, 0, 0))
     
-    lab_arr = np.asarray(lab_list, dtype=np.uint8)
+    lab_arr = np.asarray(unlab["lab_list"], dtype=np.uint8)
     class_examples = []
     class_preds = []
     for class_idx in range(conf["num_classes"]):
@@ -323,11 +302,11 @@ def checkout_findings(unlab, conf):
                 curr_class_preds.append(0)
             # found image
             else:
-                fn = name_list[indekser[i]]
+                fn = unlab["name_list"][indekser[i]]
                 img = fn2img(fn, conf["unlab_dir"], img_width)
                 
                 curr_class_examples.append(img)
-                curr_class_preds.append(pred_list[indekser[i]])
+                curr_class_preds.append(unlab["pred_list"][indekser[i]])
 
         class_examples.append(curr_class_examples)
         class_preds.append(curr_class_preds)
@@ -370,19 +349,15 @@ def checkout_findings(unlab, conf):
 
 def checkout_class(checkout, unlab, conf):
     """
-    unlab: pred, lab, name
-    """
-    pred_list = unlab[0]
-    lab_list = unlab[1]
-    name_list = unlab[2]
-    
+    Display a grid with sample images from one specified class
+    """    
     # Which class number correspond to that class name
     class_idx = np.where(conf["class_names"] == checkout)[0]
     if len(class_idx) == 0:
         raise NameError('Error: class-name not found. Check spelling.')
         
     # List of img_list-indexes with images corresponding to that class number
-    idx_list = np.where(lab_list == class_idx[0])[0]
+    idx_list = np.where(unlab["lab_list"] == class_idx[0])[0]
     num_images = len(idx_list)
     if (num_images == 0):
         raise IndexError("No findings in this class.")
@@ -403,10 +378,10 @@ def checkout_class(checkout, unlab, conf):
         # i runs from 0 to (nrows*ncols-1)
         # axi is equivalent with ax[rowid][colid]
         try:
-            fn = name_list[idx]
+            fn = unlab["name_list"][idx]
             img = fn2img(fn, conf["unlab_dir"], 256)
             
-            pred = pred_list[idx_list[i]]
+            pred = unlab["pred_list"][idx_list[i]]
             title = "conf: "+str(round(pred, 5))
             axi.set_title(title)
             axi.imshow(img)
