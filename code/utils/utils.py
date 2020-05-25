@@ -476,16 +476,13 @@ def write_to_file(var, conf, fname):
 
 
 
-def resample_unlab(unlab, dataset,  conf):
+def resample_unlab(unlab, orig_dist,  conf):
     """
     unlab: pred, lab, name
     """
     lab_list = unlab[1]
     name_list = unlab[2]
     
-    # Get the _last_ distribution used for training - NB: this must be updated for each teacher/student iteration
-    _, orig_dist = class_distribution(dataset, conf["num_classes"])
-
     num_to_match = np.max(orig_dist)
     idx_to_match = np.argmax(orig_dist)
     print ('Limit set by {} with {} samples'.format(conf["class_names"][idx_to_match], int(num_to_match)))
@@ -557,3 +554,14 @@ def fn2img(fn, folder, size):
     img = tf.image.convert_image_dtype(img, tf.float32)
     img = tf.image.resize(img, [size, size])
     return img
+
+
+
+def tf_bincount(ds, num_classes):
+    """
+    Counts samples for each class in dataset (NB: NOT REPEATED OR BATCHED)
+    """
+    count = np.zeros(num_classes)
+    for img, lab in ds:
+        count[lab] += 1
+    return count
