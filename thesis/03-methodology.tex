@@ -20,6 +20,7 @@ In this chapter we will discuss how we created the dataset used in our research,
 As discussed in Section \ref{sec:available_datasets} there is number of publicly available datasets online, and some which are restricted. Some of these datasets are difficult to access, and there is a need for more publicly available datasets which are collected for the purpose of deep learning. To assist the under-explored field of research within medical computer assisted analysis tools the datasets need to be large and well annotated. Some of the mentioned datasets lack adequately documented, annotated samples from a good source and is not well suited for our research. Thus, as a vital part of our research, we aim to produce a collection of well annotated and adequately big dataset that can be used not only in this study, but also contribute to the research community and have a impact on the research comparability in future. We achieve this by collecting medical data, sorting and annotating it and making the dataset publicly available and free for non-commercial, educational and research purposes.
 
 
+
 \subsection{Privacy, Legal and Ethics Issues}
 %Source: pogorelov thesis 3.1.1
 % ----------------------------------------------------------
@@ -108,9 +109,11 @@ These videos were processed exactly the same as previous videos, so that it will
 %TODO mention number of samples, a rough distribution, image dimensions
 
 
+
 \subsubsection{Videos}
 In addition to the labeled and unlabeled images all of the videos used for extracting them are included in the dataset in MP4 format. They are weakly labeled by a clinical expert.
 %TODO mention the included excel sheet with tags, size of dataset, format, number of frames, etc
+
 
 
 % ----------------------------------------------------------
@@ -181,6 +184,7 @@ At this step it would be natural to also apply normalization to the images, but 
 Finally the images are saved to a corresponding directory for each train, test and validation data in the given output directory.
 
 
+
 \subsection{Loading images into the pipeline}
 % write about the first part of create_dataset script
 % ----------------------------------------------------------
@@ -199,6 +203,7 @@ tf.Tensor(b'/dyed-lifted-polyps/aa0268867b.jpg', shape=(), dtype=string)
 Next we apply a transformation function to each element of the dataset to create (image, label) pairs from the filepaths. This transformation function does three things; one-hot encodes the label based on the parent directory; decodes the image so the image is represented with a tensor with dimensions (image width, image height, color channels); resize the image to the correct dimensions. 
 
 Once we have a dataset object we can transform it into a new dataset by chaining method calls on the dataset object.
+
 
 
 \subsection{Optimize performance}
@@ -345,6 +350,7 @@ One possible draw-back from using data augmentation is the network might miss im
 In recent years, automated augmentation strategies have led to state-of-the-art results in image classification and object detection \cite{AutoAugmentLearning19, RandAugmentPractical19}. These novel automated augmentation policies have shown to improve accuracy, model robustness, and performance on semi-supervised learning for image classification without no additional computational cost at inference time. Due to time constraint we did not test this on our network, but is something we would like to implement in future studies.
 
 
+
 \subsubsection{tf.image}
 % https://www.tensorflow.org/api_docs/python/tf/image
 We have used tf.image API from TensorFlow for all our data augmentations within the input pipeline. This module contains functions for image processing and decoding-encoding operations, and use little computational overhead. All functions that select a random value from an interval have the option to be seeded so that our data is reproducible.
@@ -386,6 +392,7 @@ We find that the limiting factor for setting the batch size is GPU memory, espec
 % ----------------------------------------------------------
 To combat the class imbalance in our dataset we have experimented with two tactics. The first thing we tested, which was also the easiest to implement with TensorFlow was class weighting. Weighting the classes means that we calculate a score for every class within the dataset, and during training of the network each classes weight is carried when computing the loss. Normally each class has a weight of 1, but we don't want this because of the nature of class imbalance. Instead, if there are twice as many samples in class A than in class B, we give class A a weight score which is half that of class B.
 % what happenes if we dont balance dataset?
+
 
 
 \subsubsection{Oversample}
@@ -506,8 +513,8 @@ Found that when weighting the classes the model learns slower. Which means decay
 
 \subsection{Training}
 %TODO Include a table of computer hardware used for training, and versions of all libraries used (like hicks p.73
+% Normalization; any benefit of using L2 normalization in last dense layer when using a pre-defined model?
 % ----------------------------------------------------------
-%Normalization; any benefit of using L2 normalization in last dense layer when using a pre-defined model?
 
 \begin{table} % table:system_specs
   \centering
@@ -576,11 +583,13 @@ Due to memory limitations we are forced to reduce the batch size when training w
 
 \subsection{Keeping track of experiemnts}
 % write about logging etc
+% ----------------------------------------------------------
 
 
 
 
 \subsection{Training the teacher model}
+% ----------------------------------------------------------
 
 
 
@@ -589,13 +598,18 @@ Due to memory limitations we are forced to reduce the batch size when training w
 
 
 \subsection{Generating new pseudo labels}
+% ----------------------------------------------------------
 When we use the trained teacher model to generate new pseudo labels from the dataset we set a threshold for which the predicted image is saved if it is above the set value. Here we have two options, either to set the threshold low and extract a large dataset with high uncertainty, but get the most of our minority classes. Or we can set the threshold high, and gather a dataset with lower uncertainty, but might miss more samples for the minority classes.
 
 After subtracting samples from the unlabeled dataset through predicting and saving images with a probability score higher than the threshold, we sort the images based on the probability scores. This is done so for majority classes with a large amount of samples can be squeezed to fit the minority classes and we can select the samples with the highest probability scores.
 
 The sorted samples from the unlabeled dataset is then resampled based on the original distribution of samples in the training data. Since the original dataset is resampled that means we will pick out X samples for each class to keep the distribution even between classes during training.
 
+
+
+
 \subsubsection{Inspecting the pseudo labels}
+% ----------------------------------------------------------
 Since the unlabeled dataset don't contain labels, it is difficult to fully comprehend the results of the extracted data.
 %TODO mention that the result are checked with a specialist
 %TODO add figure of unlab_ds_checkout-all.pdf
@@ -610,17 +624,39 @@ Many models train better if you gradually reduce the learning rate during traini
 
 %TODO add plot of impact of decay rate and explain
 
-For furhter studies we would like to run grid search to find a more optimal value for learning rate.
+For further studies we would like to run grid search to find a more optimal value for learning rate.
+
+
+
+\subsection{Optimizer for gradient descent}
+% Why did we chose to use Adam, and why do we use inverse time decay?
+% ----------------------------------------------------------
+
 
 
 \subsection{Hyper-parameter tuning}
+% how we fine tuned the parameters. Describe why we chose the values we did
+% mention we would have like to tested grid search to optimize performance
+% ----------------------------------------------------------
+
+
+
+
+\subsection{Evaluation methods and metrics}
+% Write about how we evaluated the models
+% NB: remember we already recapped evaluation in background. Only discuss what we did
+% ----------------------------------------------------------
+
+
 
 
 
 % ----------------------------------------------------------
-\section{Evaluation methods and metrics}
+\section{Teacher-student architecture}
 %
 % ----------------------------------------------------------
+
+
 
 
 % ----------------------------------------------------------
