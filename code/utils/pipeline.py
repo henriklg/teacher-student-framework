@@ -242,6 +242,11 @@ def oversample(ds, cache_name, num_classes, conf):
         # indefinitely and store in datasets list
         data = ds.filter(lambda img, lab: lab==i)
         data = data.cache(cache_dir+'{}_ds'.format(i))
+        
+        # Cache to drive
+        for img, lab in data:
+            pass
+        
         data = data.repeat()
         datasets.append(data)
     
@@ -265,6 +270,8 @@ def augment_ds(ds, conf, AUTOTUNE):
     
     Returns a tf.data.Dataset.map
     """
+    tf.random.set_seed(conf["seed"])
+    
     mul = conf["aug_mult"]
     def random_rotate_image(img):
         img = ndimage.rotate(img, np.random.uniform(-10*mul, 10*mul), reshape=False)
