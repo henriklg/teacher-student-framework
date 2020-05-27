@@ -493,9 +493,28 @@ Having found the error, the gradient of the cost function with regards to the we
 
 
 \subsection{Gradient descent optimization algorithms}
-%source1: https://ruder.io/optimizing-gradient-descent/
+% source1: https://ruder.io/optimizing-gradient-descent/
 % good source: https://mlfromscratch.com/optimizers-explained/#/
 % ----------------------------------------------------------
+Gradient descent is one of the most used algorithms to perform optimization, especially in the case of neural networks. In this section we are going to look at the different variants of gradient descent, as well as introducing the most common variants.
+
+Gradient descent is the process of minimizing the objective function $J(\theta)$ parameterized by a models parameters $\theta \in {\rm I\!R}^d$ by updating the parameters in the opposite direction of the gradient of the objective function $\nabla_{\theta} J(\theta)$ with regards to the parameters. The learning rate determines the length of the step towards the minimum. In layman terms we follow the slope of the surface (which is created by the aforementioned objective function) downhill until the only way to go is up.
+
+There are three variants of gradient descent. The difference between the three is how much data is being used when computing the gradient of the objective function. When we use a lot of data to compute the gradient we get a good accuracy but at the cost of computational complexity which again leads to longer time to perform an update.
+\begin{itemize}
+\item \textbf{Batch Gradient Descent}: all training samples are used to create one batch.
+\item \textbf{Stochastic Gradient Descent}: batch size is one element of the training data.
+\item \textbf{Mini-Batch Gradient Descent}: batch size is more than one sample and less than the size of the entire dataset
+\end{itemize}
+
+\textbf{Batch gradient descent} computes the gradient of the cost with regards to the parameters $\theta$ for the entire dataset with all its samples: $$ \theta = \theta - \eta \cdot \nabla J(\theta) $$ where $\eta$ is the learning rate. Because we compute the gradients for the entire dataset this is slow and consume a lot of memory. This makes it problematic for image classification tasks.
+
+\textbf{Stochastic gradient descent} (SGD) is performs a parameter update for each sample in the dataset, not the entire dataset. It is computed by: $$ \theta = \theta - \eta \cdot \nabla_{\theta} J(\theta;x^{i};y^{i}) $$ where $x^i$ and $y^i$ are one training sample. This sample-wise update of gradients leads to a lot of redundant computations, but unlike batch gradient descent it does one update at a time and is therefore much faster.
+
+\textbf{Mini-Batch gradient descent} is a combination of batch gradient descent and stochastic gradient descent. It performs one update for every mini-batch of training samples: $$ \theta = \theta - \eta \cdot \nabla_{\theta}J(\theta;x^{(i:i+n)};y^{(i:i+n)}) $$ where $n$ is the number of samples in every mini-batch. The benefits of using mini-batches is twofold; (1) reduces variance of parameter updates as gradient are averaged over multiple samples, which can lead to more stable convergence; and (2) very efficient compared to batch gradient descent.
+
+% Challenges with using vanilla mini-batch gradient descent
+However, mini-batch gradient descent comes with some challenges. It can be difficult to chose a suitable learning rate. Low learning rate leads to slow convergence and too high learning rate can cause the loss to skip over the minimum. To combat this one can use learning rate schedules which adjust the learning rate during training according to a pre-defined set of rules. But these schedules must also be tuned manually to achieve good performance and fail to adapt to the next dataset. Another problem is that even when setting a good learning rate scheduler the learning rate applies equally to all parameter updates. In the case of a highly imbalanced dataset it is better to tweak how much and often the parameters updates.
 
 \subsubsection{Adam}
 \subsubsection{SGD}
@@ -894,7 +913,7 @@ As mentioned in section \ref{sec:wireless_capsule_endoscopy}, a concern when pro
 
 This architecture uses inception modules for feature extraction and a RNN for sequential modelling of motion dynamics to regress the robot's orientation and position in real time. By taking multiple of RGB Depth images with time stamps it can calculate the 6-DoF pose of the capsule without the need of any extra sensors. For obtaining the depth images \citeauthor*{DeepEndoVO18} use the shape from shading (SfS) technique of \citeauthor{ShapeShading94} \cite{ShapeShading94}. This model outperforms state-of-the-art models like LSD SLAM and ORB SLAM.
 
-\begin{figure}[h] % fig:deep_endovo_example
+\begin{figure}[h] % double fig:deep_endovo_example
   \centering
   \begin{subfigure}[b]{0.4\linewidth}
     \centering
