@@ -312,7 +312,7 @@ This augmented data is acquired by performing a series of pre-processing transfo
 \begin{figure} % fig:data_aug-crop-rot
   \begin{center}
     \includegraphics[width=.7\textwidth]{data_aug-crop-rot}
-    \caption[The effect of data augmentation on sample image.]{The effect of data augmentation on an image from Hyper-Kvasir. Image taken from barrets-short-segment class.}
+    \caption[The effect of data augmentation on sample image.]{The effect of data augmentation on an image from Hyper-Kvasir. Image taken from barrets-short-segment class. In this example the augmentations performed are a bit excessive to underline the effects.}
     \label{fig:data_aug-crop-rot}
   \end{center}
 \end{figure}
@@ -387,8 +387,155 @@ We find that the limiting factor for setting the batch size is GPU memory, espec
 
 
 
-\subsection{Dealing with class imbalance}
+\subsection{Sampling the data}
 % remember to mention what changes in caching and shuffling
+% ----------------------------------------------------------
+
+
+
+\subsection{Training}
+%TODO Include a table of computer hardware used for training, and versions of all libraries used (like hicks p.73
+% ----------------------------------------------------------
+
+\begin{table} % table:system_specs
+  \centering
+  \renewcommand{\arraystretch}{1.3}
+  \begin{tabular}{|c|c|c|c|}
+  \hline
+  Level		& Category		& Name		& Version \\
+  \hline
+  \multirow{3}{*}{Hardware} & GPU & Nvidia GTX 1080 ti & \\
+  \cline{2-4}
+  & CPU & Intel i7-8700K 3.7GHz & \\
+  \cline{2-4}
+  & Memory & G.SKill 3200MHz 32GB & \\
+  \hline
+  \multirow{6}{*}{Software} & Operating System & Ubuntu Focal Fossa & 20.04 \\
+  \cline{2-4}
+  & \multirow{5}{*}{Library} & Python & 3.7.6 \\
+  \cline{3-4}
+  & & TensorFlow & 2.1.0 \\
+  \cline{3-4}
+  & & Keras & 2.3.1 \\
+  \cline{3-4}
+  & & Cuda & 10.1.243 \\
+  \cline{3-4}
+  & & cuDNN & 7.6.5 \\
+  \hline
+  \end{tabular}
+  \caption[System specifications]{A table showing the system specifications for the machine used for all training and evaluation sessions.}
+  \label{table:system_specs}
+\end{table}
+
+% Batch size for each model
+Due to memory limitations we are forced to reduce the batch size when training with larger models. If we run with a too large batch size the model will not fit in memory and we get a Out of Memory error (OOM Error). In Table \ref{table:model_bs} is a overview of what batch sizes we are using for which models during training.
+
+\begin{table} % table:model_bs
+  \centering
+  \begin{tabular}{|c|cc|cc|}
+	\hline
+	\multirow{2}{*}{Model} & \multicolumn{2}{c|}{128x128} & \multicolumn{2}{c|}{256x256} \\
+	\cline{2-5}
+	& Batch Size & Time [s] & Batch Size & Time [s] \\
+	\hline
+	EfficientNetB0 & 256 & 15 	& 64  & 61  \\
+	EfficientNetB1 & 128 & 21	& 32  & 91  \\
+	EfficientNetB2 & 128 & 22	& 32  & 98  \\
+ 	EfficientNetB3 & 128 & 28	& 32  & 113 \\
+  	EfficientNetB4 & 64  & 38	& 16  & 153 \\
+  	EfficientNetB5 & 64  & 52	& 16  & 206 \\
+  	EfficientNetB6 & 32  & 72	& 8   & 288 \\
+  	EfficientNetB7 & 32  & 95	& 8   & 400 \\
+  	\hline
+  \end{tabular}
+  \caption[Max batch size for each EfficientNet model]{Max batch size used for each EfficientNet model with image dimensions 128 by 128 and 256 by 256 respectively.}
+  \label{table:model_bs}
+\end{table}
+
+
+
+% ----------------------------------------------------------
+\section{Binary classification} \label{sec:system_implementation}
+% ----------------------------------------------------------
+% first thing i tested, because of of high class imbalance - a lot more healthy images then sick ones
+% ----------------------------------------------------------
+As previously mentioned one of the main concerns when dealing with medical image data is that there are a lot easier to come by images with no medical findings, than there is images with findings. While labeling images from the Hyper-CapsuleCam dataset at the beginning of this study, we quickly noticed this was an issue. After spending weeks labeling data, the total corpus of images with findings were in the thousands, while the images we had tagged as normal, healthy, images were in the tens of thousands. 
+
+After some testing with using ResNet50 model initialized with ImageNet pretrained weights, we confirmed that the model did not generalize well, and would classify all images as the majority class which greatly outnumbered the other classes. 
+
+Next, we merged all classes with labeled findings into one big class, while leaving the class with healthy images as is. This gave us a binary dataset of forty thousand images. This class-label merge was done in the input pipeline by creating a list of all class names with findings, and upon reading an image from the dataset directory, we checked if the image paths contained one of the class names from the list. If so, we labeled the image as 1, which represents 'positive' and if not the image was labeled with 0, representing 'negative'.
+
+The dataset was split into training, testing and validation datasets with the split of 60\%, 15\% and 15\% respectively.
+%TODO what did we do next
+%TODO what were the results and why?
+%TODO insert figures of results of training
+%TODO what was the next step? (multiclass resample?)
+
+
+
+
+
+
+\subsection{Learning rate}
+% see https://www.tensorflow.org/tutorials/keras/overfit_and_underfit
+% https://machinelearningmastery.com/learning-rate-for-deep-learning-neural-networks/
+% ----------------------------------------------------------
+% Inverse Time Decay
+Many models train better if you gradually reduce the learning rate during training. We are using learning rate which follows a inverse time decay which means that the learning rate is decreased to 1/2 of the base rate at $x$ epochs, 1/3 at $2x$ epochs and so on. We find that by doing this we get a model which has a less fluctuating loss during training. In Figure \ref{fig:lr_decay} we have trained two models, identical except in Figure \ref{fig:no-lr-schedule} the learning rate is set to 0.001 during all 30 epochs, while in Figure \ref{fig:lr-schedule} the learning rate starts at 0.01, and then gradually lowers itself for every epoch and reaches 0.001 by epoch 20, and finally 0.0007 at epoch 30, where the models stop training. When comparing the accuracy of the trained model on the test data we see they both perform equally well after 30 epochs, but the model trained with the use of inverse time decay learns slightly slower than the model trained without.
+
+\begin{figure}[h] % double fig:lr_decay
+  \centering
+  \begin{subfigure}[b]{0.4\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{no-lr-schedule}
+    \caption{Learning rate set to 0.001.}
+    \label{fig:no-lr-schedule}
+  \end{subfigure}
+  %
+  \begin{subfigure}[b]{0.4\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{lr-schedule}
+    \caption{With inverse time decay.}
+    \label{fig:lr-schedule}
+  \end{subfigure}
+  \caption[Effect of inverse time decay on training and validation loss.]{Effect of learning rate inverse time decay on the computed loss during training. Here both models are trained by using Adam, batch size of 128, with data augmentation and oversampling and 20\% dropout.}
+  \label{fig:lr_decay}
+\end{figure}
+
+For further studies we would like to run grid search to find a more optimal value for learning rate.
+
+
+
+\subsection{Optimizer for gradient descent}
+% Why did we chose to use Adam, and why do we use inverse time decay?
+% ----------------------------------------------------------
+
+
+
+
+
+\subsection{Hyper-parameter tuning}
+% how we fine tuned the parameters. Describe why we chose the values we did
+% mention we would have like to tested grid search to optimize performance
+% ----------------------------------------------------------
+
+
+
+
+\subsection{Evaluation methods and metrics}
+% Write about how we evaluated the models
+% NB: remember we already recapped evaluation in background. Only discuss what we did
+% ----------------------------------------------------------
+
+
+
+
+
+
+% ----------------------------------------------------------
+\section{Sample the dataset vs weighting the classes}
+% this was the second thing we tested to improve performance
+% beskriv hvordan vi gikk frem
 % ----------------------------------------------------------
 To combat the class imbalance in our dataset we have experimented with two tactics. The first thing we tested, which was also the easiest to implement with TensorFlow was class weighting. Weighting the classes means that we calculate a score for every class within the dataset, and during training of the network each classes weight is carried when computing the loss. Normally each class has a weight of 1, but we don't want this because of the nature of class imbalance. Instead, if there are twice as many samples in class A than in class B, we give class A a weight score which is half that of class B.
 % what happenes if we dont balance dataset?
@@ -396,6 +543,7 @@ To combat the class imbalance in our dataset we have experimented with two tacti
 
 
 \subsubsection{Oversample}
+% ----------------------------------------------------------
 Oversampling the training dataset is handled by a oversample() module inside pipeline.py. This module takes the training dataset as input parameter and then split the dataset into as many separate datasets as there are classes. Because the dataset is stored in a tf.data.Dataset object this must be done according to the tf.data API. We use a transformation method which filters out all image, sample pairs not belonging to the according class. Doing so gives us a python list of one dataset object for each class, containing as many samples as there were originally. The next step is to chache this list of datasets to reduce computational strain when we later want to iterate over the dataset again. Lastly we repeat every dataset so for each class in the list there is infinitely repeating samples. 
 TensorFlow has a convenient function for interleaving elements at random from a list of datasets which we use to go from having a list of repeating datasets to one datasets which produces a uniform distribution of randomly picked image, label pairs when iterated over.
 
@@ -435,6 +583,7 @@ When we run this on Hyper-Kvasir dataset we get the following output. Here we se
 
 
 \subsubsection{Class weights}
+% ----------------------------------------------------------
 The way we calculate the class weights for our data is by the following formula.
 
 % pythonic: n_samples / (n_classes * np.bincount(y))
@@ -507,90 +656,27 @@ In the case of Hyper-Kvasir dataset the class weights we use for our experiments
 
 Notice how the minimum range for class weights are set to 1.0. This is done to stabilize the loss. **find reference and reason**
 Found that when weighting the classes the model learns slower. Which means decay rate of learning rate must be lowered for it not to drop too soon. Also increase the buffer for early stopping of training.
-%TODO add formula for calculating class weights
 
 
 
-\subsection{Training}
-%TODO Include a table of computer hardware used for training, and versions of all libraries used (like hicks p.73
-% Normalization; any benefit of using L2 normalization in last dense layer when using a pre-defined model?
-% ----------------------------------------------------------
 
-\begin{table} % table:system_specs
-  \centering
-  \renewcommand{\arraystretch}{1.3}
-  \begin{tabular}{|c|c|c|c|}
-  \hline
-  Level		& Category		& Name		& Version \\
-  \hline
-  \multirow{3}{*}{Hardware} & GPU & Nvidia GTX 1080 ti & \\
-  \cline{2-4}
-  & CPU & Intel i7-8700K 3.7GHz & \\
-  \cline{2-4}
-  & Memory & G.SKill 3200MHz 32GB & \\
-  \hline
-  \multirow{6}{*}{Software} & Operating System & Ubuntu Focal Fossa & 20.04 \\
-  \cline{2-4}
-  & \multirow{5}{*}{Library} & Python & 3.7.6 \\
-  \cline{3-4}
-  & & TensorFlow & 2.1.0 \\
-  \cline{3-4}
-  & & Keras & 2.3.1 \\
-  \cline{3-4}
-  & & Cuda & 10.1.243 \\
-  \cline{3-4}
-  & & cuDNN & 7.6.5 \\
-  \hline
-  \end{tabular}
-  \caption[System specifications]{A table showing the system specifications for the machine used for all training and evaluation sessions.}
-  \label{table:system_specs}
-\end{table}
 
-% Batch size for each model
-Due to memory limitations we are forced to reduce the batch size when training with larger models. If we run with a too large batch size the model will not fit in memory and we get a Out of Memory error (OOM Error). In Table \ref{table:model_bs} is a overview of what batch sizes we are using for which models during training.
-
-\begin{table} % table:model_bs
-  \centering
-  \begin{tabular}{|c|cc|cc|}
-	\hline
-	\multirow{2}{*}{Model} & \multicolumn{2}{c|}{128x128} & \multicolumn{2}{c|}{256x256} \\
-	\cline{2-5}
-	& Batch Size & Time [s] & Batch Size & Time [s] \\
-	\hline
-	EfficientNetB0 & 256 & 15 	& 64  & 61  \\
-	EfficientNetB1 & 128 & 21	& 32  & 91  \\
-	EfficientNetB2 & 128 & 22	& 32  & 98  \\
- 	EfficientNetB3 & 128 & 28	& 32  & 113 \\
-  	EfficientNetB4 & 64  & 38	& 16  & 153 \\
-  	EfficientNetB5 & 64  & 52	& 16  & 206 \\
-  	EfficientNetB6 & 32  & 72	& 8   & 288 \\
-  	EfficientNetB7 & 32  & 95	& 8   & 400 \\
-  	\hline
-  \end{tabular}
-  \caption[Max batch size for each EfficientNet model]{Max batch size used for each EfficientNet model with image dimensions 128 by 128 and 256 by 256 respectively.}
-  \label{table:model_bs}
-\end{table}
 
 
 
 % ----------------------------------------------------------
-\section{System implementation} \label{sec:system_implementation}
-% ----------------------------------------------------------
-% Present the system architecture, some results perhaps
+\section{Teacher-student architecture}
+% Explain each step of our teacher-student model
 % ----------------------------------------------------------
 
+The specific implementation we use is EfficientNets release v1.1.0 by qubvel\footnote{github.com/qubvel/efficientnet}. This tf.keras implementation comes with pre-trained weights for both ImageNet and Noisy-Student.
 
-
-\subsection{Keeping track of experiemnts}
-% write about logging etc
-% ----------------------------------------------------------
 
 
 
 
 \subsection{Training the teacher model}
 % ----------------------------------------------------------
-
 
 
 
@@ -616,47 +702,8 @@ Since the unlabeled dataset don't contain labels, it is difficult to fully compr
 
 
 
-\subsection{Learning rate}
-% see https://www.tensorflow.org/tutorials/keras/overfit_and_underfit
-% https://machinelearningmastery.com/learning-rate-for-deep-learning-neural-networks/
-% ----------------------------------------------------------
-Many models train better if you gradually reduce the learning rate during training. We are using learning rate which follows a inverse time decay which means that the learning rate is decreased to 1/2 of the base rate at 10 epochs, 1/3 at 20 epochs and so on.
-
-%TODO add plot of impact of decay rate and explain
-
-For further studies we would like to run grid search to find a more optimal value for learning rate.
 
 
-
-\subsection{Optimizer for gradient descent}
-% Why did we chose to use Adam, and why do we use inverse time decay?
-% ----------------------------------------------------------
-
-
-
-\subsection{Hyper-parameter tuning}
-% how we fine tuned the parameters. Describe why we chose the values we did
-% mention we would have like to tested grid search to optimize performance
-% ----------------------------------------------------------
-
-
-
-
-\subsection{Evaluation methods and metrics}
-% Write about how we evaluated the models
-% NB: remember we already recapped evaluation in background. Only discuss what we did
-% ----------------------------------------------------------
-
-
-
-
-
-% ----------------------------------------------------------
-\section{Teacher-student architecture}
-% Explain each step of our teacher-student model
-% ----------------------------------------------------------
-
-The specific implementation we use is EfficientNets release v1.1.0 by qubvel\footnote{github.com/qubvel/efficientnet}. This tf.keras implementation comes with pre-trained weights for both ImageNet and Noisy-Student.
 
 
 
