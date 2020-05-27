@@ -158,7 +158,7 @@ def plot_lr_and_accuracy(history, conf):
     plt.plot(epochs_range, acc, label='Training Accuracy')
     plt.plot(epochs_range, val_acc, label='Validation Accuracy')
     plt.legend(loc='lower right')
-    # plt.ylim([0.5, 1])
+    plt.ylim([0, 1])
     plt.xlabel('Epoch')
     plt.ylabel('Accuracy')
     plt.title('Training and Validation Accuracy')
