@@ -47,21 +47,6 @@ def create_model(conf):
     model.add(layers.Dropout(conf["dropout"]))
     model.add(layers.Dense(conf["num_classes"], activation=conf["final_activation"]))
     
-    # from keras import regularizers
-    # teacher_model = Sequential()
-    # teacher_model.add(efficientnet_base)
-    # teacher_model.add(layers.GlobalAveragePooling2D())
-    # teacher_model.add(layers.Dropout(0.5))
-    # teacher_model.add(layers.Dense(512, kernel_regularizer=regularizers.l2(0.001),
-    #                                activation='relu'))
-    # teacher_model.add(layers.Dropout(0.5))
-    # teacher_model.add(layers.Dense(512, kernel_regularizer=regularizers.l2(0.001),
-    #                                activation='relu'))
-    # teacher_model.add(layers.Dropout(0.4))
-    # teacher_model.add(layers.Dense(256, kernel_regularizer=regularizers.l2(0.001),
-    #                                activation='relu'))
-    # teacher_model.add(layers.Dropout(0.3))
-    # teacher_model.add(layers.Dense(params["num_classes"], activation=conf["final_activation"]))
 
     if conf['optimizer'] == 'Adam':
         opt = tf.keras.optimizers.Adam(learning_rate=conf["learning_rate"])
