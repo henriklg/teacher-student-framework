@@ -12,6 +12,14 @@ Lastly, we demonstrate the surprising improvements of our models on domain speci
 
 
 
+
+\section{Keeping track of experiments}
+% write about logging etc
+% ----------------------------------------------------------
+Training multiple networks using a wide range of hyperparameters can become chaotic. To overcome this issue we have all our hyperparameters stored in a single python dictionary which easily can be stored in a configuration file. This dictionary handles all hyperparameters, as well as differentiate teacher models from student models, the number of samples and how the number changes during the iterative process of a teacher-student model. One of the parameters in this configuration dictionary is where the log directory is placed. For every run we dedicate a directory for saving all plots, lists, evaluation metrics and trained models and its weights so that we can keep track of what experiments have been run in the past, and what the results where. This log directory became very handy in the case of 'out of memory' errors, in which we could go back and load a trained model, or pseudo labels generated from running through the unlabeled dataset, saving us from having to run experiments multiple times.
+
+
+
 % ----------------------------------------------------------
 \section{Training details}
 % use this section to write about how we managed to get a good classifier
