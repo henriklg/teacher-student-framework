@@ -10,73 +10,48 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 
-def print_split_info(ds, num_classes, class_names):
+def print_split_info(ds, num_classes, class_names, cnt_per_class):
     """
+    Print info about the dataset
     """
-    # Count samples in each dataset by calling class_distribution
     line = "{:28}: ".format('Category')
     cnt_list = []
-    for split in ds:
-        _, cnt = class_distribution(ds[split], num_classes)
+    for split in ds: # train/test/val
+        cnt = tf_bincount(ds[split], num_classes)
         cnt_list.append(cnt)
         line += "{:5} | ".format(split)
-    print (line, '\n-------------')
+    
+    line += "{:5} | ".format("total")
+    line += "{:5}".format("% of total")
+    print (line, '\n'+'-'*72)
     
     for i in range(num_classes):
         line = "{:28}: ".format(class_names[i])
         for j in range(len(ds)):
-#             path = str(conf["data_dir"])+'/'+split+'/'+conf["class_names"][i]
-#             num_files = len([name for name in os.listdir(path)])
             line += "{:5d} | ".format(int(cnt_list[j][i]))
+        
+        line+="{:5d} | ".format(cnt_per_class[class_names[i]][0])
+        line+="{:5.2f}%".format(cnt_per_class[class_names[i]][1])
         print (line)
 
-
-
-def print_class_info(directories, data_dir, ds_size, outcast):
+def get_dataset_info(directories, data_dir, ds_size, ttv=True):
     """
-    Extract and print info about the class split of multiclass dataset
+    Get number of samples per class in dataset.
     
     return:
-    total numbeer of samples
+    a dictionary with number of samples per class and percentage of total
     """
     num_classes = len(directories)
     # Count number of samples for each folder
     count_dir = {}
     for dir_name in directories:
-        count_dir[dir_name] = len(list(data_dir.glob(dir_name+'/*.*g')))
-
-    total = sum(count_dir.values())
-    assert total != 0, "Can't divide by zero."
-    
-    for folder, count in count_dir.items():
-        print ("{:28}: {:4d} | {:2.2f}%".format(folder, count, count/total*100))
-        
-    print ('\nTotal number of images: {}, in {} classes.\n'.format(ds_size, num_classes))
-    return total
-
-
-
-def print_class_info_ttv(directories, data_dir, ds_size, outcast):
-    """
-    Extract and print info about the class split of multiclass dataset
-    
-    return:
-    total numbeer of samples
-    """
-    # Count number of samples for each folder
-    num_classes = len(directories)
-    count_dir = {}
-    for dir_name in directories:
-        count_dir[dir_name] = len(list(data_dir.glob('*/'+dir_name+'/*.*g')))
-    
-    total = sum(count_dir.values())
-    assert total != 0, "Dataset is empty."
-    
-    for folder, count in count_dir.items():
-        print ("{:28}: {:4d} | {:2.2f}%".format(folder, count, count/total*100))
-        
-    print ('\nTotal number of images: {}, in {} classes.\n'.format(ds_size, num_classes))
-    return total
+        if ttv:
+            class_cnt = len(list(data_dir.glob('*/'+dir_name+'/*.*g')))
+            count_dir[dir_name] = [class_cnt, class_cnt/ds_size*100]
+        else:
+            class_cnt = len(list(data_dir.glob(dir_name+'/*.*g')))
+            count_dir[dir_name] = [class_cnt, class_cnt/ds_size*100]
+    return count_dir
 
 
 
@@ -443,7 +418,7 @@ def write_to_file(var, conf, fname):
     """
     if type(var) == dict:
         # Write conf and params dictionary to text file
-        list_of_strings = [ '{:20} : {}'.format(key, var[key]) for key in var ]
+        list_of_strings = [ '{:25} : {}'.format(key, var[key]) for key in var ]
         with open("{}/{}.txt".format(conf["log_dir"], fname),"w") as f:
             [ f.write(f'{st}\n') for st in list_of_strings ]
         f.close()
