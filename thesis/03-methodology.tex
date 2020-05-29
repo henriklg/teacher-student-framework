@@ -383,7 +383,7 @@ Like with the rest of the operations performed in the input pipeline, TensorFlow
 
 % What batch size do we use   - Smaller batch sizes are noisy, offering a regularizing effect and lower generalization error
 One advantage of using mini-batch gradient descent is that it requires less memory. In our case the complete dataset will not fit in memory regardless so batch gradient descent is not possible to test. Another advantage is that typically networks train faster, achieves better training stability and generalization performance with mini-batches \cite{RevisitingSmall18}. \citeauthor{RevisitingSmall18} found that when experimenting with different batch sizes on ImageNet, CIFAR-10 and CIFAR-100, batch sizes of 32 or less provides more up-to-date gradient calculations, which yields more stable and reliable training. Other scientific papers also support that batch size of 32 is a good choice \cite{PracticalRecommendations12, GeneralInefficiency03}.
-We find that the limiting factor for setting the batch size is GPU memory, especially for larger models like EfficientNetsB2-B7. All models are trained on NVIDIA GTX 1080 ti with 11GB of memory, which can endure at most 64 images with dimensions of 256 by 256 being trained on EfficientNetB0 which has 5.3 million parameters.
+We find that the limiting factor for setting the batch size is GPU memory, especially for larger models like EfficientNetsB2-B7. All models are trained on NVIDIA GTX 1080 ti with 11GB of video memory, which can endure at most 64 images with dimensions of 256 by 256 being trained on EfficientNetB0 which has 5.3 million parameters.
 
 
 
@@ -393,9 +393,12 @@ We find that the limiting factor for setting the batch size is GPU memory, espec
 
 
 
-\subsection{Training}
+
+% ----------------------------------------------------------
+\section{Training our networks}
 %TODO Include a table of computer hardware used for training, and versions of all libraries used (like hicks p.73
 % ----------------------------------------------------------
+
 
 \begin{table} % table:system_specs
   \centering
@@ -451,6 +454,13 @@ Due to memory limitations we are forced to reduce the batch size when training w
   \caption[Max batch size for each EfficientNet model]{Max batch size used for each EfficientNet model with image dimensions 128 by 128 and 256 by 256 respectively.}
   \label{table:model_bs}
 \end{table}
+
+
+
+\subsection{Weight initializing}
+% mention pre-trained models and 'set correct initial bias'
+% ----------------------------------------------------------
+
 
 
 
@@ -677,8 +687,7 @@ The specific implementation we use is EfficientNets release v1.1.0 by qubvel\foo
 
 \subsection{Training the teacher model}
 % ----------------------------------------------------------
-
-
+For every iteration of putting the student back as the teacher, we tune the parameters for training step size, the level of augmentation and model dropout.
 
 
 
