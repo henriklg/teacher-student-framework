@@ -8,7 +8,7 @@ import pathlib
 import matplotlib.pyplot as plt
 import scipy.ndimage as ndimage
 
-from utils import class_distribution, print_class_info_ttv, print_class_info, print_split_info
+from utils import class_distribution, get_dataset_info, print_split_info
 
 
 # Global variables used by create_dataset and create_dataset_unlab
@@ -96,15 +96,12 @@ def create_dataset(conf):
     IMG_SIZE = conf["img_shape"][0]
     # Some parameters
     data_dir = conf["data_dir"]
-    outcast = conf["outcast"]
     verbosity = conf["verbosity"]
-    shuffle_buffer_size = conf["shuffle_buffer_size"]
-    seed = conf["seed"]
     
     # Create cache-dir if not already exists
     pathlib.Path(conf["cache_dir"]).mkdir(parents=True, exist_ok=True)
     pathlib.Path(conf["log_dir"]).mkdir(parents=True, exist_ok=True)
-    np.random.seed(seed=seed)
+    np.random.seed(seed=conf["seed"])
     AUTOTUNE = tf.data.experimental.AUTOTUNE
     ds_size = len(list(data_dir.glob('*/*/*.*g')))
     class_names = np.array(
@@ -113,34 +110,28 @@ def create_dataset(conf):
     CLASS_NAMES = class_names
     
     # Remove the outcast folder
-    if outcast != None:
-        class_names = np.delete(class_names, np.where(outcast == class_names))
-        if verbosity > 0: print ("Removed outcast:", outcast, end="\n\n")
+    if conf["outcast"] != None:
+        class_names = np.delete(class_names, np.where(conf["outcast"] == class_names))
+        if verbosity > 0: print ("Removed outcast:", conf["outcast"], end="\n\n")
     num_classes = len(class_names)
-    
-    # Print info about classes
-    if verbosity > 0: 
-        ds_size = print_class_info_ttv(class_names, data_dir, ds_size, outcast)
     
     # Create a tf.dataset of the file paths
     ds = {split: str(data_dir/split/'*/*.*g') for split in ["train","test","val"]}
-
-#     split_size = [len(list(glob.glob(ds[split]))) for split in ds] # train/test/val
+    # Find number of samples for train/test/val
     ds_sizes = {name:len(list(glob.glob(path))) for (name, path) in ds.items()}
     ds_sizes["total"] = ds_size
-    if verbosity > 0: 
-        print ("Dataset split:", ds_sizes)
     
     # Display file-strings for globbing
-    if verbosity > 0:
+    if verbosity > 1:
+        print ("Paths to each split:")
         [print(key) for key in ds.values()]
         print ()
     
     for split in ds:
         ds[split] = tf.data.Dataset.list_files(
                                     ds[split],
-                                    shuffle=shuffle_buffer_size>1,
-                                    seed=tf.constant(seed, tf.int64) if seed else None
+                                    shuffle=conf["shuffle_buffer_size"]>1,
+                                    seed=tf.constant(conf["seed"], tf.int64) if conf["seed"] else None
                                     )
     
     # Create dataset of label, image pairs from the tf.dataset of image paths
@@ -152,7 +143,9 @@ def create_dataset(conf):
     
     # print info about the dataset split
     if verbosity:
-        print_split_info(ds, num_classes, class_names)
+        print ("Dataset split:", ds_sizes, "\n")
+        cnt_per_class = get_dataset_info(class_names, data_dir, ds_size)
+        print_split_info(ds, num_classes, class_names, cnt_per_class)
     
     # Cache, shuffle, repeat, batch, prefetch pipeline
     for split in ds:
@@ -242,10 +235,6 @@ def oversample(ds, cache_name, num_classes, conf):
         # indefinitely and store in datasets list
         data = ds.filter(lambda img, lab: lab==i)
         data = data.cache(cache_dir+'{}_ds'.format(i))
-        
-        # Cache to drive
-        for img, lab in data:
-            pass
         
         data = data.repeat()
         datasets.append(data)
