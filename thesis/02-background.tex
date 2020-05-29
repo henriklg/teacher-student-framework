@@ -431,7 +431,7 @@ To calculate the error of the forward propagation it is common to use cross-entr
 \end{equation}
 
 
-\subsubsection{Back propagation}
+\subsubsection{Backpropagation}
 % ----------------------------------------------------------
 Starting from the last layer $L$, we calculate the derivative of the loss function (function \ref{eq:loss}) with regards to the activation function in order to update the weights. Computing the gradient of the loss function yields
 
@@ -496,7 +496,7 @@ Having found the error, the gradient of the cost function with regards to the we
 % source1: https://ruder.io/optimizing-gradient-descent/
 % good source: https://mlfromscratch.com/optimizers-explained/#/
 % ----------------------------------------------------------
-Gradient descent is one of the most used algorithms to perform optimization, especially in the case of neural networks. In this section we are going to look at the different variants of gradient descent, as well as introducing the most common variants.
+Gradient descent is one of the most used algorithms to perform backpropegation optimization, especially in the case of neural networks. In this section we are going to look at the different variants of gradient descent, as well as introducing the most common variants.
 
 Gradient descent is the process of minimizing the objective function $J(\theta)$ parameterized by a models parameters $\theta \in {\rm I\!R}^d$ by updating the parameters in the opposite direction of the gradient of the objective function $\nabla_{\theta} J(\theta)$ with regards to the parameters. The learning rate determines the length of the step towards the minimum. In layman terms we follow the slope of the surface (which is created by the aforementioned objective function) downhill until the only way to go is up.
 
@@ -507,30 +507,59 @@ There are three variants of gradient descent. The difference between the three i
 \item \textbf{Mini-Batch Gradient Descent}: batch size is more than one sample and less than the size of the entire dataset
 \end{itemize}
 
-\textbf{Batch gradient descent} computes the gradient of the cost with regards to the parameters $\theta$ for the entire dataset with all its samples: $$ \theta = \theta - \eta \cdot \nabla J(\theta) $$ where $\eta$ is the learning rate. Because we compute the gradients for the entire dataset this is slow and consume a lot of memory. This makes it problematic for image classification tasks.
+\textbf{Batch gradient descent} computes the gradient of the cost with regards to the parameters $\theta$ for the entire dataset with all its samples: 
+$$ \theta = \theta - \eta \cdot \nabla J(\theta) $$ 
+where $\eta$ is the learning rate. Because we compute the gradients for the entire dataset this is slow and consume a lot of memory. This makes it problematic for image classification tasks.
 
-\textbf{Stochastic gradient descent} (SGD) is performs a parameter update for each sample in the dataset, not the entire dataset. It is computed by: $$ \theta = \theta - \eta \cdot \nabla_{\theta} J(\theta;x^{i};y^{i}) $$ where $x^i$ and $y^i$ are one training sample. This sample-wise update of gradients leads to a lot of redundant computations, but unlike batch gradient descent it does one update at a time and is therefore much faster.
+\textbf{Stochastic gradient descent} (SGD) is performs a parameter update for each sample in the dataset, not the entire dataset. It is computed by: 
+$$ \theta = \theta - \eta \cdot \nabla_{\theta} J(\theta;x^{i};y^{i}) $$ 
+where $x^i$ and $y^i$ are one training sample. This sample-wise update of gradients leads to a lot of redundant computations, but unlike batch gradient descent it does one update at a time and is therefore much faster.
 
-\textbf{Mini-Batch gradient descent} is a combination of batch gradient descent and stochastic gradient descent. It performs one update for every mini-batch of training samples: $$ \theta = \theta - \eta \cdot \nabla_{\theta}J(\theta;x^{(i:i+n)};y^{(i:i+n)}) $$ where $n$ is the number of samples in every mini-batch. The benefits of using mini-batches is twofold; (1) reduces variance of parameter updates as gradient are averaged over multiple samples, which can lead to more stable convergence; and (2) very efficient compared to batch gradient descent.
+\textbf{Mini-Batch gradient descent} is a combination of batch gradient descent and stochastic gradient descent. It performs one update for every mini-batch of training samples: 
+$$ \theta = \theta - \eta \cdot \nabla_{\theta}J(\theta;x^{(i:i+n)};y^{(i:i+n)}) $$ 
+where $n$ is the number of samples in every mini-batch. The benefits of using mini-batches is twofold; (1) it reduces variance of parameter updates as gradient are averaged over multiple samples, which can lead to more stable convergence; and (2) very computationally efficient compared to batch gradient descent and stochastic gradient descent.
 
 % Challenges with using vanilla mini-batch gradient descent
-However, mini-batch gradient descent comes with some challenges. It can be difficult to chose a suitable learning rate. Low learning rate leads to slow convergence and too high learning rate can cause the loss to skip over the minimum. To combat this one can use learning rate schedules which adjust the learning rate during training according to a pre-defined set of rules. But these schedules must also be tuned manually to achieve good performance and fail to adapt to the next dataset. Another problem is that even when setting a good learning rate scheduler the learning rate applies equally to all parameter updates. In the case of a highly imbalanced dataset it is better to tweak how much and often the parameters updates.
+However, mini-batch gradient descent comes with some challenges. It can be difficult to chose a suitable learning rate. Low learning rate leads to slow convergence and too high learning rate can cause the loss to skip over the minimum. To combat this one can use learning rate schedules which adjust the learning rate during training according to a pre-defined set of rules. But these schedules must also be tuned manually to achieve good performance and fail to adapt to the next dataset. Another problem is that even when setting a good learning rate scheduler the learning rate applies equally to all parameter updates. In the case of a highly imbalanced dataset it is better to tweak how much and how often the parameters is updated.
 
-\subsubsection{Adam}
-\subsubsection{SGD}
-\subsubsection{Adagrad}
-\subsubsection{Adadelta}
+\subsubsection{Momentum based learning algorithms}
+Momentum \cite{MomentumTerm99} fixes one of the main problems with normal SGD, which is that is will often get stuck in in saddle points \cite{IdentifyingAttacking14} and converge slowly in ravines. Momentum accelerate SGD in the correct directions and dampens oscillations. These oscillations is common in ravine-like areas where instead of moving parallel to the walls in the ravine it will oscillate perpendicular while only taking small steps in the correct directions. The way momentum does this is by adding a fraction $\gamma$ of the update vector of the past time step to the current update vector: 
+$$ v_t = \gamma v_{t-1}+\eta \nabla_\theta J(\theta) $$
+$$ \theta = \theta - v_t $$
+The fraction $\gamma$ is usually set to a value in the range of $0.9$. Using momentum almost always leads to a better and faster convergence than in the case of using standard SGD. 
+
+Another version of SGD with momentum which has gained a lot of popularity is called Nesterov momentum, or Nesterov Accelerated Gradient (NAG) \cite{MethodUnconstrained83}. NAG add a notion of in which direction is best for the next update. In the case that we are converging fast on a local minimum normal momentum might have enough momentum to overshoot the minimum, and there is a need for a way to slow down when before the hill slopes up again. 
+NAG achieves this by computing $\theta - \gamma v_{t-1}$ which gives an approximation of the next position of where the parameters are going to be. This allows NAG to look ahead by calculating the gradient with regards to future position of parameters: 
+$$ v_t = \gamma v_{t-1} + \eta \nabla_\theta J(\theta-\gamma v_{t-1}) $$
+
+\subsubsection{Adaptive gradient based learning algorithms}
+Adagrad (ADAptive GRADient algorithm) \cite{AdaptiveSubgradient11} improves upon stochastic gradient descent with momentum with an adaptive learning rate tailored to the parameters. For features in the mini-batch which occurs frequently it will perform smaller updates (lower learning rate) to the parameters and for features which occurs rarely it will perform larger updates. This makes Adagrad algorithm good for handling imbalanced datasets and sparse data. The way Adagrad calculates the learning rates for every parameter at every time step is by:
+$$ \theta_{t+1} = \theta_i - \frac{\eta}{\sqrt{G_t + \epsilon}} \odot g_t $$
+where $G_t$ is a diagonal matrix witch holds the sum of the squares of the past gradients with regard to all parameters $\theta$ along its diagonal, $\epsilon$ is a small value to avoid division by zero and $g_t$ is the gradient at time step $t$, $g_t = \nabla_\theta J(\theta_t)$.
+
+\subsubsection{Momentum \& adaptive gradient based learning algorithms}
+One flaw with Adagrad is that by storing the sum of the squares of the past gradients, which are all positive, the denominator grows ever large. Eventually the learning rate will shrink towards zero and the network won't be able to learn any more additional knowledge.
+
+Adaptive Moment Estimation (Adam) \cite{AdamMethod17} store an exponentially decaying average of past squared gradients which reduces the aggressive decreasing learning rate of Adagrad. This is also done in optimization algorithms like Adadelta and RMSprop. But Adam also store an exponentially decaying average of past gradients $m_t$ which is similar to momentum. The way Adam update its parameters is:
+$$ \theta_{t+1} = \theta_t - \frac{\eta}{\sqrt{\hat{v}_t}+\epsilon}\hat{m}_t $$
+where $\hat{v}$ and $\hat{m}$ is computed by:
+$$ \hat{v}_t = \frac{v_t}{1-\beta^t_2}, \quad \hat{m_t} = \frac{m_t}{1-\beta^t_1} $$
+$m_t$ and $v_t$ are estimates of the first order moment and the second order moment of the gradients. Upon initialization the authors, \citeauthor{AdamMethod17}, discovered that biased towards zero, so to counteract the bias they instead compute $\hat{v}$ and $\hat{m}$ with a factor, $\beta$, which the authors propose default values of 0.9 for $\beta_1$ and 0.999 for $\beta_2$.
 
 
 
-\section{Popular network architectures} %NOTE : drop this and merge with deep learning?
+
+% ----------------------------------------------------------
+\section{Network architectures} 
+% NOTE : drop this and merge with deep learning?
+% ----------------------------------------------------------
+
 
 
 \subsection{ResNet}
 % source1: https://missinglink.ai/guides/keras/keras-resnet-building-training-scaling-residual-nets-keras/
 % ----------------------------------------------------------
-%TODO reference paper
-Residual Netowrk (ResNet) is in a way an upgraded form of previously mentioned Convolutional Neural Networks. This architecture enable the model to have hundreds of layers. The original CNN would succumb to to the "vanishing gradient" problem, meaning that during the backpropegation the weights that minimizes the loss function would multiplied so many times that the gradient becomes smaller and smaller. In this case adding more layers will no longer lead to better performance and in some cases even degrade model performance. 
+Residual Netowrk (ResNet) \cite{DeepResidual16} is in a way an upgraded form of previously mentioned Convolutional Neural Networks. This architecture enable the model to have hundreds of layers. The original CNN would succumb to to the "vanishing gradient" problem, meaning that during the backpropegation the weights that minimizes the loss function would multiplied so many times that the gradient becomes smaller and smaller. In this case adding more layers will no longer lead to better performance and in some cases even degrade model performance. 
 
 What makes this architecture so efficient for high number of layers is "identity shortcut connections". ResNet stacks up these connections which is initially don't do anything. During training these layers are skipped, and the model uses the activation functions from previous layers. This compresses the model down to only a few layers at the beginning of training, this enables faster learning. When the model trains again all the layers are expanded again and the "residual" parts of the network explore more and more of the feature space of the source image.
 
@@ -570,17 +599,34 @@ Write about and discuss noisy-student paper.
 \section{Model evaluation}
 % how do we evaluate how good a model is. binary vs multiclass. f1-score, confusion matrix, sensitivity.
 % ----------------------------------------------------------
+Data is simply stimuli on a neural network, and a prediction is a reaction of that stimuli. It is difficult to fully understand why we ended up with one specific model after completed training opposed to another, and the reasons for why a particular decision was made. In this section we will discuss some of the most common metrics used for evaluation, why we can not train on all of the data, and some ways to test how good the trained model actually performs.
+
+
+
+\subsection{Dataset splitting}
+% https://towardsdatascience.com/train-validation-and-test-sets-72cb40cba9e7
+% ----------------------------------------------------------
+A model can be trained to fit some assortment of data, but to understand the level of assurance the model have on the data you need to test it on data which the model has not seen during learning. Therefore it is common to split the data into three parts:
+\begin{enumerate}
+\item Training dataset; this set should contain most of the samples in the dataset, and is the data used to fit the model. Model sees and learns from this data. Depending on how much data available should be in the range 60\% - 80\% of the total number of samples.
+
+\item Validation dataset; used to update the higher level hyperparameters during training. The model does not learn from this data, but is nonetheless incorporated into the final model because the model sees it, and update parameters based upon the evaluation of model fit. To get good mid-training evaluations the dataset should contain in the range of 10\%-20\% of the training data.
+
+\item Test dataset; this dataset is hidden from the model during training and is used to provide an unbiased evaluation of a final model fit. Can be binned to contain carefully sampled data which spans all the features the model should have learned or be randomly selected from the original dataset. The size of the test dataset is usually the same size as the validation dataset (10\%-20\%).
+\end{enumerate}
+
 
 
 \subsection{Performance metrics}
 % decent source: https://towardsdatascience.com/handling-imbalanced-datasets-in-machine-learning-7a0e84220f28
-% ----------------------------------------------------------
 % ROC, sensitivity, confustion matrix etc. Check out metrics scores for hyper-kvasir paper
-
-
-\subsection{Weight initializing}
-% mention pre-trained models and 'set correct initial bias'
 % ----------------------------------------------------------
+
+
+
+\subsection{Cross validation}
+
+
 
 
 \subsection{Cross dataset validation}
@@ -589,7 +635,7 @@ Write about and discuss noisy-student paper.
 % ----------------------------------------------------------
 
 
-
+%Cam?
 
 
 
