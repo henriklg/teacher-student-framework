@@ -615,17 +615,32 @@ A model can be trained to fit some assortment of data, but to understand the lev
 \item Test dataset; this dataset is hidden from the model during training and is used to provide an unbiased evaluation of a final model fit. Can be binned to contain carefully sampled data which spans all the features the model should have learned or be randomly selected from the original dataset. The size of the test dataset is usually the same size as the validation dataset (10\%-20\%).
 \end{enumerate}
 
+In Figure \ref{fig:data_split} is an example of a dataset split where 60\% is used as training data and each validation and test dataset contain 15\% of the samples. How the dataset should be split to achieve optimal results vary on model size and how much samples you have to train on. For the case of a large model it would most likely require a substantial amount of data while models with very few hyperparameters is often more easy to validate and tune, so you can get away with reducing the size of the validation set.
+
+\begin{figure} % fig:data_split
+  \begin{center}
+    \includegraphics[width=.7\textwidth]{data_split}
+    \caption[A visualization of the splits]{A visualization of the splits.}
+    \label{fig:data_split}
+  \end{center}
+\end{figure}
 
 
 \subsection{Performance metrics}
 % decent source: https://towardsdatascience.com/handling-imbalanced-datasets-in-machine-learning-7a0e84220f28
 % ROC, sensitivity, confustion matrix etc. Check out metrics scores for hyper-kvasir paper
+% https://towardsdatascience.com/various-ways-to-evaluate-a-machine-learning-models-performance-230449055f15
+% https://towardsdatascience.com/metrics-to-evaluate-your-machine-learning-algorithm-f10ba6e38234
 % ----------------------------------------------------------
+In the upcoming few sections we will introduce the reader for some of the metrics used to evaluate a model.
+
+\subsubsection{Confusion matrix}
+
 
 
 
 \subsection{Cross validation}
-
+% ----------------------------------------------------------
 
 
 
@@ -634,8 +649,6 @@ A model can be trained to fit some assortment of data, but to understand the lev
 % especially good for imbalanced datasets.
 % ----------------------------------------------------------
 
-
-%Cam?
 
 
 
