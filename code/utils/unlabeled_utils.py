@@ -6,8 +6,7 @@ import time
 from tqdm.notebook import tqdm
 from IPython.display import clear_output
 
-from utils import print_bar_chart
-from utils import fn2img
+from utils import print_bar_chart, write_to_file, fn2img
 
 
 
@@ -35,6 +34,9 @@ def generate_labels(count, unlab, unlab_ds, unlab_size, model, conf):
     print ("Press 'Interrupt Kernel' to save and exit.")
     try:
         for tot_cnt, (image,path) in enumerate(unlab_ds, start=count["total"]):
+#             if tot_cnt > 10000:
+#                 break
+                    
             img = np.expand_dims(image, 0)
             pred = model.predict(img)
             highest_pred = np.max(pred)
@@ -51,7 +53,7 @@ def generate_labels(count, unlab, unlab_ds, unlab_size, model, conf):
                     clear_output(wait=True)
                     tqdm_predicting, tqdm_findings = get_tqdm(unlab_size, count["findings"], tot_cnt)
                     plot_and_save(unlab["lab_list"])
-
+                    
                 count["findings"] += 1   # previously findings_cnt
                 tqdm_findings.update(1)
             tqdm_predicting.update(1)
@@ -111,6 +113,51 @@ def custom_sort(unlab_findings):
 
 
 def resample_unlab(unlab, orig_dist,  conf):
+    """
+    Resample unlabeled dataset based upon a given distribution.
+    """
+    added = {}
+    
+    num_to_match = np.max(orig_dist)
+    idx_to_match = np.argmax(orig_dist)
+    print ('Limit set by {} with {} samples'.format(conf["class_names"][idx_to_match], int(num_to_match)))
+    print ("-"*40)
+
+    new_findings = ([], [])
+    new_findings_filepaths = []
+    lab_arr = np.asarray(unlab["lab_list"], dtype=np.uint8)
+
+    for class_idx in range(conf["num_classes"]):
+        # how many samples already in this class
+        in_count = orig_dist[class_idx]
+
+        indexes = np.where(lab_arr==class_idx)[0]
+        num_new_findings = len(indexes)
+
+        count = 0
+        for count, idx in enumerate(indexes, start=1):
+            if in_count >= num_to_match:
+                count -= 1 # reduce by one cuz of enumerate updates index early
+                break
+            fn = unlab["name_list"][idx]
+            img = fn2img(fn, conf["unlab_dir"], conf["img_shape"][0])
+            
+            new_findings[0].append(img)         # image
+            new_findings[1].append(unlab["lab_list"][idx])         # label
+            new_findings_filepaths.append(unlab["name_list"][idx]) # filepath
+            in_count += 1
+        
+        if conf["verbosity"]:
+            print ("{:27}: added {}/{} samples.".format(conf["class_names"][class_idx], count, num_new_findings))
+            added[conf["class_names"][class_idx]] = [count, num_new_findings]
+            
+    write_to_file(added, conf, 'samples_added_to_train')
+        
+    return new_findings, new_findings_filepaths
+
+
+
+def resample_unlab_orig(unlab, orig_dist,  conf):
     """
     Resample unlabeled dataset based upon a given distribution.
     """
