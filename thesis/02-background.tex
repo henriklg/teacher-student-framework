@@ -1,5 +1,6 @@
 \documentclass[thesis.tex]{subfiles}
 
+
 \begin{document}
 
 % ----------------------------------------------------------
@@ -254,6 +255,242 @@ Consequently, there is ongoing research related to the implementation of image a
 % source: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4665909/
 % ----------------------------------------------------------
 %TODO : mention capsule with flash storage and benefits like being able to swallow pill at home and return the data.
+
+
+
+
+
+
+% ----------------------------------------------------------
+\section{Datasets} \label{sec:available_datasets}
+% ----------------------------------------------------------
+% - Ha alle kvasir dataset under én section?
+% ----------------------------------------------------------
+%TODO : add list of diseases from datasets (like stated in \ref{sec:colon_cancer})
+
+% Introduction
+The datasets used in our experiments are Hyper-PillCam, Kvasir and Hyper-Kvasir. This section will demonstrate the main differences between the three datasets and explain how they can be found and used for fact checking. All three datasets are collected using endoscopic equipment at Vestre Viken Health Trust in Norway. The VV consists of 4 hospitals and provides health care for 470.000 people. One of the hospitals is Bærum Hospital, which has a large gastroenterology department from where the data is collected.
+
+% Section layout
+We will also go through some other publicly and restrictively available datasets, and explain why there is a need for a novel wireless video endoscopy capsule dataset. We will introduce Augere Medical, and their tagging tool implementation which we have used to label our WCE videos. In the later part of this section we will discuss some of the difficulties of the aforementioned datasets.
+
+
+
+\subsection{Available endoscopy datasets}
+% ----------------------------------------------------------
+% Present other datasets found online, and end with what they lack,
+% and why we need kvasirV2, hyper-kvasir, etc
+% source1: https://www.duo.uio.no/bitstream/handle/10852/71038/PhD-Pogorelov-2019.pdf?sequence=1&isAllowed=y P25
+% ----------------------------------------------------------
+There is a great number of publicly available endoscopy datasets online, and some that are restricted. To further improve detection rates in automated gastrointestinal analyze tools there is a demand for large amounts of data for different use cases, and since medical data often is scarce, or restricted, we introduce Kvasir-PillCam dataset, currently in development. This dataset is among the few publicly available VCE datasets, see Table \ref{table:wce_dataset_overview} for an overview. 
+Traditional colonoscopy have been around for longer and have been under more research. Therefore colonoscopy datasets are easier to find publicly, see Table \ref{table:dataset_overview} for a list of these datasets. This can benefit the ongoing automated VCE analysis as deep learning models can be tested and pretrained on them.
+
+%Sizes: \tiny, \scriptsize, \footnotesize, \small, \normalsize
+\begin{table}[h!] % table:dataset_overview
+  \scriptsize
+  \makebox[\textwidth][c]{
+  \begin{tabular}{|p{.15\textwidth}|p{.11\textwidth}|p{.1\textwidth}|p{.16\textwidth}|p{.17\textwidth}|p{.2\textwidth}|}
+  	\hline
+  	\textbf{Dataset Name}	&\textbf{Data Source}	&\textbf{Findings}	&\textbf{Size}	&\textbf{Status}		&\textbf{Description} \\
+    \hline
+    CVC-ClinicDB \cite{ExploringClinical16}	&Colonoscopy	&Polyps		&612 still images from 29 different sequences with polyp mask	&Available	&From 29 different sequences with
+polyp mask (ground truth) \\ 
+    \hline
+    ASU-Mayo Clinic Colonoscopy Video DB \cite{AutomatedPolyp16}	&Colonoscopy	&Polyps	&20 videos for training and 18 for testing	&Copyrighted	&10 videos with polyp detection,
+10 videos without polyps, GT available \\
+	\hline
+	CVC colon DB \cite{AutomaticPolyp12}	&Colonoscopy	&Polyps	&300 frames with ROI	&By explicit permission	&15 short colonoscopy sequences
+(different studies) \\
+	\hline
+	ETIS-Larib Polyp DB \cite{EmbeddedDetection14}	&Colonoscopy	&Polyps	&196 images	&By request	&196 images with GT \\
+	\hline
+	GI Lesions in Regular Colonoscopy Data Set \cite{ComputerAidedClassification16}	&Colonoscopy	&GI lesions	&76 instances	&Available	&15 serrated adenomas, 21 hyperplastic lesions, 40 adenomas \\
+	\hline
+	The Atlas of Gastrointestinal Endoscopy\footnotemark	&Endoscopy	&GI lesions	&2259 images	&Available	&Esophagus, Stomach, Duodenum and Ampulla, Capsule Endoscopy, Inflammatory Bowel Disease, Colon and Ileum and some Miscellaneous \\
+	\hline
+	WEO Clinical Endoscopy Atlas\footnotemark	&Endoscopy	&GI lesions	&152 images	&By explicit permission	&One image per lesion \\
+	\hline
+	GASTROLAB\footnotemark	&Endoscopy	&GI lesions	&Several hundreds of images and several tenths of videos	&Discontinued	&Partially damaged and unavailable dataset \\
+	\hline
+	Kvasir-V2 \cite{KVASIRMultiClass17}	&Various	&GI lesions \& landmarks	&8,000 images, 8 classes, 1,000 images per class	&Available, public, free for research and educational purposes	&See Section \ref{sec:kvasir-v2} for the description \\
+	\hline
+	Hyper-Kvasir  \cite{HyperKvasirComprehensive19} &Endoscopy	&GI lesions and landmarks	&10,662 labeled images, 373 videos and 99,417 unlabeled images	&Available, public, free for research and educational purposes	&See Section \ref{sec:hyper_kvasir} \\
+	\hline
+	Nerthus \cite{NerthusBowel17}	&Colonoscopy	&GI findings	&5,525 frames extracted from the 21 videos, 4 classes, from 500 to 2,700 frames per class	&Available, public, free for research and educational purposes	&XXX \\
+	\hline
+	Medico \cite{MedicoMultimedia18}	&Various	&GI lesions, landmarks and findings	&14,033 images, 16 classes, from 4 to 2,331 images per class	&Available, public, free for research and educational purposes	&XXX \\
+	\hline
+  \end{tabular}}
+  \caption[Existing colonoscopy image and video datasets]{Existing colonoscopy image and video datasets.}
+  \label{table:dataset_overview}
+\end{table}
+
+\addtocounter{footnote}{-3}
+\stepcounter{footnote}\footnotetext{\url{https://www.endoatlas.net/ea/AtW01/106.aspx}}
+\stepcounter{footnote}\footnotetext{\url{http://www.endoatlas.org/index.php}}
+\stepcounter{footnote}\footnotetext{\url{http://www.gastrolab.net/index.htm}}
+
+\begin{table}[h!] % table:wce_dataset_overview
+  \scriptsize
+  \centering
+  \begin{tabular}{|p{.15\textwidth}|p{.08\textwidth}|p{.2\textwidth}|p{.09\textwidth}|p{.1\textwidth}|p{.2\textwidth}|}
+	\hline
+  	\textbf{Dataset Name}	&\textbf{Data Source}	&\textbf{Findings}	&\textbf{Size}	&\textbf{Status}		&\textbf{Description} \\
+  	\hline
+	KID \cite{KIDProject17}		&VCE	&Angiectasia, bleeding, inflammations, polyps	&2,500+ images + 47 videos	&Discontinued	&Open academic \\
+	\hline
+	GIANA’17 \cite{GastrointestinalImage17}	&VCE	&Angiectasia	&600 images	&Available, by request	&Includes ground truth segmentation masks \\
+	\hline
+	CAD-CAP \cite{CADCAP2520}	&VCE	&Normal, Vascular Lesions and Inflammatory Lesions	&25,000 images	&Discontinued	&By request \\
+	\hline
+	Kvasir-PillCam	&VCE	&GI lesions, landmarks and findings	&XXX images with ROI, XX classes and XXX unlabeled images/videos	&Available, public, free for research and educational purposes	&Ours, See Section \ref{sec:hyper-capsulecam}. \\
+	\hline
+  \end{tabular}
+  \caption[An overview of existing VCE datasets from the GI tract]{An overview of existing VCE datasets from the GI tract.}
+  \label{table:wce_dataset_overview}
+\end{table}
+
+
+
+\subsection{Kvasir-V2} \label{sec:kvasir-v2}
+% ----------------------------------------------------------
+%TODO : need to fill in more below
+The Kvasir dataset \cite{KVASIRMultiClass17} contains images from inside the gastrointestinal (GI) tract. The samples are classified into three important anatomical landmarks and three clinically significant findings. In addition it has two classes related to the removal procedure of polyps. The dataset is sorted and annotated is performed by medical doctors. The class names and findings for each class is given in table \ref{table:kvasir}. One of the most important aspects of the Kvasir dataset is that it makes it easy to reproduce and compare results in scientific computing.
+
+%TODO : add sample images and explain the findings etc
+
+\begin{table}
+  \centering
+  \begin{tabular}{ |c|c|c| }
+  	\hline
+  	Class number & Class name & Number of samples \\
+    \hline
+    0 & normal & 8000 \\ 
+    1 & polyp & 8000 \\ 
+    2 & polyrus & 8000 \\ 
+    \hline
+  \end{tabular}
+  \caption{Kvasir-V2 class names and corresponding class numbers.}
+  \label{table:kvasir}
+\end{table}
+
+
+\subsection{Hyper-Kvasir} \label{sec:hyper_kvasir}
+% ----------------------------------------------------------
+The Hyper-Kvasir dataset \cite{HyperKvasirComprehensive19} is one of the largest medical datasets containing 110.079 images and 373 videos where it captures anatomical landmarks and pathological and normal findings. Resulting in more than 1.1 million images and video frames all together. The dataset contain four parts, labeled images, unlabeled images, segmented images and lastly, videos. In total the dataset is 70 GB in size, but can be downloaded and stored in parts from \url{https://datasets.simula.no/hyper-kvasir/}.
+
+%Ethics
+All the data is fully anonymized and approved by Privacy Data Protection Authority, and all experiments were performed in accordance with the relevant guidelines and regulations of the Regional Committee for Medical and Health Research Ethics - South East Norway, and the GDPR.
+
+%License /Terms of use
+The Hyper-Kvasir dataset is licensed under a Creative Commons Attribution 4.0 International License, which permits use, sharing, adaption, distribution and reproduction in any medium or format, as long as you give appropriate credit to the original authors and the source. This is important to highlight because it benefits other researchers who is in need of similar data can access the dataset easily.
+
+\begin{table} % table:hyper_kvasir
+  \centering
+  \begin{tabular}{|l|l|l|l|}
+  	\hline
+  	\textbf{Class name}		& \textbf{Samples}	& \textbf{Class name}		& \textbf{Samples} \\
+    \hline
+    barrets			& 41		& normal-z-line		& 932 \\ %\hline
+    barretts-short-segment & 53	& polyps			& 1028 \\ %\hline
+    bbps-0-1		& 646		& pylorus			& 999 \\ %\hline
+    bbps-2-3		& 1148		& retroflex-rectum	& 391 \\ %\hline
+    cecum			& 1009		& retroflex-stomach	& 764 \\ %\hline
+    dyed-lifted-polyps & 1002	& ulcerative-colitis-0-1 & 35 \\ %\hline
+    dyed-resection-margins & 989& ulcerative-colitis-1-2 & 11 \\ %\hline
+    esophagitis-a	& 403		& ulcerative-colitis-2-3 & 28 \\ %\hline
+    esophagitis-b-d	& 260		& ulcerative-colitis-grade-1 & 201 \\ %\hline
+    hemorrhoids		& 6			& ulcerative-colitis-grade-2 & 443 \\ %\hline
+    ileum			& 9			& ulcerative-colitis-grade-3 & 133 \\ %\hline
+    impacted-stool	& 131		& & \\ \hline
+  \end{tabular}
+  \caption{Hyper-Kvasir class names and corresponding amount of samples.}
+  \label{table:hyper_kvasir}
+\end{table}
+
+\subsubsection{Labeled images}
+Hyper-Kvasir contains 10,662 labeled images. The images are split into 23 different classes, and are stored in a folder with the same name as its corresponding class. All of the images are stored in JPEG format \cite{JPEGStill92}, which means it has some image quality loss but quite insignificant compared to the reduction in file size. Like in situations most often encountered the classes has a different number of samples, this is a challenge in the medical field because some findings occur more often than others. In Table \ref{table:hyper_kvasir} you can see the 23 classes and how many images there is for each class.
+
+\begin{figure}[H] % hyper-kvasir-dist
+  \begin{center}
+    \includegraphics[width=1.0\textwidth]{hyper-kvasir-dist}
+    \caption{Number of samples for each of the 23 classes in Hyper-Kvasir dataset.}
+    \label{fig:hyper-kvasir-dist}
+  \end{center}
+\end{figure}
+
+\subsubsection{Unlabeled images}
+This part of the dataset contains 99.417 unlabeled images. When extracted they can be found in a separate subfolder. The images are accompanied with extracted global features and clusters assignments in Hyper-Kvasir Github repository. 
+
+\subsubsection{Segmented images}
+Hyper-Kvasir includes images with corresponding segmentation masks and bounding boxes for 1,000 images from the polyp class. The segmentation masks depicts the polyp tissue for the corresponding image pixel. The Region of Interest (ROI) are represented by the white mask while the black does not contain polyp pixels. In Figure \ref{fig:kvasir_seg_example} we can see an example of the segmented Kvasir images.
+
+\begin{figure}[H] % kvasir_seg_example
+  \begin{center}
+    \includegraphics[width=0.7\textwidth]{kvasir_seg_example.png}
+    \caption{Example of a segmented image from Hyper-Kvasir dataset.}
+    \label{fig:kvasir_seg_example}
+  \end{center}
+\end{figure}
+
+
+\subsubsection{Videos}
+In total there are 373 videos provided in the dataset, corresponding to 11.62 hours of videos and about 1 million video frames that can be convertet to images. The file format for the videos are Audio Video Interleave (AVI). The video portion of the dataset is 38.6GB in file size. In addition to the video folder there is a CSV file provided containing the videos IDs and findings. The finding contains the description of the finding in the video, of which there is 171 of. Finding description is meant to describe the video as a whole. Some of the findings are related to the categories found in the image portion and some are unique for the videos.
+
+
+
+
+\subsection{Augere Medical AS} \label{sec:augere_medical}
+% ----------------------------------------------------------
+% Write about augere medical and the tagging tool and export script used
+% ----------------------------------------------------------
+Write about Augere Medical, the tagging tool and export script used.
+
+
+
+\subsection{Class imbalance in dataset}
+% https://machinelearningmastery.com/tactics-to-combat-imbalanced-classes-in-your-machine-learning-dataset/
+% another good source: https://towardsdatascience.com/handling-imbalanced-datasets-in-machine-learning-7a0e84220f28
+% https://towardsdatascience.com/practical-tips-for-class-imbalance-in-binary-classification-6ee29bcdb8a7
+%TODO remember to mention class imbalance solutions is to be performed on training data only!
+% ----------------------------------------------------------
+Class imbalance typically refers to a problem with classification problems where the classes are not represented equally. In the medical imaging domain this is very common for two reasons: (1) there are a lot more healthy patients than there are sick ones, and (2) for a specific unhealthy patient, there are a lot more images of healthy tissue than there are images of tissue with lesions.
+As an example you could have a VCE video which has been carefully analyzed by a clinical expert and each frame is tagged with either being in class 1; healthy, or class 2; unhealthy. Of this dataset 10 000 frames have no findings, and 50 of them have confirmed findings. You could then use this data to train a model to have 99\% accuracy which sounds great, but in reality the model only achieves these impressive results because it classifies all the data as class 1; healthy.
+
+There are different methods to combat this class imbalance problem:
+\begin{itemize}
+\item Collect more data.
+\item Changing the performance metric.
+\item Resample the dataset.
+\item Introduce class penalties.
+\end{itemize}
+It is laboring, time consuming and expensive to collect more data for medical image classifications tasks because a clinical expert is required to validate the data. 
+
+
+\subsubsection{Resample}
+% https://towardsdatascience.com/handling-imbalanced-datasets-in-deep-learning-f48407a0e758
+% https://en.wikipedia.org/wiki/Oversampling_and_undersampling_in_data_analysis
+% ----------------------------------------------------------
+In Figure \ref{fig:oversample} is an example for how samples in a class are copied to generate a new, balanced dataset.
+
+\begin{figure} % fig:resampling (double figure)
+  \centering
+  \begin{subfigure}[b]{0.4\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{oversample}
+    \caption{Oversampling}
+    \label{fig:oversample}
+  \end{subfigure}
+  \quad
+  \begin{subfigure}[b]{0.4\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{undersample}
+    \caption{Undersampling}
+    \label{fig:undersample}
+  \end{subfigure}
+  \caption[Two popular resampling methods]{Two popular resampling methods.}
+  \label{fig:resampling}
+\end{figure}
 
 
 
@@ -549,6 +786,7 @@ $m_t$ and $v_t$ are estimates of the first order moment and the second order mom
 
 
 
+
 % ----------------------------------------------------------
 \section{Network architectures} 
 % NOTE : drop this and merge with deep learning?
@@ -587,10 +825,10 @@ EfficientNets \cite{EfficientNetRethinking19} focuses on improving the accuracy 
 
 
 
-\subsection{Student teacher model}
+\subsection{Self learning with noisy paper}
 %source1:
 % ----------------------------------------------------------
-Write about and discuss noisy-student paper.
+Write about and discuss noisy-student paper. Introduce self sampling (teacher, student-model) and what have been done in noisy student.
 
 
 
@@ -626,16 +864,52 @@ In Figure \ref{fig:data_split} is an example of a dataset split where 60\% is us
 \end{figure}
 
 
+
 \subsection{Performance metrics}
-% decent source: https://towardsdatascience.com/handling-imbalanced-datasets-in-machine-learning-7a0e84220f28
-% ROC, sensitivity, confustion matrix etc. Check out metrics scores for hyper-kvasir paper
+% https://towardsdatascience.com/handling-imbalanced-datasets-in-machine-learning-7a0e84220f28
 % https://towardsdatascience.com/various-ways-to-evaluate-a-machine-learning-models-performance-230449055f15
 % https://towardsdatascience.com/metrics-to-evaluate-your-machine-learning-algorithm-f10ba6e38234
+% https://towardsdatascience.com/beyond-accuracy-precision-and-recall-3da06bea9f6c
 % ----------------------------------------------------------
 In the upcoming few sections we will introduce the reader for some of the metrics used to evaluate a model.
 
-\subsubsection{Confusion matrix}
 
+\subsubsection{Confusion matrix}
+Confusion matrix is a table used to describe the performance of a model on a set of test data with known true values. Every row in the confusion matrix table represents the instances in a predicted class while every column represents the instances in an actual class. In Figure \ref{table:confusion_matrix} is a layout of a binary classifier model. In the quadrant with TP, FP, FN and TN is the corresponding number of predicted and true class samples. In a confusion matrix the correct predictions are found along the diagonal line starting in the top left corner and ending in bottom right. Number outside this line is incorrect predictions. Confusion matrix is especially useful for calculating true positives (TP), false positive (FP), false negative (FN) and true negative (TN).
+
+\subsubsection{Accuracy}
+Accuracy (ACC) of a model is the degree of closeness of measurement of a quantity to the quantity's true value. That is, the accuracy is the proportion of correct predictions among the the total number of samples, given as a percentage. The way to calculate the accuracy is
+$$ ACC = \frac{TP + TN}{TP + TN + FN + FP} $$
+
+\subsubsection{Recall}
+Recall, also known as sensitivity, is the models ability to find all the relevant cases in the dataset. It is a especially important measure for imbalanced datasets. The definition for recall is the number of true positives divided by the number of true positive plus the number of false negatives
+$$ REC = \frac{TP}{TP + FN} $$
+
+\subsubsection{Precision}
+Precision (PREC) is the closeness of measurements to each other. While recall expresses the ability to find all relevant instances in the dataset, precision expresses the proportion of the data points the model says were relevant that actually were relevant. It measures the percentage of predicted samples classified as true, which were correctly classified. Precision is defined as the number of true positives divided by the number of true positives plus the number of false positives.
+$$ PREC = \frac{TP}{TP + FP} $$
+
+\subsubsection{F1 score}
+F1 score, also known as F-measure, is a combination of Recall and Precision. To create a balanced classification model which is good at both find relevant cases (recall) and relevant cases that are actually relevant (precision), the best practice is to calculate the F1 score during training and make changes to maximize its value. F1 score is calculated with this formula:
+$$ F1 = 2 \frac{PREC \cdot REC}{PREC + REC} $$
+
+
+\begin{table} % table:confusion_matrix
+  \centering
+  \begin{tabular}{|c|c|c|c|}
+	\cline{3-4}
+	\multicolumn{2}{c|}{\multirow{2}{*}{ }} & \multicolumn{2}{c|}{Actual class} \\
+	\cline{3-4}
+	\multicolumn{2}{c|}{} & Class 1 & Class 2 \\
+	\hline
+	\multirow{2}{*}{\rotatebox[origin=c]{90}{\parbox[c]{1cm}{\centering Pred class}}} & Class 1 & \textbf{TP} & \textbf{FP} \\
+	\cline{2-4}
+	& Class 2 & \textbf{FN} & \textbf{TN} \\
+	\hline
+  \end{tabular}
+  \caption[Confusion matrix layout]{Confusion matrix layout where TP = True Positive; FP = False Positive; FN = False Negative and TN = True Negative.}
+  \label{table:confusion_matrix}
+\end{table}
 
 
 
@@ -652,248 +926,19 @@ In the upcoming few sections we will introduce the reader for some of the metric
 
 
 
-% ----------------------------------------------------------
-\section{Datasets} \label{sec:available_datasets}
-% ----------------------------------------------------------
-% - Ha alle kvasir dataset under én section?
-% ----------------------------------------------------------
-%TODO : add list of diseases from datasets (like stated in \ref{sec:colon_cancer})
-
-% Introduction
-The datasets used in our experiments are Hyper-PillCam, Kvasir and Hyper-Kvasir. This section will demonstrate the main differences between the three datasets and explain how they can be found and used for fact checking. All three datasets are collected using endoscopic equipment at Vestre Viken Health Trust in Norway. The VV consists of 4 hospitals and provides health care for 470.000 people. One of the hospitals is Bærum Hospital, which has a large gastroenterology department from where the data is collected.
-
-% Section layout
-We will also go through some other publicly and restrictively available datasets, and explain why there is a need for a novel wireless video endoscopy capsule dataset. We will introduce Augere Medical, and their tagging tool implementation which we have used to label our WCE videos. In the later part of this section we will discuss some of the difficulties of the aforementioned datasets.
-
-
-
-\subsection{Available endoscopy datasets}
-% ----------------------------------------------------------
-% Present other datasets found online, and end with what they lack,
-% and why we need kvasirV2, hyper-kvasir, etc
-% source1: https://www.duo.uio.no/bitstream/handle/10852/71038/PhD-Pogorelov-2019.pdf?sequence=1&isAllowed=y P25
-% ----------------------------------------------------------
-There is a great number of publicly available endoscopy datasets online, and some that are restricted. To further improve detection rates in automated gastrointestinal analyze tools there is a demand for large amounts of data for different use cases, and since medical data often is scarce, or restricted, we introduce Kvasir-PillCam dataset, currently in development. This dataset is among the few publicly available VCE datasets, see Table \ref{table:wce_dataset_overview} for an overview. 
-Traditional colonoscopy have been around for longer and have been under more research. Therefore colonoscopy datasets are easier to find publicly, see Table \ref{table:dataset_overview} for a list of these datasets. This can benefit the ongoing automated VCE analysis as deep learning models can be tested and pretrained on them.
-
-%Sizes: \tiny, \scriptsize, \footnotesize, \small, \normalsize
-\begin{table}[h!] % table:dataset_overview
-  \scriptsize
-  \makebox[\textwidth][c]{
-  \begin{tabular}{|p{.15\textwidth}|p{.11\textwidth}|p{.1\textwidth}|p{.16\textwidth}|p{.17\textwidth}|p{.2\textwidth}|}
-  	\hline
-  	\textbf{Dataset Name}	&\textbf{Data Source}	&\textbf{Findings}	&\textbf{Size}	&\textbf{Status}		&\textbf{Description} \\
-    \hline
-    CVC-ClinicDB \cite{ExploringClinical16}	&Colonoscopy	&Polyps		&612 still images from 29 different sequences with polyp mask	&Available	&From 29 different sequences with
-polyp mask (ground truth) \\ 
-    \hline
-    ASU-Mayo Clinic Colonoscopy Video DB \cite{AutomatedPolyp16}	&Colonoscopy	&Polyps	&20 videos for training and 18 for testing	&Copyrighted	&10 videos with polyp detection,
-10 videos without polyps, GT available \\
-	\hline
-	CVC colon DB \cite{AutomaticPolyp12}	&Colonoscopy	&Polyps	&300 frames with ROI	&By explicit permission	&15 short colonoscopy sequences
-(different studies) \\
-	\hline
-	ETIS-Larib Polyp DB \cite{EmbeddedDetection14}	&Colonoscopy	&Polyps	&196 images	&By request	&196 images with GT \\
-	\hline
-	GI Lesions in Regular Colonoscopy Data Set \cite{ComputerAidedClassification16}	&Colonoscopy	&GI lesions	&76 instances	&Available	&15 serrated adenomas, 21 hyperplastic lesions, 40 adenomas \\
-	\hline
-	The Atlas of Gastrointestinal Endoscopy\footnotemark	&Endoscopy	&GI lesions	&2259 images	&Available	&Esophagus, Stomach, Duodenum and Ampulla, Capsule Endoscopy, Inflammatory Bowel Disease, Colon and Ileum and some Miscellaneous \\
-	\hline
-	WEO Clinical Endoscopy Atlas\footnotemark	&Endoscopy	&GI lesions	&152 images	&By explicit permission	&One image per lesion \\
-	\hline
-	GASTROLAB\footnotemark	&Endoscopy	&GI lesions	&Several hundreds of images and several tenths of videos	&Discontinued	&Partially damaged and unavailable dataset \\
-	\hline
-	Kvasir-V2 \cite{KVASIRMultiClass17}	&Various	&GI lesions \& landmarks	&8,000 images, 8 classes, 1,000 images per class	&Available, public, free for research and educational purposes	&See Section \ref{sec:kvasir-v2} for the description \\
-	\hline
-	Hyper-Kvasir  \cite{HyperKvasirComprehensive19} &Endoscopy	&GI lesions and landmarks	&10,662 labeled images, 373 videos and 99,417 unlabeled images	&Available, public, free for research and educational purposes	&See Section \ref{sec:hyper_kvasir} \\
-	\hline
-	Nerthus \cite{NerthusBowel17}	&Colonoscopy	&GI findings	&5,525 frames extracted from the 21 videos, 4 classes, from 500 to 2,700 frames per class	&Available, public, free for research and educational purposes	&XXX \\
-	\hline
-	Medico \cite{MedicoMultimedia18}	&Various	&GI lesions, landmarks and findings	&14,033 images, 16 classes, from 4 to 2,331 images per class	&Available, public, free for research and educational purposes	&XXX \\
-	\hline
-  \end{tabular}}
-  \caption[Existing colonoscopy image and video datasets]{Existing colonoscopy image and video datasets.}
-  \label{table:dataset_overview}
-\end{table}
-
-\addtocounter{footnote}{-3}
-\stepcounter{footnote}\footnotetext{\url{https://www.endoatlas.net/ea/AtW01/106.aspx}}
-\stepcounter{footnote}\footnotetext{\url{http://www.endoatlas.org/index.php}}
-\stepcounter{footnote}\footnotetext{\url{http://www.gastrolab.net/index.htm}}
-
-\begin{table}[h!] % table:wce_dataset_overview
-  \scriptsize
-  \centering
-  \begin{tabular}{|p{.15\textwidth}|p{.08\textwidth}|p{.2\textwidth}|p{.09\textwidth}|p{.1\textwidth}|p{.2\textwidth}|}
-	\hline
-  	\textbf{Dataset Name}	&\textbf{Data Source}	&\textbf{Findings}	&\textbf{Size}	&\textbf{Status}		&\textbf{Description} \\
-  	\hline
-	KID \cite{KIDProject17}		&VCE	&Angiectasia, bleeding, inflammations, polyps	&2,500+ images + 47 videos	&Discontinued	&Open academic \\
-	\hline
-	GIANA’17 \cite{GastrointestinalImage17}	&VCE	&Angiectasia	&600 images	&Available, by request	&Includes ground truth segmentation masks \\
-	\hline
-	CAD-CAP \cite{CADCAP2520}	&VCE	&Normal, Vascular Lesions and Inflammatory Lesions	&25,000 images	&Discontinued	&By request \\
-	\hline
-	Kvasir-PillCam	&VCE	&GI lesions, landmarks and findings	&XXX images with ROI, XX classes and XXX unlabeled images/videos	&Available, public, free for research and educational purposes	&Ours, See Section \ref{sec:hyper-capsulecam}. \\
-	\hline
-  \end{tabular}
-  \caption[An overview of existing VCE datasets from the GI tract]{An overview of existing VCE datasets from the GI tract.}
-  \label{table:wce_dataset_overview}
-\end{table}
-
-
-
-\subsection{Kvasir-V2} \label{sec:kvasir-v2}
-% ----------------------------------------------------------
-%TODO : need to fill in more below
-The Kvasir dataset \cite{KVASIRMultiClass17} contains images from inside the gastrointestinal (GI) tract. The samples are classified into three important anatomical landmarks and three clinically significant findings. In addition it has two classes related to the removal procedure of polyps. The dataset is sorted and annotated is performed by medical doctors. The class names and findings for each class is given in table \ref{table:kvasir}. One of the most important aspects of the Kvasir dataset is that it makes it easy to reproduce and compare results in scientific computing.
-
-%TODO : add sample images and explain the findings etc
-
-\begin{table}
-  \centering
-  \begin{tabular}{ |c|c|c| }
-  	\hline
-  	Class number & Class name & Number of samples \\
-    \hline
-    0 & normal & 8000 \\ 
-    1 & polyp & 8000 \\ 
-    2 & polyrus & 8000 \\ 
-    \hline
-  \end{tabular}
-  \caption{Kvasir-V2 class names and corresponding class numbers.}
-  \label{table:kvasir}
-\end{table}
-
-
-\subsection{Hyper-Kvasir} \label{sec:hyper_kvasir}
-% ----------------------------------------------------------
-The Hyper-Kvasir dataset \cite{HyperKvasirComprehensive19} is one of the largest medical datasets containing 110.079 images and 373 videos where it captures anatomical landmarks and pathological and normal findings. Resulting in more than 1.1 million images and video frames all together. The dataset contain four parts, labeled images, unlabeled images, segmented images and lastly, videos. In total the dataset is 70 GB in size, but can be downloaded and stored in parts from \url{https://datasets.simula.no/hyper-kvasir/}.
-
-%Ethics
-All the data is fully anonymized and approved by Privacy Data Protection Authority, and all experiments were performed in accordance with the relevant guidelines and regulations of the Regional Committee for Medical and Health Research Ethics - South East Norway, and the GDPR.
-
-%License /Terms of use
-The Hyper-Kvasir dataset is licensed under a Creative Commons Attribution 4.0 International License, which permits use, sharing, adaption, distribution and reproduction in any medium or format, as long as you give appropriate credit to the original authors and the source. This is important to highlight because it benefits other researchers who is in need of similar data can access the dataset easily.
-
-\begin{table} % table:hyper_kvasir
-  \centering
-  \begin{tabular}{|l|l|l|l|}
-  	\hline
-  	\textbf{Class name}		& \textbf{Samples}	& \textbf{Class name}		& \textbf{Samples} \\
-    \hline
-    barrets			& 41		& normal-z-line		& 932 \\ %\hline
-    barretts-short-segment & 53	& polyps			& 1028 \\ %\hline
-    bbps-0-1		& 646		& pylorus			& 999 \\ %\hline
-    bbps-2-3		& 1148		& retroflex-rectum	& 391 \\ %\hline
-    cecum			& 1009		& retroflex-stomach	& 764 \\ %\hline
-    dyed-lifted-polyps & 1002	& ulcerative-colitis-0-1 & 35 \\ %\hline
-    dyed-resection-margins & 989& ulcerative-colitis-1-2 & 11 \\ %\hline
-    esophagitis-a	& 403		& ulcerative-colitis-2-3 & 28 \\ %\hline
-    esophagitis-b-d	& 260		& ulcerative-colitis-grade-1 & 201 \\ %\hline
-    hemorrhoids		& 6			& ulcerative-colitis-grade-2 & 443 \\ %\hline
-    ileum			& 9			& ulcerative-colitis-grade-3 & 133 \\ %\hline
-    impacted-stool	& 131		& & \\ \hline
-  \end{tabular}
-  \caption{Hyper-Kvasir class names and corresponding amount of samples.}
-  \label{table:hyper_kvasir}
-\end{table}
-
-\subsubsection{Labeled images}
-Hyper-Kvasir contains 10,662 labeled images. The images are split into 23 different classes, and are stored in a folder with the same name as its corresponding class. All of the images are stored in JPEG format \cite{JPEGStill92}, which means it has some image quality loss but quite insignificant compared to the reduction in file size. Like in situations most often encountered the classes has a different number of samples, this is a challenge in the medical field because some findings occur more often than others. In Table \ref{table:hyper_kvasir} you can see the 23 classes and how many images there is for each class.
-
-\begin{figure}[H] % hyper-kvasir-dist
-  \begin{center}
-    \includegraphics[width=1.0\textwidth]{hyper-kvasir-dist}
-    \caption{Number of samples for each of the 23 classes in Hyper-Kvasir dataset.}
-    \label{fig:hyper-kvasir-dist}
-  \end{center}
-\end{figure}
-
-\subsubsection{Unlabeled images}
-This part of the dataset contains 99.417 unlabeled images. When extracted they can be found in a separate subfolder. The images are accompanied with extracted global features and clusters assignments in Hyper-Kvasir Github repository. 
-
-\subsubsection{Segmented images}
-Hyper-Kvasir includes images with corresponding segmentation masks and bounding boxes for 1,000 images from the polyp class. The segmentation masks depicts the polyp tissue for the corresponding image pixel. The Region of Interest (ROI) are represented by the white mask while the black does not contain polyp pixels. In Figure \ref{fig:kvasir_seg_example} we can see an example of the segmented Kvasir images.
-
-\begin{figure}[H] % kvasir_seg_example
-  \begin{center}
-    \includegraphics[width=0.7\textwidth]{kvasir_seg_example.png}
-    \caption{Example of a segmented image from Hyper-Kvasir dataset.}
-    \label{fig:kvasir_seg_example}
-  \end{center}
-\end{figure}
-
-
-\subsubsection{Videos}
-In total there are 373 videos provided in the dataset, corresponding to 11.62 hours of videos and about 1 million video frames that can be convertet to images. The file format for the videos are Audio Video Interleave (AVI). The video portion of the dataset is 38.6GB in file size. In addition to the video folder there is a CSV file provided containing the videos IDs and findings. The finding contains the description of the finding in the video, of which there is 171 of. Finding description is meant to describe the video as a whole. Some of the findings are related to the categories found in the image portion and some are unique for the videos.
-
-
-
-
-\subsection{Augere Medical AS} \label{sec:augere_medical}
-% ----------------------------------------------------------
-% Write about augere medical and the tagging tool and export script used
-% ----------------------------------------------------------
-Write about Augere Medical, the tagging tool and export script used.
-
-
-
-\subsection{Imbalanced data}
-% https://machinelearningmastery.com/tactics-to-combat-imbalanced-classes-in-your-machine-learning-dataset/
-% another good source: https://towardsdatascience.com/handling-imbalanced-datasets-in-machine-learning-7a0e84220f28
-% https://towardsdatascience.com/practical-tips-for-class-imbalance-in-binary-classification-6ee29bcdb8a7
-%TODO remember to mention class imbalance solutions is to be performed on training data only!
-% ----------------------------------------------------------
-Class imbalance typically refers to a problem with classification problems where the classes are not represented equally. In the medical imaging domain this is very common for two reasons: (1) there are a lot more healthy patients than there are sick ones, and (2) for a specific unhealthy patient, there are a lot more images of healthy tissue than there are images of tissue with lesions.
-As an example you could have a VCE video which has been carefully analyzed by a clinical expert and each frame is tagged with either being in class 1; healthy, or class 2; unhealthy. Of this dataset 10 000 frames have no findings, and 50 of them have confirmed findings. You could then use this data to train a model to have 99\% accuracy which sounds great, but in reality the model only achieves these impressive results because it classifies all the data as class 1; healthy.
-
-There are different methods to combat this class imbalance problem:
-\begin{itemize}
-\item Collect more data.
-\item Changing the performance metric.
-\item Resample the dataset.
-\item Introduce class penalties.
-\end{itemize}
-It is laboring, time consuming and expensive to collect more data for medical image classifications tasks because a clinical expert is required to validate the data. 
-
-
-\subsubsection{Resample}
-% https://towardsdatascience.com/handling-imbalanced-datasets-in-deep-learning-f48407a0e758
-% https://en.wikipedia.org/wiki/Oversampling_and_undersampling_in_data_analysis
-% ----------------------------------------------------------
-In Figure \ref{fig:oversample} is an example for how samples in a class are copied to generate a new, balanced dataset.
-
-\begin{figure} % fig:resampling (double figure)
-  \centering
-  \begin{subfigure}[b]{0.4\linewidth}
-    \centering
-    \includegraphics[width=\linewidth]{oversample}
-    \caption{Oversampling}
-    \label{fig:oversample}
-  \end{subfigure}
-  \quad
-  \begin{subfigure}[b]{0.4\linewidth}
-    \centering
-    \includegraphics[width=\linewidth]{undersample}
-    \caption{Undersampling}
-    \label{fig:undersample}
-  \end{subfigure}
-  \caption[Two popular resampling methods]{Two popular resampling methods.}
-  \label{fig:resampling}
-\end{figure}
 
 
 % ----------------------------------------------------------
 \section{TensorFlow Framework} 
 % ----------------------------------------------------------
-% ?? Perhaps add everything under framework/libraries?
-%\subsection{Keras}
 % source1 (td.data): https://www.tensorflow.org/guide/data
 % ----------------------------------------------------------
 
 
-\subsection{tf.data} % ??
+\subsection{tf.Keras}
+
+
+\subsection{tf.data}
 % ----------------------------------------------------------
 
 
