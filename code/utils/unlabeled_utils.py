@@ -65,7 +65,7 @@ def generate_labels(count, unlab, unlab_ds, unlab_size, model, conf):
         plot_and_save(unlab["lab_list"])
 
     finally:
-        print ("\nTotal run time: {:.3f} s".format( time.time() - total_time ))
+        print ("\nTotal run time: {:.1f} min.".format( (time.time() - total_time)/60 ))
         print ("Found {} new samples in unlabeled_ds after looking at {} images.".format(count["findings"], tot_cnt))
         
     return unlab, count
