@@ -142,7 +142,7 @@ def resample_unlab(unlab, orig_dist,  conf):
             fn = unlab["name_list"][idx]
             img = fn2img(fn, conf["unlab_dir"], conf["img_shape"][0])
             
-            new_findings[0].append(img)         # image
+            new_findings[0].append(img)                            # image
             new_findings[1].append(unlab["lab_list"][idx])         # label
             new_findings_filepaths.append(unlab["name_list"][idx]) # filepath
             in_count += 1
