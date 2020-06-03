@@ -25,9 +25,9 @@ coverage.xml
 # Folders
 resources/
 data/
-models/
 logs/
 cache/
+experiments/
 
 
 # Latex files
