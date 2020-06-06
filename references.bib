@@ -1170,6 +1170,54 @@ networks.},
   language = {nob}
 }
 
+@article{MnasNetPlatformAware19,
+  title = {{{MnasNet}}: {{Platform}}-{{Aware Neural Architecture Search}} for {{Mobile}}},
+  shorttitle = {{{MnasNet}}},
+  author = {Tan, Mingxing and Chen, Bo and Pang, Ruoming and Vasudevan, Vijay and Sandler, Mark and Howard, Andrew and Le, Quoc V.},
+  year = {2019},
+  month = may,
+  abstract = {Designing convolutional neural networks (CNN) for mobile devices is challenging because mobile models need to be small and fast, yet still accurate. Although significant efforts have been dedicated to design and improve mobile CNNs on all dimensions, it is very difficult to manually balance these trade-offs when there are so many architectural possibilities to consider. In this paper, we propose an automated mobile neural architecture search (MNAS) approach, which explicitly incorporate model latency into the main objective so that the search can identify a model that achieves a good trade-off between accuracy and latency. Unlike previous work, where latency is considered via another, often inaccurate proxy (e.g., FLOPS), our approach directly measures real-world inference latency by executing the model on mobile phones. To further strike the right balance between flexibility and search space size, we propose a novel factorized hierarchical search space that encourages layer diversity throughout the network. Experimental results show that our approach consistently outperforms state-of-the-art mobile CNN models across multiple vision tasks. On the ImageNet classification task, our MnasNet achieves 75.2\% top-1 accuracy with 78ms latency on a Pixel phone, which is 1.8x faster than MobileNetV2 [29] with 0.5\% higher accuracy and 2.3x faster than NASNet [36] with 1.2\% higher accuracy. Our MnasNet also achieves better mAP quality than MobileNets for COCO object detection. Code is at https://github.com/tensorflow/tpu/tree/master/models/official/mnasnet},
+  archivePrefix = {arXiv},
+  eprint = {1807.11626},
+  eprinttype = {arxiv},
+  file = {/home/henriklg/Zotero/storage/VVZ9FR5W/Tan et al. - 2019 - MnasNet Platform-Aware Neural Architecture Search.pdf;/home/henriklg/Zotero/storage/X6HTB34H/1807.html},
+  journal = {arXiv:1807.11626 [cs]},
+  keywords = {Computer Science - Computer Vision and Pattern Recognition,Computer Science - Machine Learning},
+  primaryClass = {cs}
+}
+
+@article{MnasNetPlatformAware19a,
+  title = {{{MnasNet}}: {{Platform}}-{{Aware Neural Architecture Search}} for {{Mobile}}},
+  shorttitle = {{{MnasNet}}},
+  author = {Tan, Mingxing and Chen, Bo and Pang, Ruoming and Vasudevan, Vijay and Sandler, Mark and Howard, Andrew and Le, Quoc V.},
+  year = {2019},
+  month = may,
+  abstract = {Designing convolutional neural networks (CNN) for mobile devices is challenging because mobile models need to be small and fast, yet still accurate. Although significant efforts have been dedicated to design and improve mobile CNNs on all dimensions, it is very difficult to manually balance these trade-offs when there are so many architectural possibilities to consider. In this paper, we propose an automated mobile neural architecture search (MNAS) approach, which explicitly incorporate model latency into the main objective so that the search can identify a model that achieves a good trade-off between accuracy and latency. Unlike previous work, where latency is considered via another, often inaccurate proxy (e.g., FLOPS), our approach directly measures real-world inference latency by executing the model on mobile phones. To further strike the right balance between flexibility and search space size, we propose a novel factorized hierarchical search space that encourages layer diversity throughout the network. Experimental results show that our approach consistently outperforms state-of-the-art mobile CNN models across multiple vision tasks. On the ImageNet classification task, our MnasNet achieves 75.2\% top-1 accuracy with 78ms latency on a Pixel phone, which is 1.8x faster than MobileNetV2 [29] with 0.5\% higher accuracy and 2.3x faster than NASNet [36] with 1.2\% higher accuracy. Our MnasNet also achieves better mAP quality than MobileNets for COCO object detection. Code is at https://github.com/tensorflow/tpu/tree/master/models/official/mnasnet},
+  archivePrefix = {arXiv},
+  eprint = {1807.11626},
+  eprinttype = {arxiv},
+  file = {/home/henriklg/Zotero/storage/BRWYDBCM/Tan et al. - 2019 - MnasNet Platform-Aware Neural Architecture Search.pdf;/home/henriklg/Zotero/storage/RTDETLKH/1807.html},
+  journal = {arXiv:1807.11626 [cs]},
+  keywords = {Computer Science - Computer Vision and Pattern Recognition,Computer Science - Machine Learning},
+  primaryClass = {cs}
+}
+
+@article{MobileNetV2Inverted19,
+  title = {{{MobileNetV2}}: {{Inverted Residuals}} and {{Linear Bottlenecks}}},
+  shorttitle = {{{MobileNetV2}}},
+  author = {Sandler, Mark and Howard, Andrew and Zhu, Menglong and Zhmoginov, Andrey and Chen, Liang-Chieh},
+  year = {2019},
+  month = mar,
+  abstract = {In this paper we describe a new mobile architecture, MobileNetV2, that improves the state of the art performance of mobile models on multiple tasks and benchmarks as well as across a spectrum of different model sizes. We also describe efficient ways of applying these mobile models to object detection in a novel framework we call SSDLite. Additionally, we demonstrate how to build mobile semantic segmentation models through a reduced form of DeepLabv3 which we call Mobile DeepLabv3. The MobileNetV2 architecture is based on an inverted residual structure where the input and output of the residual block are thin bottleneck layers opposite to traditional residual models which use expanded representations in the input an MobileNetV2 uses lightweight depthwise convolutions to filter features in the intermediate expansion layer. Additionally, we find that it is important to remove non-linearities in the narrow layers in order to maintain representational power. We demonstrate that this improves performance and provide an intuition that led to this design. Finally, our approach allows decoupling of the input/output domains from the expressiveness of the transformation, which provides a convenient framework for further analysis. We measure our performance on Imagenet classification, COCO object detection, VOC image segmentation. We evaluate the trade-offs between accuracy, and number of operations measured by multiply-adds (MAdd), as well as the number of parameters},
+  archivePrefix = {arXiv},
+  eprint = {1801.04381},
+  eprinttype = {arxiv},
+  file = {/home/henriklg/Zotero/storage/JHNG6J9H/Sandler et al. - 2019 - MobileNetV2 Inverted Residuals and Linear Bottlen.pdf;/home/henriklg/Zotero/storage/EMAHRKZA/1801.html},
+  journal = {arXiv:1801.04381 [cs]},
+  keywords = {Computer Science - Computer Vision and Pattern Recognition},
+  primaryClass = {cs}
+}
+
 @article{MomentumTerm99,
   title = {On the Momentum Term in Gradient Descent Learning Algorithms},
   author = {Qian, Ning},
@@ -1430,6 +1478,65 @@ decision when building a practical system.},
   journal = {arXiv:1911.04252 [cs, stat]},
   keywords = {Computer Science - Computer Vision and Pattern Recognition,Computer Science - Machine Learning,Statistics - Machine Learning},
   primaryClass = {cs, stat}
+}
+
+@article{SemiSupervisedDeep18,
+  title = {Semi-{{Supervised Deep Learning Using Pseudo Labels}} for {{Hyperspectral Image Classification}}},
+  author = {Wu, Hao and Prasad, Saurabh},
+  year = {2018},
+  month = mar,
+  volume = {27},
+  pages = {1259--1270},
+  issn = {1941-0042},
+  doi = {10.1109/TIP.2017.2772836},
+  abstract = {Deep learning has gained popularity in a variety of computer vision tasks. Recently, it has also been successfully applied for hyperspectral image classification tasks. Training deep neural networks, such as a convolutional neural network for classification requires a large number of labeled samples. However, in remote sensing applications, we usually only have a small amount of labeled data for training because they are expensive to collect, although we still have abundant unlabeled data. In this paper, we propose semi-supervised deep learning for hyperspectral image classification-our approach uses limited labeled data and abundant unlabeled data to train a deep neural network. More specifically, we use deep convolutional recurrent neural networks (CRNN) for hyperspectral image classification by treating each hyperspectral pixel as a spectral sequence. In the proposed semi-supervised learning framework, the abundant unlabeled data are utilized with their pseudo labels (cluster labels). We propose to use all the training data together with their pseudo labels to pre-train a deep CRNN, and then fine-tune using the limited available labeled data. Further, to utilize spatial information in the hyperspectral images, we propose a constrained Dirichlet process mixture model (C-DPMM), a non-parametric Bayesian clustering algorithm, for semi-supervised clustering which includes pairwise must-link and cannot-link constraints-this produces high-quality pseudo-labels, resulting in improved initialization of the deep neural network. We also derived a variational inference model for the C-DPMM for efficient inference. Experimental results with real hyperspectral image data sets demonstrate that the proposed semi-supervised method outperforms state-of-the-art supervised and semi-supervised learning methods for hyperspectral classification.},
+  file = {/home/henriklg/Zotero/storage/6BHD7XMB/Wu and Prasad - 2018 - Semi-Supervised Deep Learning Using Pseudo Labels .pdf;/home/henriklg/Zotero/storage/4XBATZPY/8105856.html},
+  journal = {IEEE Transactions on Image Processing},
+  keywords = {Bayes methods,C-DPMM,cluster labels,computer vision,computer vision tasks,constrained Dirichlet process mixture model,convolution,Convolutional recurrent neural networks,deep convolutional recurrent neural networks,deep CRNN,Dirichlet process mixture model,Feature extraction,high-quality pseudolabels,hyperspectral image classification tasks,hyperspectral image data sets,hyperspectral imaging,Hyperspectral imaging,hyperspectral pixel,image classification,image sequences,learning (artificial intelligence),Machine learning,mixture models,Neural networks,nonparametric Bayesian clustering algorithm,pattern clustering,pseudo labels,recurrent neural nets,semisupervised clustering,semisupervised deep learning,spectral analysis,spectral sequence,Training},
+  number = {3}
+}
+
+@inproceedings{SemisupervisedLearning17,
+  title = {Semi-Supervised {{Learning}} for {{Network}}-{{Based Cardiac MR Image Segmentation}}},
+  booktitle = {Medical {{Image Computing}} and {{Computer}}-{{Assisted Intervention}} - {{MICCAI}} 2017},
+  author = {Bai, Wenjia and Oktay, Ozan and Sinclair, Matthew and Suzuki, Hideaki and Rajchl, Martin and Tarroni, Giacomo and Glocker, Ben and King, Andrew and Matthews, Paul M. and Rueckert, Daniel},
+  editor = {Descoteaux, Maxime and {Maier-Hein}, Lena and Franz, Alfred and Jannin, Pierre and Collins, D. Louis and Duchesne, Simon},
+  year = {2017},
+  pages = {253--260},
+  publisher = {{Springer International Publishing}},
+  address = {{Cham}},
+  doi = {10.1007/978-3-319-66185-8_29},
+  abstract = {Training a fully convolutional network for pixel-wise (or voxel-wise) image segmentation normally requires a large number of training images with corresponding ground truth label maps. However, it is a challenge to obtain such a large training set in the medical imaging domain, where expert annotations are time-consuming and difficult to obtain. In this paper, we propose a semi-supervised learning approach, in which a segmentation network is trained from both labelled and unlabelled data. The network parameters and the segmentations for the unlabelled data are alternately updated. We evaluate the method for short-axis cardiac MR image segmentation and it has demonstrated a high performance, outperforming a baseline supervised method. The mean Dice overlap metric is 0.92 for the left ventricular cavity, 0.85 for the myocardium and 0.89 for the right ventricular cavity. It also outperforms a state-of-the-art multi-atlas segmentation method by a large margin and the speed is substantially faster.},
+  isbn = {978-3-319-66185-8},
+  language = {en},
+  series = {Lecture {{Notes}} in {{Computer Science}}}
+}
+
+@inproceedings{SemisupervisedLearning18,
+  title = {Semi-Supervised Learning with Generative Adversarial Networks for Chest {{X}}-Ray Classification with Ability of Data Domain Adaptation},
+  booktitle = {2018 {{IEEE}} 15th {{International Symposium}} on {{Biomedical Imaging}} ({{ISBI}} 2018)},
+  author = {Madani, Ali and Moradi, Mehdi and Karargyris, Alexandros and {Syeda-Mahmood}, Tanveer},
+  year = {2018},
+  month = apr,
+  pages = {1038--1042},
+  issn = {1945-8452},
+  doi = {10.1109/ISBI.2018.8363749},
+  abstract = {Deep learning algorithms require large amounts of labeled data which is difficult to attain for medical imaging. Even if a particular dataset is accessible, a learned classifier struggles to maintain the same level of performance on a different medical imaging dataset from a new or never-seen data source domain. Utilizing generative adversarial networks in a semi-supervised learning architecture, we address both problems of labeled data scarcity and data domain overfitting. For cardiac abnormality classification in chest X-rays, we demonstrate that an order of magnitude less data is required with semi-supervised learning generative adversarial networks than with conventional supervised learning convolutional neural networks. In addition, we demonstrate its robustness across different datasets for similar classification tasks.},
+  file = {/home/henriklg/Zotero/storage/VUF876AZ/Madani et al. - 2018 - Semi-supervised learning with generative adversari.pdf;/home/henriklg/Zotero/storage/HGDLC3JF/8363749.html},
+  keywords = {Biomedical imaging,cardiac abnormality classification,chest x-ray,chest X-ray classification,chest X-rays,conventional supervised learning convolutional neural networks,data domain adaptation,data domain overfitting,data source domain,datasets,deep learning algorithms,Diseases,Gallium nitride,Generators,image classification,labeled data scarcity,learned classifier,learning (artificial intelligence),magnitude less data,medical image processing,medical imaging dataset,neural nets,pattern classification,semi-supervised learning,semisupervised learning architecture,semisupervised learning generative adversarial networks,Task analysis,Training,X-ray imaging}
+}
+
+@article{SemisupervisedMedical20,
+  title = {Semi-Supervised {{Medical Image Classification}} with {{Relation}}-Driven {{Self}}-Ensembling {{Model}}},
+  author = {Liu, Quande and Yu, Lequan and Luo, Luyang and Dou, Qi and Heng, Pheng Ann and Heng, Pheng Ann},
+  year = {2020},
+  pages = {1--1},
+  issn = {1558-254X},
+  doi = {10.1109/TMI.2020.2995518},
+  abstract = {Training deep neural networks usually requires a large amount of labeled data to obtain good performance. However, in medical image analysis, obtaining high-quality labels for the data is laborious and expensive, as accurately annotating medical images demands expertise knowledge of the clinicians. In this paper, we present a novel relation-driven semi-supervised framework for medical image classification. It is a consistencybased method which exploits the unlabeled data by encouraging the prediction consistency of given input under perturbations, and leverages a self-ensembling model to produce high-quality consistency targets for the unlabeled data. Considering that human diagnosis often refers to previous analogous cases to make reliable decisions, we introduce a novel sample relation consistency (SRC) paradigm to effectively exploit unlabeled data by modeling the relationship information among different samples. Superior to existing consistency-based methods which simply enforce consistency of individual predictions, our framework explicitly enforces the consistency of semantic relation among different samples under perturbations, encouraging the model to explore extra semantic information from unlabeled data. We have conducted extensive experiments to evaluate our method on two public benchmark medical image classification datasets, i.e., skin lesion diagnosis with ISIC 2018 challenge and thorax disease classification with ChestX-ray14. Our method outperforms many state-of-the-art semi-supervised learning methods on both singlelabel and multi-label image classification scenarios.},
+  file = {/home/henriklg/Zotero/storage/FYNIDCV3/Liu et al. - 2020 - Semi-supervised Medical Image Classification with .pdf},
+  journal = {IEEE Transactions on Medical Imaging},
+  keywords = {Feature extraction,Lesions,Medical diagnostic imaging,medical image classification,Predictive models,sample relation modelling,self-ensembling model,Semantics,Semi-supervised learning,Semisupervised learning}
 }
 
 @article{ShapeShading94,
