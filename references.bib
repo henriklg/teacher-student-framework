@@ -167,6 +167,21 @@
   series = {Best {{Papers}} of {{Iberian Conference}} on {{Pattern Recognition}} and {{Image Analysis}} ({{IbPRIA}}'2011)}
 }
 
+@article{BillionscaleSemisupervised19,
+  title = {Billion-Scale Semi-Supervised Learning for Image Classification},
+  author = {Yalniz, I. Zeki and J{\'e}gou, Herv{\'e} and Chen, Kan and Paluri, Manohar and Mahajan, Dhruv},
+  year = {2019},
+  month = may,
+  abstract = {This paper presents a study of semi-supervised learning with large convolutional networks. We propose a pipeline, based on a teacher/student paradigm, that leverages a large collection of unlabelled images (up to 1 billion). Our main goal is to improve the performance for a given target architecture, like ResNet-50 or ResNext. We provide an extensive analysis of the success factors of our approach, which leads us to formulate some recommendations to produce high-accuracy models for image classification with semi-supervised learning. As a result, our approach brings important gains to standard architectures for image, video and fine-grained classification. For instance, by leveraging one billion unlabelled images, our learned vanilla ResNet-50 achieves 81.2\% top-1 accuracy on the ImageNet benchmark.},
+  archivePrefix = {arXiv},
+  eprint = {1905.00546},
+  eprinttype = {arxiv},
+  file = {/home/henriklg/Zotero/storage/X73J3X9J/Yalniz et al. - 2019 - Billion-scale semi-supervised learning for image c.pdf;/home/henriklg/Zotero/storage/DASYFKVS/1905.html},
+  journal = {arXiv:1905.00546 [cs]},
+  keywords = {Computer Science - Computer Vision and Pattern Recognition},
+  primaryClass = {cs}
+}
+
 @article{BleedingDetection19,
   title = {Bleeding Detection in Wireless Capsule Endoscopy Videos \textemdash{} {{Color}} versus Texture Features},
   author = {Pogorelov, Konstantin and Suman, Shipra and Azmadi Hussin, Fawnizu and Saeed Malik, Aamir and Ostroukhova, Olga and Riegler, Michael and Halvorsen, P\aa l and Hooi Ho, Shiaw and Goh, Khean-Lee},
@@ -524,6 +539,24 @@ Conclusion: The comprehensive results have demonstrated that the proposed SSAEIM
   journal = {IEEE Journal of Biomedical and Health Informatics},
   keywords = {2D CNN,3D CNN based method,3D convolution,Activity recognition,ambient camera,automatic feature extractor,Convolution,convolutional neural network,Convolutional neural networks,Data mining,deep learning,fall data collection,fall dataset,fall detection,fall detection benchmark,feature extraction,Feature extraction,health care,image classification,image motion analysis,image quality,image representation,image sequences,learning (artificial intelligence),long short-term memory based spatial visual attention scheme,LSTM,Machine learning,medical image processing,medical service,motion feature extraction,object detection,public healthcare problem,recurrent neural nets,sport dataset,Sports-1 M,temporal sequence,three-dimensional CNN,three-dimensional convolutional neural network,Three-dimensional displays,Two dimensional displays,video cameras,video kinematic data,video signal processing,visual attention},
   number = {1}
+}
+
+@inproceedings{DeepNetworks16,
+  title = {Deep {{Networks}} with {{Stochastic Depth}}},
+  booktitle = {Computer {{Vision}} \textendash{} {{ECCV}} 2016},
+  author = {Huang, Gao and Sun, Yu and Liu, Zhuang and Sedra, Daniel and Weinberger, Kilian Q.},
+  editor = {Leibe, Bastian and Matas, Jiri and Sebe, Nicu and Welling, Max},
+  year = {2016},
+  pages = {646--661},
+  publisher = {{Springer International Publishing}},
+  address = {{Cham}},
+  doi = {10.1007/978-3-319-46493-0_39},
+  abstract = {Very deep convolutional networks with hundreds of layers have led to significant reductions in error on competitive benchmarks. Although the unmatched expressiveness of the many layers can be highly desirable at test time, training very deep networks comes with its own set of challenges. The gradients can vanish, the forward flow often diminishes, and the training time can be painfully slow. To address these problems, we propose stochastic depth, a training procedure that enables the seemingly contradictory setup to train short networks and use deep networks at test time. We start with very deep networks but during training, for each mini-batch, randomly drop a subset of layers and bypass them with the identity function. This simple approach complements the recent success of residual networks. It reduces training time substantially and improves the test error significantly on almost all data sets that we used for evaluation. With stochastic depth we can increase the depth of residual networks even beyond 1200 layers and still yield meaningful improvements in test error (4.91 \% on CIFAR-10).},
+  file = {/home/henriklg/Zotero/storage/98TKI32X/Huang et al. - 2016 - Deep Networks with Stochastic Depth.pdf},
+  isbn = {978-3-319-46493-0},
+  keywords = {Constant Depth,Early Layer,Test Error,Training Time,Validation Error},
+  language = {en},
+  series = {Lecture {{Notes}} in {{Computer Science}}}
 }
 
 @article{DeepReinforcement17,
@@ -1065,6 +1098,24 @@ In this respect, Kvasir is important for research on both single- and multi-dise
   keywords = {cancer,CNN,color features,computer-aided lesion detection system,convolutional neural network features,detect gastrointestinal disease,endoscopes,Endoscopes,endoscopy image lesion detection,feature extraction,Feature extraction,gastrointestinal examination,Gastrointestinal tract,gastrointestinal tract directly,Histograms,Image color analysis,image colour analysis,image texture,Lesions,medical image processing,neural nets,support vector machine,support vector machines,Support vector machines,SVM,texture features,trainable feature extractor}
 }
 
+@inproceedings{LIREOpen16,
+  title = {{{LIRE}}: Open Source Visual Information Retrieval},
+  shorttitle = {{{LIRE}}},
+  booktitle = {Proceedings of the 7th {{International Conference}} on {{Multimedia Systems}}},
+  author = {Lux, Mathias and Riegler, Michael and Halvorsen, P\aa l and Pogorelov, Konstantin and Anagnostopoulos, Nektarios},
+  year = {2016},
+  month = may,
+  pages = {1--4},
+  publisher = {{Association for Computing Machinery}},
+  address = {{Klagenfurt, Austria}},
+  doi = {10.1145/2910017.2910630},
+  abstract = {With an annual growth rate of 16.2\% of taken photos a year, researchers predict an almost unbelievable number of 4.9 trillion stored images in 2017. Nearly 80\% of these photos in 2017 will be taken with mobile phones. To be able to cope with this immense amount of visual data in a fast and accurate way, a visual information retrieval systems are needed for various domains and applications. LIRE, short for Lucene Image Retrieval, is a light weight and easy to use Java library for visual information retrieval. It allows developers and researchers to integrate common content based image retrieval approaches in their applications and research projects. LIRE supports global and local image features and can cope with millions of images using approximate search and distributing indexes on the cloud. In this demo we present a novel tool called F-search that emphasize the core strengths of LIRE: lightness, speed and accuracy.},
+  file = {/home/henriklg/Zotero/storage/27PI8ATY/Lux et al. - 2016 - LIRE open source visual information retrieval.pdf},
+  isbn = {978-1-4503-4297-1},
+  keywords = {search engine,visual information retrieval},
+  series = {{{MMSys}} '16}
+}
+
 @misc{MachineLearning18,
   title = {Machine {{Learning}} Is {{Fun}}!},
   author = {Geitgey, Adam},
@@ -1534,7 +1585,7 @@ decision when building a practical system.},
   issn = {1558-254X},
   doi = {10.1109/TMI.2020.2995518},
   abstract = {Training deep neural networks usually requires a large amount of labeled data to obtain good performance. However, in medical image analysis, obtaining high-quality labels for the data is laborious and expensive, as accurately annotating medical images demands expertise knowledge of the clinicians. In this paper, we present a novel relation-driven semi-supervised framework for medical image classification. It is a consistencybased method which exploits the unlabeled data by encouraging the prediction consistency of given input under perturbations, and leverages a self-ensembling model to produce high-quality consistency targets for the unlabeled data. Considering that human diagnosis often refers to previous analogous cases to make reliable decisions, we introduce a novel sample relation consistency (SRC) paradigm to effectively exploit unlabeled data by modeling the relationship information among different samples. Superior to existing consistency-based methods which simply enforce consistency of individual predictions, our framework explicitly enforces the consistency of semantic relation among different samples under perturbations, encouraging the model to explore extra semantic information from unlabeled data. We have conducted extensive experiments to evaluate our method on two public benchmark medical image classification datasets, i.e., skin lesion diagnosis with ISIC 2018 challenge and thorax disease classification with ChestX-ray14. Our method outperforms many state-of-the-art semi-supervised learning methods on both singlelabel and multi-label image classification scenarios.},
-  file = {/home/henriklg/Zotero/storage/FYNIDCV3/Liu et al. - 2020 - Semi-supervised Medical Image Classification with .pdf},
+  file = {/home/henriklg/Zotero/storage/FYNIDCV3/Liu et al. - 2020 - Semi-supervised Medical Image Classification with .pdf;/home/henriklg/Zotero/storage/LVENGTFE/9095275.html},
   journal = {IEEE Transactions on Medical Imaging},
   keywords = {Feature extraction,Lesions,Medical diagnostic imaging,medical image classification,Predictive models,sample relation modelling,self-ensembling model,Semantics,Semi-supervised learning,Semisupervised learning}
 }
