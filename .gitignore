@@ -32,4 +32,5 @@ experiments/
 
 # Latex files
 thesis/build/*
-!thesis/build/*.pdf
+#!thesis/build/*.pdf
+*.pdf
