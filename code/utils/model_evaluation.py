@@ -150,6 +150,7 @@ def plot_lr_and_accuracy(history, conf):
         plt.xlabel('Epoch')
         plt.ylabel('Learnign rate')
         plt.title('Learning Rate development during training');
+        plt.tight_layout()
         plt.savefig(conf["log_dir"]+'/learning_rate.pdf', format='pdf')
     
     
@@ -175,6 +176,7 @@ def plot_lr_and_accuracy(history, conf):
     plt.xlabel('Epoch')
     plt.ylabel('Accuracy')
     plt.title('Training and Validation Loss')
+    plt.tight_layout()
     plt.savefig(conf["log_dir"]+'/accuracy_and_loss.pdf', format='pdf')
     plt.show()
     
