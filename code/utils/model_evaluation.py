@@ -137,13 +137,11 @@ def plot_lr_and_accuracy(history, conf):
 
     loss = history.history['loss']
     val_loss = history.history['val_loss']
-
-    if conf["learning_schedule"]: 
-        lr = history.history['lr']
     
     epochs_range = range(history.epoch[-1]+1)
     
     if conf["learning_schedule"]:
+        lr = history.history['lr']
         # Plot the learning rate
         plt.figure(figsize=(8, 6))
         plt.plot(epochs_range, lr, label='Learning Rate')
@@ -152,7 +150,6 @@ def plot_lr_and_accuracy(history, conf):
         plt.title('Learning Rate development during training');
         plt.tight_layout()
         plt.savefig(conf["log_dir"]+'/learning_rate.pdf', format='pdf')
-    
     
     # Plot train-val accuracy and loss
     plt.figure(figsize=(14, 6))
@@ -174,7 +171,7 @@ def plot_lr_and_accuracy(history, conf):
     plt.legend(loc='upper right')
     plt.ylim([0.0, 3])
     plt.xlabel('Epoch')
-    plt.ylabel('Accuracy')
+    plt.ylabel('Loss')
     plt.title('Training and Validation Loss')
     plt.tight_layout()
     plt.savefig(conf["log_dir"]+'/accuracy_and_loss.pdf', format='pdf')
