@@ -64,12 +64,12 @@ def plot_confusion_matrix(cm, log_dir, names=None, cmap='Blues', figsize=(15,13)
     """
     """
     # Font sizes
-    axis_font = 8 # font size of x,y labels
+    axis_font = 10 # font size of x,y labels
     cell_font = 7 # font size of sns heatmap
     plt.rc('xtick', labelsize=axis_font)
     plt.rc('ytick', labelsize=axis_font)
     plt.rc('axes', titlesize=16) # font size of title
-    plt.rc('axes', labelsize=10) # size of 'predicted','true label'
+    plt.rc('axes', labelsize=12) # size of 'predicted','true label'
     
     plt.figure(figsize=figsize)
     ax = plt.subplot()
@@ -132,26 +132,39 @@ def display_confusion_matrix(true_labels, predicted_labels, classes):
 def plot_lr_and_accuracy(history, conf):
     """
     """
+    import seaborn as sns
+    sns.set()
+
+    SMALL_SIZE = 12
+    MEDIUM_SIZE = 14
+    BIGGER_SIZE = 16
+
+    plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+    plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
+    plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+    plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+    plt.rc('legend', fontsize=MEDIUM_SIZE)    # legend fontsize
+    plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
     acc = history.history['sparse_categorical_accuracy']
     val_acc = history.history['val_sparse_categorical_accuracy']
 
     loss = history.history['loss']
     val_loss = history.history['val_loss']
-
-    if conf["learning_schedule"]: 
-        lr = history.history['lr']
     
     epochs_range = range(history.epoch[-1]+1)
     
     if conf["learning_schedule"]:
+        lr = history.history['lr']
         # Plot the learning rate
         plt.figure(figsize=(8, 6))
         plt.plot(epochs_range, lr, label='Learning Rate')
         plt.xlabel('Epoch')
         plt.ylabel('Learnign rate')
         plt.title('Learning Rate development during training');
+        plt.tight_layout()
         plt.savefig(conf["log_dir"]+'/learning_rate.pdf', format='pdf')
-    
     
     # Plot train-val accuracy and loss
     plt.figure(figsize=(14, 6))
@@ -173,8 +186,9 @@ def plot_lr_and_accuracy(history, conf):
     plt.legend(loc='upper right')
     plt.ylim([0.0, 3])
     plt.xlabel('Epoch')
-    plt.ylabel('Accuracy')
+    plt.ylabel('Loss')
     plt.title('Training and Validation Loss')
+    plt.tight_layout()
     plt.savefig(conf["log_dir"]+'/accuracy_and_loss.pdf', format='pdf')
     plt.show()
     

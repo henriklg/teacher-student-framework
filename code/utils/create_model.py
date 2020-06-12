@@ -58,8 +58,9 @@ def create_model(conf):
         loss='sparse_categorical_crossentropy',
         metrics=['sparse_categorical_accuracy']
     )
-
-    model.summary()
+    
+    if conf["verbosity"]:
+        model.summary()
     
     return model
 
@@ -67,44 +68,57 @@ def create_model(conf):
 
 def create_callbacks(conf):
     """
+    Create callbacks used during training of model.
+    Returns a list of callbacks.
     """
-    # By using LearnignRateScheduler
-    initial_learning_rate = conf["learning_rate"]
-    decay_steps = conf["steps"]["train"]
-    batch_size = conf['batch_size']
-    decay_rate = conf['decay_rate']
-
-    def schedule(epoch):
-        # calculate new learning rate
-        learning_rate = initial_learning_rate / (1 + decay_rate * (epoch*batch_size) / decay_steps)
-        # update tensorboard
-        tf.summary.scalar(name='learning_rate', data=learning_rate, step=epoch)
-        return learning_rate
-
-    file_writer = tf.summary.create_file_writer(conf["log_dir"] + "/metrics")
-    file_writer.set_as_default()
-
-    lr_schedule_cb = LearningRateScheduler(schedule, verbose=1)
-    earlystopp_cb = EarlyStopping(
-        monitor='val_loss', 
-        verbose=1, 
-        patience=conf["early_stopp_patience"], 
-        restore_best_weights=True
-    )
-    checkpoint_cb = ModelCheckpoint(
-        filepath=conf["log_dir"]+'/checkpoints/best_cp-{epoch:03d}.hdf', 
-        monitor='val_loss', 
-        save_best_only=True, 
-        mode='auto'
-    )
-    tensorboard_cb = TensorBoard(
-        log_dir=conf["log_dir"], 
-        update_freq='batch'
-    )
-
-    callbacks = [tensorboard_cb]
-    if conf["early_stopp"]: callbacks.append(earlystopp_cb)
-    if conf["learning_schedule"]: callbacks.append(lr_schedule_cb)
-    if conf["checkpoint"]: callbacks.append(checkpoint_cb)
+    callbacks = []
+    
+    # Tensorboard
+    if conf["tensorboard"]:
+        file_writer = tf.summary.create_file_writer(conf["log_dir"] + "/metrics")
+        file_writer.set_as_default()
         
+        tensorboard_cb = TensorBoard(
+            log_dir=conf["log_dir"], 
+            update_freq='batch'
+        )
+        callbacks.append(tensorboard_cb)
+        
+    # Inverse Time Decay LR Scheduler
+    if conf["learning_schedule"]:
+        initial_learning_rate = conf["learning_rate"]
+        decay_steps = conf["steps"]["train"]
+        batch_size = conf['batch_size']
+        decay_rate = conf['decay_rate']
+
+        def schedule(epoch):
+            # calculate new learning rate
+            learning_rate = initial_learning_rate / (1 + decay_rate * (epoch*batch_size) / decay_steps)
+            # update tensorboard
+            tf.summary.scalar(name='learning_rate', data=learning_rate, step=epoch)
+            return learning_rate
+
+        lr_schedule_cb = LearningRateScheduler(schedule, verbose=1)
+        callbacks.append(lr_schedule_cb)
+        
+    # Early stopping
+    if conf["early_stopp"]: 
+        earlystopp_cb = EarlyStopping(
+            monitor='val_loss', 
+            verbose=1, 
+            patience=conf["early_stopp_patience"], 
+            restore_best_weights=True
+        )
+        callbacks.append(earlystopp_cb)
+        
+    # Save checkpoints during training
+    if conf["checkpoint"]: 
+        checkpoint_cb = ModelCheckpoint(
+            filepath=conf["log_dir"]+'/checkpoints/best_cp-{epoch:03d}.hdf', 
+            monitor='val_loss', 
+            save_best_only=True, 
+            mode='auto'
+        )
+        callbacks.append(checkpoint_cb)
+    
     return callbacks

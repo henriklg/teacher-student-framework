@@ -143,9 +143,8 @@ def create_dataset(conf):
     
     # print info about the dataset split
     if verbosity:
-        print ("Dataset split:", ds_sizes, "\n")
         cnt_per_class = get_dataset_info(class_names, data_dir, ds_size)
-        print_split_info(ds, num_classes, class_names, cnt_per_class)
+        print_split_info(ds, num_classes, class_names, cnt_per_class, ds_sizes)
     
     # Cache, shuffle, repeat, batch, prefetch pipeline
     for split in ds:

@@ -15,7 +15,7 @@ def generate_labels(count, unlab, unlab_ds, unlab_size, model, conf):
     Generate new psuedo labels from unlabeled dataset
     """
     def plot_and_save(lab_list):
-        lab_array = np.asarray(unlab["lab_list"], dtype=np.uint8)
+        lab_array = np.asarray(lab_list, dtype=np.uint8)
         findings = np.bincount(lab_array, minlength=int(conf["num_classes"]))
         print_bar_chart(
             data=[findings],

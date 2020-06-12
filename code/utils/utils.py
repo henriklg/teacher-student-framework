@@ -10,7 +10,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 
-def print_split_info(ds, num_classes, class_names, cnt_per_class):
+def print_split_info(ds, num_classes, class_names, cnt_per_class, ds_sizes):
     """
     Print info about the dataset
     """
@@ -33,6 +33,13 @@ def print_split_info(ds, num_classes, class_names, cnt_per_class):
         line+="{:5d} | ".format(cnt_per_class[class_names[i]][0])
         line+="{:5.2f}%".format(cnt_per_class[class_names[i]][1])
         print (line)
+    
+    # print totals
+    print ('-'*72)
+    line = "{:28}: ".format("Total")
+    for ds_name in ds_sizes:
+        line+= "{:5} | ".format(ds_sizes[ds_name])
+    print (line)
 
 def get_dataset_info(directories, data_dir, ds_size, ttv=True):
     """
