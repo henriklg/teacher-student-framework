@@ -29,7 +29,7 @@ def create_model(conf):
         from efficientnet.tfkeras import EfficientNetB7 as EfficientNet # 65.4M params
         
     efficientnet_base = EfficientNet(
-        weights=conf["weights"],    # "imagenet", or "noisy-student"
+        weights=conf["weights"],    # "imagenet", None or "noisy-student"
         include_top=False, 
         input_shape=conf["img_shape"]
     )
