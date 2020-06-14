@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 import scipy.ndimage as ndimage
 
 from utils import class_distribution, get_dataset_info, print_split_info
+# For split_and_create_dataset
+from utils import print_bin_class_info
 
 
 # Global variables used by create_dataset and create_dataset_unlab
@@ -113,7 +115,7 @@ def create_dataset(conf):
     if conf["outcast"] != None:
         class_names = np.delete(class_names, np.where(conf["outcast"] == class_names))
         if verbosity > 0: print ("Removed outcast:", conf["outcast"], end="\n\n")
-    num_classes = len(class_names)
+    conf["num_classes"] = len(class_names)
     
     # Create a tf.dataset of the file paths
     ds = {split: str(data_dir/split/'*/*.*g') for split in ["train","test","val"]}
@@ -144,15 +146,14 @@ def create_dataset(conf):
     # print info about the dataset split
     if verbosity:
         cnt_per_class = get_dataset_info(class_names, data_dir, ds_size)
-        print_split_info(ds, num_classes, class_names, cnt_per_class, ds_sizes)
+        print_split_info(ds, conf["num_classes"], class_names, cnt_per_class, ds_sizes)
     
     # Cache, shuffle, repeat, batch, prefetch pipeline
     for split in ds:
-        ds[split] = prepare_for_training(ds[split], split, num_classes, conf, cache=True)
+        ds[split] = prepare_for_training(ds[split], split, conf, cache=True)
     
     steps = {name:ds_sizes[name]//conf["batch_size"] for (name, data) in ds.items()}
     conf["class_names"] = class_names
-    conf["num_classes"] = num_classes
     conf["ds_sizes"] = ds_sizes
     conf["steps"] = steps
     ds["clean_train"] = clean_train
@@ -161,7 +162,7 @@ def create_dataset(conf):
 
 
 
-def prepare_for_training(ds, ds_name, num_classes, conf, cache):
+def prepare_for_training(ds, ds_name, conf, cache):
     """
     Cache -> shuffle -> repeat -> augment -> batch -> prefetch
     """
@@ -169,7 +170,7 @@ def prepare_for_training(ds, ds_name, num_classes, conf, cache):
     
     # Resample dataset. NB: dataset is cached in resamler
     if conf["resample"] and 'train' in ds_name:
-        ds = oversample(ds, ds_name, num_classes, conf)
+        ds = oversample(ds, ds_name, conf)
     
     # Cache to SSD
     elif cache:
@@ -200,7 +201,7 @@ def prepare_for_training(ds, ds_name, num_classes, conf, cache):
 
 
 
-def oversample(ds, cache_name, num_classes, conf):
+def oversample(ds, cache_name, conf):
     """
     Resample the dataset. Accepts both binary and multiclass datasets.
     
@@ -212,6 +213,8 @@ def oversample(ds, cache_name, num_classes, conf):
     Returns:
     - Resampled, repeated, and unbatched dataset
     """
+    num_classes = conf["num_classes"]
+    
     ## Check the original sample distribution
     if conf["verbosity"] > 0:
         print ("\n---- Ratios before resampling ---- ")
@@ -384,6 +387,8 @@ def split_and_create_dataset(conf):
                                                 ds_size, outcast, class_names, 
                                                 neg_class_name, pos_class_names
             )
+        conf["neg_count"] = neg_count
+        conf["pos_count"] = pos_count
     # Full dataset
     else:     
         class_names = directories
@@ -447,11 +452,11 @@ def split_and_create_dataset(conf):
     conf["class_names"] = class_names
     conf["num_classes"] = num_classes
     conf["sizes"] = {"total":ds_size, 
-                  "train":split_size[0], 
-                  "test":split_size[1], 
-                  "val":split_size[2]}
-    conf["steps"] = {"train":split_size[0]//conf["batch_size"], 
-                  "test":split_size[1]//conf["batch_size"],
-                  "val":split_size[2]//conf["batch_size"]}
+                  "train":train_size, 
+                  "test":test_size, 
+                  "val":val_size}
+    conf["steps"] = {"train":train_size//conf["batch_size"], 
+                  "test":test_size//conf["batch_size"],
+                  "val":val_size//conf["batch_size"]}
     
     return train_ds, test_ds, val_ds
