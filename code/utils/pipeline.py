@@ -10,7 +10,7 @@ import scipy.ndimage as ndimage
 
 from utils import class_distribution, get_dataset_info, print_split_info
 # For split_and_create_dataset
-from utils import print_bin_class_info
+from utils import print_bin_class_info, better_class_dist, show_image
 
 
 # Global variables used by create_dataset and create_dataset_unlab
@@ -218,7 +218,8 @@ def oversample(ds, cache_name, conf):
     ## Check the original sample distribution
     if conf["verbosity"] > 0:
         print ("\n---- Ratios before resampling ---- ")
-        initial_dist, count = class_distribution(ds, num_classes)
+#         initial_dist, count = class_distribution(ds, num_classes)
+        initial_dist = better_class_dist(ds, num_classes)
         print (initial_dist)
 
     ## Prep cache
@@ -360,8 +361,9 @@ def split_and_create_dataset(conf):
     shuffle_buffer_size = conf["shuffle_buffer_size"]
     seed = conf["seed"]
 
+    pathlib.Path(conf["cache_dir"]).mkdir(parents=True, exist_ok=True)
+    pathlib.Path(conf["log_dir"]).mkdir(parents=True, exist_ok=True)
     np.random.seed(seed=seed)
-    train_cache = 'train'
     neg_count = pos_count = 0
     AUTOTUNE = tf.data.experimental.AUTOTUNE
     ds_size = len(list(data_dir.glob('*/*.*g')))
@@ -437,15 +439,15 @@ def split_and_create_dataset(conf):
         print ("{:32} {:>5}".format("Validation dataset sample size:", val_size))
     
     # Resample the dataset. NB: dataset is cached in resamler
-    if conf["resample"]:
-        train_ds = oversample(train_ds, num_classes, conf)
-        train_cache = None
+#     if conf["resample"]:
+#         train_ds = oversample(train_ds, num_classes, conf)
+#         train_cache = False
     
     # Create cache-dir if not already exists
     pathlib.Path(conf["cache_dir"]).mkdir(parents=True, exist_ok=True)
     
     # Cache, shuffle, repeat, batch, prefetch pipeline
-    train_ds = prepare_for_training(train_ds, 'train', conf, cache=train_cache)
+    train_ds = prepare_for_training(train_ds, 'train', conf, cache=True)
     test_ds = prepare_for_training(test_ds, 'test', conf, cache=True)
     val_ds = prepare_for_training(val_ds, 'val', conf, cache=True)
             
