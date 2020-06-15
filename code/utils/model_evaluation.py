@@ -60,7 +60,7 @@ def get_confusion_matrix(true_labels, predicted_labels):
 
 
 
-def plot_confusion_matrix(cm, log_dir, names=None, cmap='Blues', figsize=(15,13)):
+def plot_confusion_matrix(cm, log_dir, names=None, cmap='Blues', figsize=(15,13), show=True):
     """
     """
     # Font sizes
@@ -111,7 +111,10 @@ def plot_confusion_matrix(cm, log_dir, names=None, cmap='Blues', figsize=(15,13)
     
     plt.tight_layout()
     plt.savefig(log_dir+"/confusion_matrix.pdf", format="pdf")
-    plt.show()
+    if show:
+        plt.show()
+    else:
+        plt.close()
 
 
 
