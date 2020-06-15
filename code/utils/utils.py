@@ -126,30 +126,10 @@ def class_distribution(count_ds, num_classes, count_batches=10, bs=1024):
     return distribution, final_counts
 
 
+def better_class_dist(count_ds, num_classes):
+    counts = tf_bincount(count_ds, num_classes)
+    return counts/counts.sum()
 
-def get_class_weights(ds, conf):
-    """
-    """
-    if not conf["class_weight"]:
-        return None
-    
-    assert not conf["resample"], "Should only use resample or class_weight. Not both." 
-    
-    ds = unpipe(ds, conf["ds_sizes"]["train"])
-    
-    _, cnt = class_distribution(ds, conf["num_classes"])
-    total = cnt.sum()
-    score = total / (cnt*conf["num_classes"])
-    # Set scores lower than 1.0 to 1
-    score[score<1.0] = 1.0
-
-    class_weights = dict(enumerate(score))
-    
-    if conf["verbosity"]:
-        print ("---- Class weights ----")
-        print (class_weights)
-    
-    return class_weights
 
 
 

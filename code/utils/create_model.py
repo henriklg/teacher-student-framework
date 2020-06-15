@@ -7,6 +7,8 @@ from tensorflow.python.keras.callbacks import LearningRateScheduler, TensorBoard
 from tensorflow.python.keras.models import Sequential, Model, load_model
 from tensorflow.keras import layers
 
+from utils import unpipe, class_distribution
+
 
 def create_model(conf):
     """
@@ -27,7 +29,7 @@ def create_model(conf):
         from efficientnet.tfkeras import EfficientNetB6 as EfficientNet # 42.2M params
     elif conf["model"] == 'EfficientNetB7':
         from efficientnet.tfkeras import EfficientNetB7 as EfficientNet # 65.4M params
-        
+    
     efficientnet_base = EfficientNet(
         weights=conf["weights"],    # "imagenet", None or "noisy-student"
         include_top=False, 
@@ -37,7 +39,7 @@ def create_model(conf):
     # Unfreeze the layers. I.E we're just using the pre-trained 
     # weights as initial weigths and biases and train over them
     efficientnet_base.trainable = True
-
+    
     # Define model
     model = Sequential()
     model.add(efficientnet_base)
@@ -46,13 +48,12 @@ def create_model(conf):
     model.add(layers.Dense(512, activation='relu'))
     model.add(layers.Dropout(conf["dropout"]))
     model.add(layers.Dense(conf["num_classes"], activation=conf["final_activation"]))
-    
 
     if conf['optimizer'] == 'Adam':
         opt = tf.keras.optimizers.Adam(learning_rate=conf["learning_rate"])
     elif conf['optimizer'] == 'SGD':
         opt = tf.keras.optimizers.SGD(learning_rate=conf["learning_rate"])
-
+    
     model.compile(
         optimizer=opt,
         loss='sparse_categorical_crossentropy',
@@ -122,3 +123,29 @@ def create_callbacks(conf):
         callbacks.append(checkpoint_cb)
     
     return callbacks
+
+
+
+def get_class_weights(ds, conf):
+    """
+    """
+    if not conf["class_weight"]:
+        return None
+    
+    assert not conf["resample"], "Should only use resample or class_weight. Not both." 
+    
+    ds = unpipe(ds, conf["ds_sizes"]["train"])
+    
+    _, cnt = class_distribution(ds, conf["num_classes"])
+    total = cnt.sum()
+    score = total / (cnt*conf["num_classes"])
+    # Set scores lower than 1.0 to 1
+#     score[score<1.0] = 1.0
+
+    class_weights = dict(enumerate(score))
+    
+    if conf["verbosity"]:
+        print ("---- Class weights ----")
+        print (class_weights)
+    
+    return class_weights
