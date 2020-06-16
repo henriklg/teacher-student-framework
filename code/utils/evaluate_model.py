@@ -1,8 +1,11 @@
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import pickle
 import matplotlib.pyplot as plt
+
 from sklearn import metrics as m
+from utils import write_to_file, unpipe
 
 
 def get_metrics(true_labels, predicted_labels):
@@ -219,3 +222,45 @@ def show_dataset_predictions(true_labels, pred_labels, pred_confidence, images, 
     plt.subplots_adjust(left=0, bottom=0, right=2, top=2, wspace=0.5, hspace=0.5)
     plt.tight_layout()
     plt.savefig("{}/checkout-eval_ds-pred.pdf".format(conf["log_dir"]), format="pdf")
+
+
+
+
+def evaluate_model(model, history, ds, conf):
+    # Create true_labels and pred_labels for later evaluations
+    eval_ds = unpipe(ds["val"], conf["ds_sizes"]["val"]).as_numpy_iterator()
+    eval_ds = np.array(list(eval_ds))
+    true_labels = list(eval_ds[:,1])
+    eval_images = np.stack(eval_ds[:,0], axis=0)
+
+    # Save the metrics from training
+    write_to_file(history.history, conf, "history")
+    write_to_file(conf, conf, "conf")
+    with open(conf["log_dir"]+"/history.pkl", 'wb') as f:
+        pickle.dump(history.history, f)
+        
+    # Plot leanring rate and loss
+    plot_lr_and_accuracy(history, conf)
+    
+    # Evaluate model on test dataset
+    model_evaluation = model.evaluate(ds["val"], verbose=2, steps=conf["steps"]["val"])
+    write_to_file(model_evaluation, conf, "evaluate_val")
+    
+    # Create predictions and pred_labels
+    predictions = model.predict(eval_images, verbose=1)
+    pred_confidence = [np.max(pred) for pred in predictions]
+    pred_labels = [np.argmax(pred) for pred in predictions]
+    
+    # Classification report
+    report = get_classification_report(
+            true_labels, 
+            pred_labels, 
+            range(conf["num_classes"]), 
+            target_names=conf["class_names"]
+    )
+    print (report)
+    write_to_file(report, conf, "classification_report")
+
+    # Confusion matrix
+    cm = get_confusion_matrix(true_labels, pred_labels)
+    plot_confusion_matrix(cm, conf["log_dir"], conf["class_names"], figsize=(12,10), show=False)
