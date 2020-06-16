@@ -2,11 +2,10 @@ import tensorflow as tf
 import numpy as np
 import os
 import pathlib
-import textwrap
 import matplotlib.pyplot as plt
 
 from tqdm.notebook import tqdm
-from PIL import Image, ImageDraw, ImageFont
+
 
 
 
@@ -40,6 +39,8 @@ def print_split_info(ds, num_classes, class_names, cnt_per_class, ds_sizes):
     for ds_name in ds_sizes:
         line+= "{:5} | ".format(ds_sizes[ds_name])
     print (line)
+
+
 
 def get_dataset_info(directories, data_dir, ds_size, ttv=True):
     """
@@ -126,6 +127,8 @@ def class_distribution(count_ds, num_classes, count_batches=10, bs=1024):
     return distribution, final_counts
 
 
+
+
 def better_class_dist(count_ds, num_classes):
     counts = tf_bincount(count_ds, num_classes)
     return counts/counts.sum()
@@ -150,6 +153,8 @@ def show_image(img, class_names=None, title=None):
             plt.title(title, fontdict={'color':'white','size':20})
         plt.imshow(img)
         plt.axis('off')
+
+
 
 
 def print_bar_chart(data, conf, title=None, fname=None, figsize=(15,6)):
@@ -192,7 +197,7 @@ def print_bar_chart(data, conf, title=None, fname=None, figsize=(15,6)):
     # Rotate the tick labels and set their alignment.
     plt.setp(ax.get_xticklabels(), rotation=25, ha="right",
                  rotation_mode="anchor")
-    plt.grid(axis='y')
+    plt.grid(axis='x')
 
     def autolabel(rects):
         """Attach a text label above each bar in *rects*, displaying its height."""
@@ -218,145 +223,6 @@ def unpipe(ds, size):
     return ds.unbatch().take(size)
 
 
-
-
-def checkout_findings(unlab, conf):
-    """
-    Create a large plot of 6 samples from every class found in the unlabeled dataset
-    """
-    ### Create images with label names
-    class_label_img = []
-    font_path = '/usr/share/fonts/truetype/ubuntu/UbuntuMono-B.ttf'
-    img_width = 512
-    font_size = int(img_width*0.15)
-    letters_per_line = 13
-
-    for i in range(conf["num_classes"]):
-        img = Image.new('RGB', (img_width, img_width), color = (0, 0, 0))
-        fnt = ImageFont.truetype(font_path, font_size)
-        d = ImageDraw.Draw(img)
-        if (len(conf["class_names"][i])>letters_per_line):
-            text = textwrap.fill(conf["class_names"][i], width=letters_per_line)
-        else:
-            text = conf["class_names"][i]
-        linebreaks = text.count('\n')
-        d.text((1,(img_width//2.2)-linebreaks*img_width*0.1), text, font=fnt, fill=(255, 255, 255))
-
-        class_label_img.append(img)
-        
-    ### Create a list with 6 samples per class
-    # black image
-    img_black = Image.new('RGB', (conf["img_shape"][0], conf["img_shape"][1]), color = (0, 0, 0))
-    
-    lab_arr = np.asarray(unlab["lab_list"], dtype=np.uint8)
-    class_examples = []
-    class_preds = []
-    for class_idx in range(conf["num_classes"]):
-        curr_class_examples = []
-        curr_class_preds = []
-
-        indekser = np.where(lab_arr==class_idx)[0]
-        for i in range(6):
-            # get 6 finding images from class_idx-class
-            # no image - index out of bounds
-            if not indekser.size > i:
-                curr_class_examples.append(img_black)
-                curr_class_preds.append(0)
-            # found image
-            else:
-                fn = unlab["name_list"][indekser[i]]
-                img = fn2img(fn, conf["unlab_dir"], img_width)
-                
-                curr_class_examples.append(img)
-                curr_class_preds.append(unlab["pred_list"][indekser[i]])
-
-        class_examples.append(curr_class_examples)
-        class_preds.append(curr_class_preds)
-
-    assert (len(conf["class_names"])==len(class_examples)), 'must be same length'
-    
-    ### Display the predicted images in each class
-    # settings
-    nrows, ncols = conf["num_classes"], 7  # array of sub-plots
-    figsize = [ncols*3, conf["num_classes"]*3]     # figure size, inches
-
-    # create figure (fig), and array of axes (ax)
-    fig, ax = plt.subplots(nrows=nrows, ncols=ncols, 
-                           figsize=figsize, frameon=False, facecolor='white')
-
-    # plot simple raster image on each sub-plot
-    for i, axi in enumerate(ax.flat):
-        # i runs from 0 to (nrows*ncols-1)
-        # axi is equivalent with ax[rowid][colid]
-        rowid = i // ncols
-        colid = i % ncols
-
-        if colid == 0:
-            img = class_label_img[rowid]
-        else:
-            pred = class_preds[rowid][colid-1]
-            title = "conf: "+str(round(pred, 3))
-            if pred: axi.set_title(title)
-            img = class_examples[rowid][colid-1]
-            
-        axi.imshow(img)
-        axi.set_axis_off()
-
-    plt.axis('off')
-    plt.tight_layout(True)
-    plt.savefig("{}/checkout-all.pdf".format(conf["log_dir"]), format='pdf')
-    plt.show()
-
-
-
-def checkout_class(checkout, unlab, conf):
-    """
-    Display a grid with sample images from one specified class
-    """    
-    # Which class number correspond to that class name
-    class_idx = np.where(conf["class_names"] == checkout)[0]
-    if len(class_idx) == 0:
-        raise NameError('Error: class-name not found. Check spelling.')
-        
-    # List of img_list-indexes with images corresponding to that class number
-    idx_list = np.where(unlab["lab_list"] == class_idx[0])[0]
-    num_images = len(idx_list)
-    if (num_images == 0):
-        raise IndexError("No findings in this class.")
-    
-    # settings
-    figint = np.sqrt(num_images)
-    nrows = int(np.floor(figint)) if figint <= 5 else 5
-    ncols = int(np.ceil(figint)) if figint <= 5 else 5
-    figsize = [ncols*3, nrows*3]     # figure size, inches
-
-    # create figure (fig), and array of axes (ax)
-    fig, ax = plt.subplots(nrows=nrows, ncols=ncols, 
-                           figsize=figsize, frameon=False, facecolor='white')
-    
-    # plot simple raster image on each sub-plot
-    for i, axi in enumerate(ax.flat):
-        idx = idx_list[i]
-        # i runs from 0 to (nrows*ncols-1)
-        # axi is equivalent with ax[rowid][colid]
-        try:
-            fn = unlab["name_list"][idx]
-            img = fn2img(fn, conf["unlab_dir"], 256)
-            
-            pred = unlab["pred_list"][idx_list[i]]
-            title = "conf: "+str(round(pred, 5))
-            axi.set_title(title)
-            axi.imshow(img)
-        except IndexError:
-            # No more images - skip last suplots
-            pass
-        finally:
-            axi.set_axis_off()
-    
-    plt.axis('off')
-    plt.tight_layout(True)
-    plt.savefig("{}/checkout-{}.pdf".format(conf["log_dir"], checkout), format='pdf')
-    plt.show()
 
 
 
@@ -403,6 +269,9 @@ def write_to_file(var, conf, fname):
     """
     Write 'var' to a .txt file inside log_dir. 
     """
+    # make sure folder exists:
+    pathlib.Path(conf["log_dir"]).mkdir(parents=True, exist_ok=True)
+    
     if type(var) == dict:
         # Write conf and params dictionary to text file
         list_of_strings = [ '{:25} : {}'.format(key, var[key]) for key in var ]
