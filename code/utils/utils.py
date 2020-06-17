@@ -178,7 +178,6 @@ def print_bar_chart(data, conf, title=None, fname=None, figsize=(15,6)):
     else:
         bar_placement = np.arange(-np.floor(num_bars/2), np.floor(num_bars/2)+1)
 
-
     fig, ax = plt.subplots(figsize=figsize)
 
     rects = []

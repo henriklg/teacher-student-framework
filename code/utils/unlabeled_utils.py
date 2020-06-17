@@ -36,8 +36,8 @@ def generate_labels(count, pseudo, unlab_ds, unlab_size, model, conf):
     print ("Press 'Interrupt Kernel' to save and exit.")
     try:
         for tot_cnt, (image,path) in enumerate(unlab_ds, start=count["total"]):
-#             if tot_cnt > 10000:
-#                 break
+            if tot_cnt > conf["pseudo_thresh"] and conf["pseudo_thresh"] is not 0:
+                break
                     
             img = np.expand_dims(image, 0)
             pred = model.predict(img)
@@ -51,7 +51,7 @@ def generate_labels(count, pseudo, unlab_ds, unlab_size, model, conf):
 
                 # Clear old bar chart, generate new one and refresh the tqdm progress bars
                 # NB, tqdm run-timer is also reset, unfortunately
-                if not count["findings"]%500 and count["findings"]>100:
+                if not count["findings"]%300 and count["findings"]>100:
                     clear_output(wait=True)
                     tqdm_predicting, tqdm_findings = get_tqdm(unlab_size, count["findings"], tot_cnt)
                     plot_and_save(pseudo["lab_list"])
