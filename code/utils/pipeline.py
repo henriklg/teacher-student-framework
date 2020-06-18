@@ -255,6 +255,7 @@ def oversample(ds, cache_name, conf):
 
 
 
+
 def augment_ds(ds, conf, AUTOTUNE):
     """
     Apply augmentation of the dataset. 
@@ -305,6 +306,7 @@ def augment_ds(ds, conf, AUTOTUNE):
 
 
 
+
 def create_unlab_ds(conf):
     """
     Pipeline for loading unlabeled dataset.
@@ -331,7 +333,8 @@ def create_unlab_ds(conf):
 
     print ("Loaded {} images into unlabeled_ds.".format(ds_size_unlab))
     
-    return unlab_ds, ds_size_unlab
+    conf["ds_sizes"]["unlab"] = ds_size_unlab
+    return unlab_ds
 
 
 
@@ -437,11 +440,6 @@ def split_and_create_dataset(conf):
         print ("{:32} {:>5}".format("Train dataset sample size:", train_size))
         print ("{:32} {:>5}".format("Test dataset sample size:", test_size))
         print ("{:32} {:>5}".format("Validation dataset sample size:", val_size))
-    
-    # Resample the dataset. NB: dataset is cached in resamler
-#     if conf["resample"]:
-#         train_ds = oversample(train_ds, num_classes, conf)
-#         train_cache = False
     
     # Create cache-dir if not already exists
     pathlib.Path(conf["cache_dir"]).mkdir(parents=True, exist_ok=True)
