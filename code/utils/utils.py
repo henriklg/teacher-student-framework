@@ -157,7 +157,7 @@ def show_image(img, class_names=None, title=None):
 
 
 
-def print_bar_chart(data, conf, title=None, fname=None, figsize=(15,6)):
+def print_bar_chart(data, conf, title=None, fname=None, figsize=(15,6), show=True):
     """
     Takes in list of data and makes a bar chart of it.
     Dynamically allocates placement for bars.
@@ -214,7 +214,10 @@ def print_bar_chart(data, conf, title=None, fname=None, figsize=(15,6)):
     fig.tight_layout()
     if fname:
         plt.savefig('{}/{}.pdf'.format(conf["log_dir"], fname), format='pdf')
-    plt.show()
+    if show:
+        plt.show()
+    else:
+        plt.close()
 
 
 
