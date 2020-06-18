@@ -62,7 +62,7 @@ def get_dataset_info(directories, data_dir, ds_size, ttv=True):
 
 
 
-def print_bin_class_info(directories, data_dir, ds_size, outcast, class_names, neg, pos):
+def print_bin_class_info(conf, directories, neg, pos):
     """
     Extract and print info about the class split of binary dataset
     """
@@ -72,7 +72,7 @@ def print_bin_class_info(directories, data_dir, ds_size, outcast, class_names, n
     negpos = [0, 0]
     for dir_name in directories:
         # Number of samples in 'class_name' folder
-        count = len(list(data_dir.glob('*/'+dir_name+'/*.*g')))
+        count = len(list(conf["data_dir"].glob('*/'+dir_name+'/*.*g')))
         count_dir[dir_name] = count
         
         if (dir_name == neg[0]):
@@ -82,16 +82,17 @@ def print_bin_class_info(directories, data_dir, ds_size, outcast, class_names, n
     
     tot = np.sum(negpos)
     assert tot != 0, "Can't divide by zero."
+    conf["neg_count"] = negpos[0]
+    conf["pos_count"] = negpos[1]
     
     # Print folder name and amount of samples
-    for i, class_ in enumerate([neg, pos]):
-        print ("\n{:33} : {:5} | {:2.2f}%".format(class_names[i], negpos[i], negpos[i]/tot*100))
-        print ("-"*45)
-        for cl in class_:
-            print ("{:5}- {:26} : {:5} | {:>2.2f}%".format(" "*5, cl, count_dir[cl], count_dir[cl]/tot*100))
-    print ('\nTotal number of image {} : {}\n'.format(" "*5, tot))
-    
-    return tot, negpos[0], negpos[1]
+    if conf["verbosity"]:
+        for i, class_ in enumerate([neg, pos]):
+            print ("\n{:33} : {:5} | {:2.2f}%".format(conf["class_names"][i], negpos[i], negpos[i]/tot*100))
+            print ("-"*45)
+            for cl in class_:
+                print ("{:5}- {:26} : {:5} | {:>2.2f}%".format(" "*5, cl, count_dir[cl], count_dir[cl]/tot*100))
+        print ('\nTotal number of image {} : {}\n'.format(" "*5, tot))
 
 
 
