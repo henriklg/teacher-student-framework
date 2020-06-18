@@ -9,14 +9,14 @@ from tqdm.notebook import tqdm
 
 
 
-def print_split_info(ds, num_classes, class_names, cnt_per_class, ds_sizes):
+def print_split_info(ds, class_names, cnt_per_class, ds_sizes):
     """
     Print info about the dataset
     """
     line = "{:28}: ".format('Category')
     cnt_list = []
     for split in ds: # train/test/val
-        cnt = tf_bincount(ds[split], num_classes)
+        cnt = tf_bincount(ds[split], len(class_names))
         cnt_list.append(cnt)
         line += "{:5} | ".format(split)
     
@@ -24,7 +24,7 @@ def print_split_info(ds, num_classes, class_names, cnt_per_class, ds_sizes):
     line += "{:5}".format("% of total")
     print (line, '\n'+'-'*72)
     
-    for i in range(num_classes):
+    for i in range(len(class_names)):
         line = "{:28}: ".format(class_names[i])
         for j in range(len(ds)):
             line += "{:5d} | ".format(int(cnt_list[j][i]))
@@ -49,7 +49,6 @@ def get_dataset_info(directories, data_dir, ds_size, ttv=True):
     return:
     a dictionary with number of samples per class and percentage of total
     """
-    num_classes = len(directories)
     # Count number of samples for each folder
     count_dir = {}
     for dir_name in directories:
@@ -67,12 +66,13 @@ def print_bin_class_info(directories, data_dir, ds_size, outcast, class_names, n
     """
     Extract and print info about the class split of binary dataset
     """
+    neg = [neg]
     # Count the samples in each folder
     count_dir = {}
     negpos = [0, 0]
     for dir_name in directories:
         # Number of samples in 'class_name' folder
-        count = len(list(data_dir.glob(dir_name+'/*.*g')))
+        count = len(list(data_dir.glob('*/'+dir_name+'/*.*g')))
         count_dir[dir_name] = count
         
         if (dir_name == neg[0]):
@@ -85,10 +85,10 @@ def print_bin_class_info(directories, data_dir, ds_size, outcast, class_names, n
     
     # Print folder name and amount of samples
     for i, class_ in enumerate([neg, pos]):
-        print ("\n{:27} : {:5} | {:2.2f}%".format(class_names[i], negpos[i], negpos[i]/tot*100))
+        print ("\n{:33} : {:5} | {:2.2f}%".format(class_names[i], negpos[i], negpos[i]/tot*100))
         print ("-"*45)
         for cl in class_:
-            print ("{:5}- {:20} : {:5} | {:>2.2f}%".format(" "*5, cl, count_dir[cl], count_dir[cl]/tot*100))
+            print ("{:5}- {:26} : {:5} | {:>2.2f}%".format(" "*5, cl, count_dir[cl], count_dir[cl]/tot*100))
     print ('\nTotal number of image {} : {}\n'.format(" "*5, tot))
     
     return tot, negpos[0], negpos[1]
