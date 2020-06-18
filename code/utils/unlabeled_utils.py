@@ -12,28 +12,28 @@ from utils import print_bar_chart, write_to_file, fn2img, tf_bincount
 
 
 
-def generate_labels(count, pseudo, unlab_ds, unlab_size, model, conf):
+def generate_labels(pseudo, count, unlab_ds, model, conf):
     """
     Generate new psuedo labels from unlabeled dataset
     """
-    def plot_and_save(lab_list):
+    def plot_and_save(lab_list, show=False):
         lab_array = np.asarray(lab_list, dtype=np.uint8)
         findings = np.bincount(lab_array, minlength=int(conf["num_classes"]))
         print_bar_chart(
             data=[findings],
             conf=conf,
             title=None,
-            fname="bar_chart-findings",
-            figsize=(16,7)
+            fname="pseudo_labels_distribution",
+            figsize=(16,7),
+            show=show
         )
         lab_array=None
     
-    
     total_time = time.time()
-
-    tqdm_predicting, tqdm_findings = get_tqdm(unlab_size, count["findings"], count["total"])
-
-    print ("Press 'Interrupt Kernel' to save and exit.")
+    tqdm_predicting, tqdm_findings = get_tqdm(conf["ds_sizes"]["unlab"], count["findings"], count["total"])
+    
+    if conf["verbosity"]:
+        print ("Press 'Interrupt Kernel' to save and exit.")
     try:
         for tot_cnt, (image,path) in enumerate(unlab_ds, start=count["total"]):
             if tot_cnt > conf["pseudo_thresh"] and conf["pseudo_thresh"] is not 0:
@@ -42,35 +42,32 @@ def generate_labels(count, pseudo, unlab_ds, unlab_size, model, conf):
             img = np.expand_dims(image, 0)
             pred = model.predict(img)
             highest_pred = np.max(pred)
-            if highest_pred > conf["keep_threshold"]:
+            if highest_pred > conf["keep_thresh"]:
                 pred_idx = np.argmax(pred).astype(np.uint8)
 
                 pseudo["lab_list"].append(pred_idx)
                 pseudo["pred_list"].append(highest_pred)
                 pseudo["name_list"].append(path)
 
-                # Clear old bar chart, generate new one and refresh the tqdm progress bars
-                # NB, tqdm run-timer is also reset, unfortunately
-                if not count["findings"]%300 and count["findings"]>100:
-                    clear_output(wait=True)
-                    tqdm_predicting, tqdm_findings = get_tqdm(unlab_size, count["findings"], tot_cnt)
+                # For every 1000 pseudo label found, save results in case of crash
+                if not count["findings"]%1000 and count["findings"]>100:
                     plot_and_save(pseudo["lab_list"])
-                    with open(conf["log_dir"]+"/unlab_findings.pkl", 'wb') as f:
+                    with open(conf["log_dir"]+"/pseudo_labels.pkl", 'wb') as f:
                         pickle.dump(pseudo, f)
                     
-                count["findings"] += 1   # previously findings_cnt
+                count["findings"] += 1
                 tqdm_findings.update(1)
             tqdm_predicting.update(1)
     except KeyboardInterrupt:
-        clear_output(wait=True)
         count["total"] = tot_cnt
         print ("Exiting")
-        tqdm_predicting, tqdm_findings = get_tqdm(unlab_size, count["findings"], count["total"])
-        plot_and_save(pseudo["lab_list"])
-        with open(conf["log_dir"]+"/unlab_findings.pkl", 'wb') as f:
-            pickle.dump(pseudo, f)
 
     finally:
+        # Plot and save
+        plot_and_save(pseudo["lab_list"], show=True)
+        with open(conf["log_dir"]+"/pseudo_labels.pkl", 'wb') as f:
+            pickle.dump(pseudo, f)
+            
         print ("\nTotal run time: {:.1f} min.".format( (time.time() - total_time)/60 ))
         print ("Found {} new samples in unlabeled_ds after looking at {} images.".format(count["findings"], tot_cnt))
         
@@ -165,7 +162,7 @@ def resample_unlab(pseudo, orig_dist,  conf):
 
 
 
-def reduce_dataset(ds, unlab_size, remove=None):
+def reduce_dataset(ds, remove=None):
     """
     Remove samples which are combined into the training data from the unlabeled data
     """
@@ -179,8 +176,7 @@ def reduce_dataset(ds, unlab_size, remove=None):
         return not in_list
     
     new_unlab_ds = ds.filter(remove_samples)
-    new_unlab_size = unlab_size - len(remove)
-    return new_unlab_ds, new_unlab_size
+    return new_unlab_ds
 
 
 
@@ -211,28 +207,28 @@ def resample_and_combine(ds, conf, pseudo, pseudo_sorted, datasets_bin):
         title=None,
         fname="bar_chart-distribution"
     )
-    
     return datasets_bin, added_samples
 
 
 
-def update_sanity(sanity, added_count, unlab_size, datasets_bin, conf):
+def update_sanity(sanity, added_count, datasets_bin, conf):
     """
     """
-    sanity = [{"added_samples": added_count,
-               "last_unlab_size": unlab_size,
-               "curr_unlab_size": unlab_size - added_count,
+    sanity.append({"added_samples": added_count,
+               "last_unlab_size": conf["ds_sizes"]["unlab"],
+               "curr_unlab_size": conf["ds_sizes"]["unlab"] - added_count,
                "last_train_size": int(np.sum(datasets_bin[-2])),
                "curr_train_size": int(np.sum(datasets_bin[-1]))
-              }]
+              })
     write_to_file(sanity, conf, "sanity")
     
-    return sanity
+    conf["ds_sizes"]["unlab"] -= added_count
+    return sanity, conf
 
 
 
 
-def checkout_findings(pseudo, conf):
+def checkout_findings(pseudo, conf, show=True):
     """
     Create a large plot of 6 samples from every class found in the unlabeled dataset
     """
@@ -317,11 +313,14 @@ def checkout_findings(pseudo, conf):
     plt.axis('off')
     plt.tight_layout(True)
     plt.savefig("{}/checkout-all.pdf".format(conf["log_dir"]), format='pdf')
-    plt.show()
+    if show:
+        plt.show()
+    else:
+        plt.close()
 
 
 
-def checkout_class(checkout, pseudo, conf):
+def checkout_class(checkout, pseudo, conf, show=True):
     """
     Display a grid with sample images from one specified class
     """    
@@ -368,4 +367,7 @@ def checkout_class(checkout, pseudo, conf):
     plt.axis('off')
     plt.tight_layout(True)
     plt.savefig("{}/checkout-{}.pdf".format(conf["log_dir"], checkout), format='pdf')
-    plt.show()
+    if show:
+        plt.show()
+    else:
+        plt.close()
