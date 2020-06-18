@@ -86,7 +86,7 @@ def create_callbacks(conf):
         callbacks.append(tensorboard_cb)
         
     # Inverse Time Decay LR Scheduler
-    if conf["learning_schedule"]:
+    if conf["decay_rate"]>0:
         initial_learning_rate = conf["learning_rate"]
         decay_steps = conf["steps"]["train"]
         batch_size = conf['batch_size']
@@ -103,7 +103,7 @@ def create_callbacks(conf):
         callbacks.append(lr_schedule_cb)
         
     # Early stopping
-    if conf["early_stopp"]: 
+    if conf["early_stopp_patience"]>0: 
         earlystopp_cb = EarlyStopping(
             monitor='val_loss', 
             verbose=1, 
