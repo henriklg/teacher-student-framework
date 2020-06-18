@@ -460,3 +460,100 @@ def split_and_create_dataset(conf):
                   "val":val_size//conf["batch_size"]}
     
     return train_ds, test_ds, val_ds
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+def create_binary_dataset(conf):
+    """
+    new binary fjkalsdø
+    """
+    global POS_CLASS_NAMES
+    global IMG_SIZE
+    IMG_SIZE = conf["img_shape"][0]
+    # Some parameters
+    data_dir = conf["data_dir"]
+    outcast = conf["outcast"]
+    verbosity = conf["verbosity"]
+
+    pathlib.Path(conf["cache_dir"]).mkdir(parents=True, exist_ok=True)
+    pathlib.Path(conf["log_dir"]).mkdir(parents=True, exist_ok=True)
+    np.random.seed(seed=conf["seed"])
+    AUTOTUNE = tf.data.experimental.AUTOTUNE
+    ds_size = len(list(data_dir.glob('*/*/*.*g')))
+    directories = np.array(
+        [item.name for item in data_dir.glob('train/*') if item.name != 'metadata.json'])
+    
+    # Remove the outcast folder
+    if outcast != None:
+        directories = np.delete(directories, np.where(outcast == directories))
+        if verbosity > 0: print ("Removed outcast:", outcast, end="\n\n")
+
+    ## Print info about the dataset
+    # Binary dataset
+    class_names = np.array(['Negative','Positive'])
+    conf["num_classes"] = len(class_names)
+    neg_class_name = conf['neg_class'] # 'normal'-class
+    pos_class_names = np.delete(directories, np.where(neg_class_name == directories))
+    POS_CLASS_NAMES = pos_class_names
+    
+    # Print info about neg/pos split
+    ds_size, neg_count, pos_count = print_bin_class_info(
+                                        directories, data_dir, 
+                                        ds_size, outcast, class_names, 
+                                        neg_class_name, pos_class_names
+    )
+    conf["neg_count"] = neg_count
+    conf["pos_count"] = pos_count
+    
+    # Create a tf.dataset of the file paths
+    ds = {split: str(data_dir/split/'*/*.*g') for split in ["train", "test", "val"]}
+    ds_sizes = {name:len(list(glob.glob(path))) for (name, path) in ds.items()}
+    ds_sizes["total"] = ds_size
+    
+    if verbosity > 1:
+        print ("Paths to each split:")
+        [print(key) for key in ds.values()]
+        print ()
+    
+    for split in ds:
+        ds[split] = tf.data.Dataset.list_files(
+                                    ds[split],
+                                    shuffle=conf["shuffle_buffer_size"]>1,
+                                    seed=tf.constant(conf["seed"], tf.int64) if conf["seed"] else None
+                                    )
+    # Create dataset of label, image pairs from the tf.dataset of image paths
+    for split in ds:
+        ds[split] = ds[split].map(process_path_bin, num_parallel_calls=AUTOTUNE)
+    
+    # Save a clean copy of training data
+    clean_train = ds["train"]                                
+    
+    # print info about the dataset split
+    if verbosity:
+        cnt_per_class = get_dataset_info(class_names, data_dir, ds_size)
+        print_split_info(ds, class_names, cnt_per_class, ds_sizes)
+    
+    # Cache, shuffle, repeat, batch, prefetch pipeline
+    for split in ds:
+        ds[split] = prepare_for_training(ds[split], split, conf, cache=True)
+    
+    steps = {name:ds_sizes[name]//conf["batch_size"] for (name, data) in ds.items()}
+    conf["class_names"] = class_names
+    conf["ds_sizes"] = ds_sizes
+    conf["steps"] = steps
+    ds["clean_train"] = clean_train
+    
+    return ds
