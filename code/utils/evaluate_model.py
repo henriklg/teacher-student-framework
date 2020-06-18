@@ -161,7 +161,7 @@ def plot_lr_and_accuracy(history, conf):
     
     epochs_range = range(history.epoch[-1]+1)
     
-    if conf["learning_schedule"]:
+    if conf["decay_rate"] > 0:
         lr = history.history['lr']
         # Plot the learning rate
         plt.figure(figsize=(8, 6))
