@@ -2,11 +2,13 @@
 Split dataset into train/test/val and resize images to correct size.
 
 The dataset comes in the following format:
-    data_folder/
+    data_dir/
         image1
         image2
         image3
         ...
+
+Example: py build_unlabeled_dataset.py --data_dir unlabeled --output_dir unlabeled_ttv --size 128
 """
 
 import argparse

@@ -2,11 +2,13 @@
 Split dataset into train/test/val and resize images to correct size.
 
 The dataset comes in the following format:
-    data_folder/
+    data_dir/
         class1
         ... images
         class2/
         ... images
+        
+Example: py build_dataset.py --data_dir labeled --output_dir labeled_ttv --split 0.7 0.15 --size 128
 """
 
 import argparse
@@ -22,7 +24,7 @@ from tqdm import tqdm
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_dir', default='data', help="Directory with the dataset")
 parser.add_argument('--output_dir', default='data', help="Where to write the new data")
-parser.add_argument('--split', nargs=2, help="Train, test, val split given as [0.7 0.15]")
+parser.add_argument('--split', nargs=2, help="Train, test, val split given as '0.7 0.15'")
 parser.add_argument('--size', default=256, help="Image size")
 parser.add_argument('--seed', default=2511, help="What seed to use when shuffling the data")
 
