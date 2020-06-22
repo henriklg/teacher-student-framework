@@ -121,7 +121,7 @@ def create_dataset(conf):
     
     ### IF BINARY ###
     directories = class_names
-    if conf["ds_info"] == 'binary':
+    if 'binary' in conf["ds_info"] and conf["neg_class"] is not None:
         class_names = np.array(['Negative','Positive'])
         conf["num_classes"] = 2
         conf["class_names"] = class_names
