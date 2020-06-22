@@ -14,23 +14,26 @@ def create_model(conf):
     """
     """
     if conf["model"] == 'EfficientNetB0': 
-        from efficientnet.tfkeras import EfficientNetB0 as EfficientNet # 4.7M params
+        from efficientnet.tfkeras import EfficientNetB0 as Network # 4.7M params
     elif conf["model"] == 'EfficientNetB1': 
-        from efficientnet.tfkeras import EfficientNetB1 as EfficientNet # 7.2M params
+        from efficientnet.tfkeras import EfficientNetB1 as Network # 7.2M params
     elif conf["model"] == 'EfficientNetB2':
-        from efficientnet.tfkeras import EfficientNetB2 as EfficientNet # 8.5M params
+        from efficientnet.tfkeras import EfficientNetB2 as Network # 8.5M params
     elif conf["model"] == 'EfficientNetB3':
-        from efficientnet.tfkeras import EfficientNetB3 as EfficientNet # 11.5M params
+        from efficientnet.tfkeras import EfficientNetB3 as Network # 11.5M params
     elif conf["model"] == 'EfficientNetB4':
-        from efficientnet.tfkeras import EfficientNetB4 as EfficientNet # 18.6M params
+        from efficientnet.tfkeras import EfficientNetB4 as Network # 18.6M params
     elif conf["model"] == 'EfficientNetB5':
-        from efficientnet.tfkeras import EfficientNetB5 as EfficientNet # 29.5M params
+        from efficientnet.tfkeras import EfficientNetB5 as Network # 29.5M params
     elif conf["model"] == 'EfficientNetB6':
-        from efficientnet.tfkeras import EfficientNetB6 as EfficientNet # 42.2M params
+        from efficientnet.tfkeras import EfficientNetB6 as Network # 42.2M params
     elif conf["model"] == 'EfficientNetB7':
-        from efficientnet.tfkeras import EfficientNetB7 as EfficientNet # 65.4M params
+        from efficientnet.tfkeras import EfficientNetB7 as Network # 65.4M params
     
-    efficientnet_base = EfficientNet(
+    elif conf["model"] == 'ResNet50':
+        from tensorflow.keras.applications import ResNet50 as Network # 23,6M params
+        
+    base_model = Network(
         weights=conf["weights"],    # "imagenet", None or "noisy-student"
         include_top=False, 
         input_shape=conf["img_shape"]
@@ -38,11 +41,11 @@ def create_model(conf):
     
     # Unfreeze the layers. I.E we're just using the pre-trained 
     # weights as initial weigths and biases and train over them
-    efficientnet_base.trainable = True
+    base_model.trainable = True
     
     # Define model
     model = Sequential()
-    model.add(efficientnet_base)
+    model.add(base_model)
     model.add(layers.GlobalAveragePooling2D())
     model.add(layers.Dropout(conf["dropout"]))
     model.add(layers.Dense(512, activation='relu'))
