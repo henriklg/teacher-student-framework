@@ -264,7 +264,7 @@ def oversample(ds, cache_name, conf):
         datasets.append(data)
     
     target_dist = [ 1.0/num_classes ] * num_classes
-    balanced_ds = tf.data.experimental.sample_from_datasets(datasets, target_dist, seed=conf["seed"])
+    balanced_ds = tf.data.experimental.sample_from_datasets(datasets, weights=target_dist, seed=conf["seed"])
     
     ## Check the sample distribution after oversampling the dataset
     if conf["verbosity"] > 0:
