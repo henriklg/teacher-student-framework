@@ -50,7 +50,7 @@ def generate_labels(pseudo, count, unlab_ds, model, conf):
                 pseudo["name_list"].append(path)
 
                 # For every 1000 pseudo label found, save results in case of crash
-                if not count["findings"]%1000 and count["findings"]>100:
+                if not count["findings"]%2000 and count["findings"]>100:
                     plot_and_save(pseudo["lab_list"])
                     with open(conf["log_dir"]+"/pseudo_labels.pkl", 'wb') as f:
                         pickle.dump(pseudo, f)
@@ -115,17 +115,22 @@ def custom_sort(pseudo):
 
 
 
-def resample_unlab(pseudo, orig_dist,  conf):
+def resample_unlab(pseudo, orig_dist, conf, limit=0):
     """
     Resample unlabeled dataset based upon a given distribution.
     """
     added = {}
+    total_added = 0
     
-    num_to_match = np.max(orig_dist)
-    idx_to_match = np.argmax(orig_dist)
+    if limit is 0:
+        limit = int(np.max(orig_dist))
+        limit_set_by = conf["class_names"][np.argmax(orig_dist)]
+    else:
+        limit_set_by = 'user'
+        
     if conf["verbosity"]:
-        print ('Limit set by {} with {} samples'.format(conf["class_names"][idx_to_match], int(num_to_match)))
-        print ("-"*40)
+        print ('Limit set by {} with {} samples'.format(limit_set_by, limit))
+        print ("-"*50)
 
     new_findings = ([], [])
     new_findings_filepaths = []
@@ -140,22 +145,28 @@ def resample_unlab(pseudo, orig_dist,  conf):
 
         count = 0
         for count, idx in enumerate(indexes, start=1):
-            if in_count >= num_to_match:
+            if in_count >= limit:
                 count -= 1 # reduce by one cuz of enumerate updates index early
                 break
             fn = pseudo["name_list"][idx]
             img = fn2img(fn, conf["unlab_dir"], conf["img_shape"][0])
             
-            new_findings[0].append(img)                            # image
+            new_findings[0].append(img)                             # image
             new_findings[1].append(pseudo["lab_list"][idx])         # label
             new_findings_filepaths.append(pseudo["name_list"][idx]) # filepath
             in_count += 1
-        
+            
+        total_added += count
         if conf["verbosity"]:
-            print ("{:27}: added {}/{} samples.".format(conf["class_names"][class_idx], count, num_new_findings))
+            print ("{:27}: added {}/{} samples".format(conf["class_names"][class_idx], count, num_new_findings))
             
         added[conf["class_names"][class_idx]] = [count, num_new_findings]
     write_to_file(added, conf, 'samples_added_to_train')
+    
+    if conf["verbosity"]:
+        print ("-"*50)
+        text = "Added a total of {} samples to the training dataset. New dataset size is {}."
+        print (text.format(total_added, conf["ds_sizes"]["train"] + total_added))
         
     return new_findings, new_findings_filepaths
 
@@ -181,11 +192,11 @@ def reduce_dataset(ds, remove=None):
 
 
 
-def resample_and_combine(ds, conf, pseudo, pseudo_sorted, datasets_bin):
+def resample_and_combine(ds, conf, pseudo, pseudo_sorted, datasets_bin, limit=0):
     """
     """
     if conf["resample"]:
-        new_findings, added_samples = resample_unlab(pseudo_sorted, datasets_bin[-1], conf)
+        new_findings, added_samples = resample_unlab(pseudo_sorted, datasets_bin[-1], conf, limit=limit)
         # create tf.tensor of the new findings
         findings_tensor = tf.data.Dataset.from_tensor_slices(new_findings)
     else:
@@ -222,7 +233,10 @@ def update_sanity(sanity, added_count, datasets_bin, conf):
               })
     write_to_file(sanity, conf, "sanity")
     
+    # Update dataset sizes
     conf["ds_sizes"]["unlab"] -= added_count
+    conf["ds_sizes"]["train"] = sanity[-1]["curr_train_size"]
+    conf["steps"]["train"] = sanity[-1]["curr_train_size"]//conf["batch_size"] 
     return sanity, conf
 
 
