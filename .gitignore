@@ -36,3 +36,5 @@ experiments/
 thesis/build/*
 #!thesis/build/*.pdf
 *.pdf
+
+*.json
