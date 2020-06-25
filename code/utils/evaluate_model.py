@@ -233,11 +233,13 @@ def evaluate_model(model, history, ds, conf):
     true_labels = list(eval_ds[:,1])
     eval_images = np.stack(eval_ds[:,0], axis=0)
 
-    # Save the metrics from training
+    # Save the metrics and model from training
     write_to_file(history.history, conf, "history")
     write_to_file(conf, conf, "conf")
     with open(conf["log_dir"]+"/history.pkl", 'wb') as f:
         pickle.dump(history.history, f)
+    if conf["num_epochs"] > 9:
+        model.save(conf["log_dir"]+'/model')
         
     # Plot leanring rate and loss
     plot_lr_and_accuracy(history, conf)
