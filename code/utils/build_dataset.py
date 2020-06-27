@@ -25,14 +25,15 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--data_dir', default='data', help="Directory with the dataset")
 parser.add_argument('--output_dir', default='data', help="Where to write the new data")
 parser.add_argument('--split', nargs=2, help="Train, test, val split given as '0.7 0.15'")
-parser.add_argument('--size', default=256, help="Image size")
+parser.add_argument('--size', default=0, help="Resize to this resolution. Default is to use orginal resolution.")
 parser.add_argument('--seed', default=2511, help="What seed to use when shuffling the data")
 
 def resize_and_save(filename, output_dir, size):
     """Resize the image contained in `filename` and save it to the `output_dir`"""
     image = cv2.imread(filename, cv2.IMREAD_UNCHANGED)
     # Use bilinear interpolation instead of the default "nearest neighbor" method
-    image = cv2.resize(image, (size, size), interpolation=cv2.INTER_LINEAR)
+    if size > 1:
+      image = cv2.resize(image, (size, size), interpolation=cv2.INTER_LINEAR)
     path = os.path.join(output_dir, filename.split('/')[-1])
     cv2.imwrite(path, image)
     
