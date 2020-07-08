@@ -248,10 +248,11 @@ def checkout_findings(pseudo, conf, show=True):
     """
     ### Create images with label names
     class_label_img = []
-    font_path = '/usr/share/fonts/truetype/ubuntu/UbuntuMono-B.ttf'
+#     font_path = '/usr/share/fonts/truetype/ubuntu/UbuntuMono-B.ttf'
+    font_path = '/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf'
     img_width = 512
-    font_size = int(img_width*0.15)
-    letters_per_line = 13
+    font_size = int(img_width*0.14) #hypkva 15
+    letters_per_line = 12           #hypkva 13
 
     for i in range(conf["num_classes"]):
         img = Image.new('RGB', (img_width, img_width), color = (0, 0, 0))
