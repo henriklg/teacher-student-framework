@@ -228,7 +228,7 @@ def show_dataset_predictions(true_labels, pred_labels, pred_confidence, images, 
 
 def evaluate_model(model, history, ds, conf):
     # Create true_labels and pred_labels for later evaluations
-    eval_ds = unpipe(ds["val"], conf["ds_sizes"]["val"]).as_numpy_iterator()
+    eval_ds = unpipe(ds["test"], conf["ds_sizes"]["test"]).as_numpy_iterator()
     eval_ds = np.array(list(eval_ds))
     true_labels = list(eval_ds[:,1])
     eval_images = np.stack(eval_ds[:,0], axis=0)
@@ -245,7 +245,7 @@ def evaluate_model(model, history, ds, conf):
     plot_lr_and_accuracy(history, conf)
     
     # Evaluate model on test dataset
-    model_evaluation = model.evaluate(ds["val"], verbose=2, steps=conf["steps"]["val"])
+    model_evaluation = model.evaluate(ds["test"], verbose=2, steps=conf["steps"]["test"])
     write_to_file(model_evaluation, conf, "evaluate_val")
     
     # Create predictions and pred_labels
