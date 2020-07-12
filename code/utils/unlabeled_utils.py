@@ -200,6 +200,7 @@ def resample_and_combine(ds, conf, pseudo, pseudo_sorted, datasets_bin, limit=0)
         # create tf.tensor of the new findings
         findings_tensor = tf.data.Dataset.from_tensor_slices(new_findings)
     else:
+        # NB: this uses the un-sorted list of labels
         added_samples = pseudo["name_list"]
         img_list = [fn2img(name, conf["unlab_dir"], conf["img_shape"][0]) for name in pseudo["name_list"]]
         findings_tensor = tf.data.Dataset.from_tensor_slices((img_list, pseudo["lab_list"]))
@@ -210,6 +211,8 @@ def resample_and_combine(ds, conf, pseudo, pseudo_sorted, datasets_bin, limit=0)
 
     # count samples in the new/combined dataset
     datasets_bin.append(tf_bincount(ds["combined_train"], conf["num_classes"]))
+    with open(conf["log_dir"]+"/datasets_bin.pkl", 'wb') as f:
+        pickle.dump(datasets_bin, f)
 
     # History of class distribution
     print_bar_chart(
