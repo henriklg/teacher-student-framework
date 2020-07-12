@@ -163,6 +163,21 @@ def print_bar_chart(data, conf, title=None, fname=None, figsize=(15,6), show=Tru
     Takes in list of data and makes a bar chart of it.
     Dynamically allocates placement for bars.
     """
+    import seaborn as sns
+    sns.set()
+
+    SMALL_SIZE = 12
+    MEDIUM_SIZE = 14
+    BIGGER_SIZE = 16
+
+    plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+    plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
+    plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+    plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+    plt.rc('legend', fontsize=MEDIUM_SIZE)    # legend fontsize
+    plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+    
     x = np.arange(conf["num_classes"])
     width = 0.7      # 1.0 = bars side by side
     width = width/len(data)
