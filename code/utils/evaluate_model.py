@@ -227,12 +227,6 @@ def show_dataset_predictions(true_labels, pred_labels, pred_confidence, images, 
 
 
 def evaluate_model(model, history, ds, conf):
-    # Create true_labels and pred_labels for later evaluations
-    eval_ds = unpipe(ds["test"], conf["ds_sizes"]["test"]).as_numpy_iterator()
-    eval_ds = np.array(list(eval_ds))
-    true_labels = list(eval_ds[:,1])
-    eval_images = np.stack(eval_ds[:,0], axis=0)
-
     # Save the metrics and model from training
     write_to_file(history.history, conf, "history")
     write_to_file(conf, conf, "conf")
@@ -240,12 +234,18 @@ def evaluate_model(model, history, ds, conf):
         pickle.dump(history.history, f)
     if conf["num_epochs"] > 9:
         model.save(conf["log_dir"]+'/model')
-        
-    # Plot leanring rate and loss
+    
+    # Plot learning rate and loss
     plot_lr_and_accuracy(history, conf)
     
+    # Create true_labels and pred_labels for later evaluations
+    eval_ds = unpipe(ds["test"], conf["ds_sizes"]["test"]).as_numpy_iterator()
+    eval_ds = np.array(list(eval_ds))
+    true_labels = list(eval_ds[:,1])
+    eval_images = np.stack(eval_ds[:,0], axis=0)
+    
     # Evaluate model on test dataset
-    model_evaluation = model.evaluate(ds["test"], verbose=2, steps=conf["steps"]["test"])
+    model_evaluation = model.evaluate(ds["test"], verbose=0, steps=conf["steps"]["test"])
     write_to_file(model_evaluation, conf, "evaluate_val")
     
     # Create predictions and pred_labels
